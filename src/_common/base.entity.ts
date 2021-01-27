@@ -3,19 +3,20 @@ import { Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, Bas
 export abstract class AbstractBaseEntity extends BaseEntity {
 
     @PrimaryGeneratedColumn('uuid')
-    Id: number;
+    id: number;
+
     @Column()
-    CreatedBy: string
+    createdBy: string
 
-    @CreateDateColumn('CreatedAt')
-    CreatedAt: Date
+    @CreateDateColumn({ name: 'createdAt', default: new Date() })
+    createdAt: Date
 
-    @UpdateDateColumn('UpdatedAt')
-    LastUpdatedAt: Date
-
-    @Column({ type: 'bool', default: false })
-    IsDeleted: boolean = false;
+    @UpdateDateColumn({ name: 'updatedAt', nullable: true })
+    updatedAt: Date
 
     @Column({ type: 'bool', default: false })
-    IsSystemDefined: boolean = false;
+    isDeleted: boolean = false;
+
+    @Column({ type: 'bool', default: false })
+    isSystemDefined: boolean = false;
 }

@@ -9,4 +9,8 @@ export class CreateSectorDto {
     @IsString()
     @IsNotEmpty()
     readonly description: string;
+
+    @IsString()
+    @IsNotEmpty()
+    readonly createdBy: string;
 }

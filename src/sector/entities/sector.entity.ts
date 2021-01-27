@@ -4,7 +4,7 @@ import { AbstractBaseEntity } from "src/_common/base.entity";
 
 @Entity('Sector')
 export class SectorEntity extends AbstractBaseEntity{
-    @Column()
+    @Column({unique : true})
     name : string
 
     @Column()
