@@ -8,6 +8,9 @@ export abstract class AbstractBaseEntity extends BaseEntity {
     @Column()
     createdBy: string
 
+    @Column({nullable: true })
+    updatedBy: string
+
     @CreateDateColumn({ name: 'createdAt', default: new Date() })
     createdAt: Date
 
