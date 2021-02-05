@@ -3,7 +3,6 @@ import { Repository, EntityRepository, DeleteResult } from 'typeorm';
 import { CreateSectorDto } from './dto/create-sector.dto';
 import { UpdateSectorDto } from './dto/update-sector.dto';
 import { SectorEntity } from './entities/sector.entity';
-import { SectorRO } from './sector.interface';
 
 @EntityRepository(SectorEntity)
 export class SectorRepository extends Repository<SectorEntity> {
