@@ -1,34 +1,62 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CreateAccountDto } from './dto/create-account.dto';
-import { UpdateAccountDto } from './dto/update-account.dto';
-import { AccountEntity } from './entities/account.entity';
+import { CooperateDTO } from './dto/cooperate.dto';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { IndividualDTO } from './dto/individual.dto';
+import { RegisterDto, LoginDto } from './dto/auth-credential.dto';
+import { CooperateRO, IndividualRO, UserRO } from './interfaces/account.interface';
+import { JwtPayload, UserDataRO } from './interfaces/user.interface';
+import { JwtService } from '@nestjs/jwt';
+import { AccountRepository } from './AccountRepository';
 
 @Injectable()
 export class AccountService {
   constructor(
-    @InjectRepository(AccountEntity)
-    private readonly userRepository: Repository<AccountEntity>
-  ) {}
+    private readonly accountRepository: AccountRepository,
+    private jwtService: JwtService,
+  ) { }
 
-  create(createAccountDto: CreateAccountDto) {
-    return 'This action adds a new account';
+  public async login(loginDto: LoginDto): Promise<UserRO> {
+    const email = await this.accountRepository.validateUserPassword(loginDto);
+    if (!email) {
+      throw new HttpException({message: `Invalid email or password`}, HttpStatus.UNAUTHORIZED);
+    }
+    const payload: JwtPayload = { email };
+    const accessToken = await this.jwtService.sign(payload);
+    console.log(`Generated JWT Token with payload ${JSON.stringify(payload)}`);
+
+    let dataToReturn = { email, token: accessToken, expires_in: 86400 };
+    return dataToReturn;
   }
 
-  findAll() {
-    return `This action returns all account`;
+  public async register(registerDto: RegisterDto): Promise<string> {
+    return this.accountRepository.register(registerDto);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} account`;
+  public async findAll(): Promise<UserDataRO[]> {
+    return await this.accountRepository.find();
   }
 
-  update(id: number, updateAccountDto: UpdateAccountDto) {
-    return `This action updates a #${id} account`;
+  public async findOne(id: string): Promise<UserDataRO> {
+    return await this.accountRepository.getById(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} account`;
+  public async findByEmail(email: string): Promise<UserDataRO> {
+    return await this.accountRepository.findByEmail(email);
   }
+
+  public async createIndividual(toCreate: IndividualDTO): Promise<IndividualRO> {
+    return await this.accountRepository.save(toCreate);
+  }
+
+  public async createCooperate(toCreate: CooperateDTO): Promise<CooperateRO> {
+    return await this.accountRepository.save(toCreate);
+  }
+
+  public async updateIndividual(id: string, toUpdate: IndividualDTO): Promise<IndividualRO> {
+    return await this.accountRepository.updateIndividual(id, toUpdate);
+  }
+
+  public async updateCooperate(id: string, toUpdate: CooperateDTO): Promise<CooperateRO> {
+    return await this.accountRepository.updateCooperate(id, toUpdate);
+  }
+
 }

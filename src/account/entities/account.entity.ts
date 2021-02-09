@@ -1,6 +1,7 @@
-import { IsDate, IsEmail, IsFQDN, IsInt, IsNumber, Length, Min } from "class-validator";
+import { IsDate, IsEmail, IsFQDN, IsInt, Length } from "class-validator";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { Column, Entity } from "typeorm";
+import * as bcrypt from 'bcrypt';
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
@@ -9,128 +10,138 @@ export class AccountEntity extends AbstractBaseEntity {
     @IsEmail()
     @Length(128)
     @Column({ unique: true, length: 128 })
-    email: string
+    public email: string;
 
-    @Min(8)
     @Column()
-    password: string
+    public password: string;
 
     @Length(128)
     @Column({ length: 128 })
-    accounType: string
+    public accounType: string;
 
     @Length(128)
     @Column({ length: 128 })
-    accountPackage: string
+    public accountPackage: string;
 
     @Length(128)
     @Column({ length: 128, nullable: true })
-    accountStatus: string
+    public accountStatus: string;
 
-    @Column({ default: false })
-    isLocked: boolean
+    @Column({ type: 'bool', default: false })
+    public isLocked: boolean = false;
 
-    @Column({ default: true })
-    isActive: boolean
+    @Column({ type: 'bool', default: true })
+    public isActive: boolean = true;
 
-    @Column({ default: false })
-    pcnVerified: boolean
+    @Column({ type: 'bool', default: false })
+    public pcnVerified: boolean = false;
 
-    @Column({ default: false })
-    isReported: boolean
-
-    @IsNumber()
-    @Length(128)
-    @Column({ length: 128 })
-    phoneNumber: string
+    @Column({ type: 'bool', default: false })
+    public isReported: boolean;
 
     @Length(128)
-    @Column({ length: 128 })
-    country: string
+    @Column({ length: 128, nullable: true })
+    public phoneNumber: string;
 
     @Length(128)
-    @Column({ length: 128 })
-    state: string
+    @Column({ length: 128, nullable: true })
+    public country: string;
+
+    @Length(128)
+    @Column({ length: 128, nullable: true })
+    public state: string;
 
     @Length(200)
-    @Column({ length: 200 })
-    lga: string
+    @Column({ length: 200, nullable: true })
+    public lga: string;
 
     @Length(200)
-    @Column({ length: 200 })
-    city: string
+    @Column({ length: 200, nullable: true })
+    public city: string;
 
     @Length(200)
-    @Column({ length: 200 })
-    address: string
+    @Column({ length: 200, nullable: true })
+    public address: string;
 
     @Length(50)
-    @Column({ default: '', length: 50 })
-    pcn: string
+    @Column({ nullable: true, length: 50 })
+    public pcn: string;
 
     @Length(128)
-    @Column({ default: '', length: 128 })
-    sectorId: string
+    @Column({ nullable: true, length: 128 })
+    public sectorId: string;
 
-    @Column()
-    longitude: number
+    @Column({type: 'float',  default: 0 })
+    public longitude: number;
 
-    @Column()
-    latitude: number
+    @Column({type: 'float',  default: 0 })
+    public latitude: number;
 
-    @Column({ default: '' })
-    profileImage: string
+    @Column({ nullable: true })
+    public profileImage: string;
 
     // individual
     @Length(256)
-    @Column({ length: 256, default: '' })
-    firstName: string
+    @Column({ length: 256, nullable: true })
+    public firstName: string;
 
     @Length(256)
-    @Column({ length: 256, default: '' })
-    lastName: string
+    @Column({ length: 256, nullable: true })
+    public lastName: string;
 
     @IsDate()
     @Column({ nullable: true })
-    dateOfBirth: Date
+    public dateOfBirth: Date;
 
-    @Column({ default: false })
-    isPracticing: boolean
+    @Column({ type: 'bool', default: false })
+    public isPracticing: boolean = false;
+
+    @Length(20)
+    @Column({ length: 20, nullable: true })
+    public gender: string;
 
     // co-operation 
     @Length(256)
-    @Column({ length: 256, default: '' })
-    organizationName: string
+    @Column({ length: 256, nullable: true })
+    public organizationName: string;
 
     @Length(128)
-    @Column({ length: 128, default: '' })
-    organizationType: string
+    @Column({ length: 128, nullable: true })
+    public organizationType: string;
 
     @IsInt()
-    @Column()
-    numberofEmployees: number
+    @Column({ default: 0 })
+    public numberofEmployees: number;
 
-    @Column({ default: '' })
-    premisesImage?: string
+    @Column({ nullable: true })
+    public premisesImage: string;
 
     @Length(50)
     @Column({ length: 50, default: '' })
-    companyRegistrationNumber?: string
+    public companyRegistrationNumber?: string;
 
     @IsInt()
-    @Column({default: 0})
-    yearofEstablishment: number
-
-    @IsDate()
-    @Column('timestamp', {default: (): string => 'LOCALTIMESTAMP' })
-    openingTime?: Date
+    @Column({ default: 0 })
+    public yearofEstablishment: number;
 
     @IsDate()
     @Column('timestamp', { default: (): string => 'LOCALTIMESTAMP' })
-    closingTime?: Date
+    public openingTime?: Date;
+
+    @IsDate()
+    @Column('timestamp', { default: (): string => 'LOCALTIMESTAMP' })
+    public closingTime?: Date;
 
     @IsFQDN()
-    @Column({ default: '' })
-    website?: string
+    @Column({ nullable: true })
+    public website: string;
+
+    @Column()
+    public salt: string;
+
+    async validatePassword(password: string): Promise<boolean> {
+        const hash = await bcrypt.hash(password, this.salt);
+        return hash === this.password;
+    }
 }
 
