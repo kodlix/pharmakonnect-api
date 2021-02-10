@@ -56,7 +56,7 @@ export class AccountRepository extends Repository<AccountEntity> {
     }
 
     public async findByEmail(email: string): Promise<UserDataRO | undefined> {
-        const result = await this.findOne({ email });
+        const result = await this.findOne({ where: { email: email } });
         if (!result) {
             throw new HttpException({ message: `${email} does not exists` }, HttpStatus.NOT_FOUND);
         }
