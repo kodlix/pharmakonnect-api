@@ -12,7 +12,6 @@ export class IndividualDTO extends BaseAccountDTO {
     @IsNotEmpty()
     @ApiProperty()
     readonly lastName: string;
-    @IsDate()
     @IsNotEmpty()
     @ApiProperty()
     readonly dateOfBirth: Date;
@@ -22,4 +21,6 @@ export class IndividualDTO extends BaseAccountDTO {
     @IsNotEmpty()
     @ApiProperty()
     readonly gender: string;
+    @ApiProperty()
+    readonly isRegComplete: boolean = false;
 }

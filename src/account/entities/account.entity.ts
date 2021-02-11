@@ -1,4 +1,4 @@
-import { IsDate, IsEmail, IsFQDN, IsInt, Length } from "class-validator";
+import { IsEmail, IsFQDN, Length } from "class-validator";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { Column, Entity } from "typeorm";
 import * as bcrypt from 'bcrypt';
@@ -17,7 +17,7 @@ export class AccountEntity extends AbstractBaseEntity {
 
     @Length(128)
     @Column({ length: 128 })
-    public accounType: string;
+    public accountType: string;
 
     @Length(128)
     @Column({ length: 128 })
@@ -80,6 +80,9 @@ export class AccountEntity extends AbstractBaseEntity {
     @Column({ nullable: true })
     public profileImage: string;
 
+    @Column({ type: 'bool', default: false })
+    public isRegComplete: boolean = false;
+
     // individual
     @Length(256)
     @Column({ length: 256, nullable: true })
@@ -89,8 +92,7 @@ export class AccountEntity extends AbstractBaseEntity {
     @Column({ length: 256, nullable: true })
     public lastName: string;
 
-    @IsDate()
-    @Column({ nullable: true })
+    @Column({ type: 'date', nullable: true })
     public dateOfBirth: Date;
 
     @Column({ type: 'bool', default: false })
@@ -109,8 +111,7 @@ export class AccountEntity extends AbstractBaseEntity {
     @Column({ length: 128, nullable: true })
     public organizationType: string;
 
-    @IsInt()
-    @Column({ default: 0 })
+    @Column({type: 'int', default: 0 })
     public numberofEmployees: number;
 
     @Column({ nullable: true })
@@ -120,17 +121,14 @@ export class AccountEntity extends AbstractBaseEntity {
     @Column({ length: 50, default: '' })
     public companyRegistrationNumber?: string;
 
-    @IsInt()
-    @Column({ default: 0 })
+    @Column({type: 'int', default: 0 })
     public yearofEstablishment: number;
 
-    @IsDate()
     @Column('timestamp', { default: (): string => 'LOCALTIMESTAMP' })
-    public openingTime?: Date;
+    public openingTime: Date;
 
-    @IsDate()
     @Column('timestamp', { default: (): string => 'LOCALTIMESTAMP' })
-    public closingTime?: Date;
+    public closingTime: Date;
 
     @IsFQDN()
     @Column({ nullable: true })

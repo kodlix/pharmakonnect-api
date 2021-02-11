@@ -11,8 +11,11 @@ export interface UserDataRO {
     profileImage: string;
     longitude: number;
     latitude: number;
+    isLocked: boolean;
+    isRegComplete: boolean;
+    accountType: string;
 }
 
 export interface JwtPayload {
     email: string;
-  }
+}

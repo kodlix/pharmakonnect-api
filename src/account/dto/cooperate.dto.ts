@@ -25,10 +25,8 @@ export class CooperateDTO extends BaseAccountDTO {
     @IsNotEmpty()
     @ApiProperty()
     readonly yearofEstablishment: number;
-    @IsDate()
     @ApiProperty()
     readonly openingTime: Date;
-    @IsDate()
     @ApiProperty()
     readonly closingTime: Date;
     @IsString()
