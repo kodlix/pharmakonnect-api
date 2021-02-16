@@ -7,7 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SectorModule } from './sector/sector.module';
 import { CountryModule } from './country/country.module';
 import { StateModule } from './state/state.module';
-import { CityModule } from './city/city.module';
+import { LgaModule } from './lga/lga.module';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { CityModule } from './city/city.module';
     SectorModule,
     CountryModule,
     StateModule,
-    CityModule
+    LgaModule
   ],
   controllers: [AppController],
   providers: [AppService],

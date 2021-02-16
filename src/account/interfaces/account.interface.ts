@@ -24,7 +24,7 @@ export interface IndividualRO {
     profileImage: string;
 }
 
-export interface CooperateRO {
+export interface CorperateRO {
     id: string;
     email: string;
     organizationName: string;

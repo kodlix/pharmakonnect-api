@@ -1,8 +1,8 @@
-import { CooperateDTO } from './dto/cooperate.dto';
+import { CorperateDTO } from './dto/cooperate.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { IndividualDTO } from './dto/individual.dto';
 import { RegisterDTO, LoginDTO, LockUserDTO } from './dto/credential.dto';
-import { CooperateRO, IndividualRO, UserRO } from './interfaces/account.interface';
+import { CorperateRO, IndividualRO, UserRO } from './interfaces/account.interface';
 import { JwtPayload, UserDataRO } from './interfaces/user.interface';
 import { JwtService } from '@nestjs/jwt';
 import { AccountRepository } from './AccountRepository';
@@ -16,9 +16,12 @@ export class AccountService {
 
   public async login(loginDto: LoginDTO): Promise<UserRO> {
     const user = await this.accountRepository.validateUserPassword(loginDto);
+    if (!user) {
+      throw new HttpException({ error: `Invalid email or password` }, HttpStatus.BAD_REQUEST);
+    }
     const { email, accountPackage, isRegComplete, accountType } = user
     if (!email) {
-      throw new HttpException({ message: `Invalid email or password` }, HttpStatus.UNAUTHORIZED);
+      throw new HttpException({ error: `Invalid email or password` }, HttpStatus.UNAUTHORIZED);
     }
     const payload: JwtPayload = { email };
     const accessToken = await this.jwtService.sign(payload);
@@ -48,7 +51,7 @@ export class AccountService {
     return await this.accountRepository.updateUser(email, toUpdate);
   }
 
-  public async updateCorperate(email: string, toUpdate: CooperateDTO): Promise<CooperateRO> {
+  public async updateCorperate(email: string, toUpdate: CorperateDTO): Promise<CorperateRO> {
     return await this.accountRepository.updateUser(email, toUpdate);
   }
 

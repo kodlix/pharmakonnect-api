@@ -3,10 +3,8 @@ import * as bcrypt from 'bcrypt';
 import { AccountEntity } from "./entities/account.entity";
 import { RegisterDTO, LoginDTO, LockUserDTO } from "./dto/credential.dto";
 import { HttpException, HttpStatus } from "@nestjs/common";
-import { CooperateRO, IndividualRO, UserFromDbRO } from "./interfaces/account.interface";
+import { UserFromDbRO } from "./interfaces/account.interface";
 import { UserDataRO } from "./interfaces/user.interface";
-import { CooperateDTO } from "./dto/cooperate.dto";
-import { IndividualDTO } from "./dto/individual.dto";
 
 @EntityRepository(AccountEntity)
 export class AccountRepository extends Repository<AccountEntity> {

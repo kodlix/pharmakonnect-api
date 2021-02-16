@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class CreateCountryDto {
+export class CreateLgaDto {
 
     @IsString()
     @IsNotEmpty()
@@ -14,10 +14,11 @@ export class CreateCountryDto {
     readonly name: string;
 
     @IsString()
+    readonly createdBy: string;
+
+    @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    readonly capital: string;
-    
-    @IsString()
-    readonly createdBy: string;
+    readonly stateId: string;
+
 }
