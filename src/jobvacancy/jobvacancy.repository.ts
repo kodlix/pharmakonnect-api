@@ -1,0 +1,103 @@
+/* eslint-disable prettier/prettier */
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { Repository, EntityRepository, DeleteResult } from 'typeorm';
+import { ApproveJobVacancyDto } from './dto/approve-jobvacancy';
+import { CreateJobVacancyDto } from './dto/create-jobvacancy.dto';
+import { RejectJobVacancyDto } from './dto/reject-jobvacancy';
+import { UpdateJobVacancyDto } from './dto/update-jobvacancy.dto';
+import { JobVacancyEntity } from './entities/jobvacancy.entity';
+
+
+@EntityRepository(JobVacancyEntity)
+export class JobVacancyRepository extends Repository<JobVacancyEntity> {
+    async createEntity(dto: CreateJobVacancyDto): Promise<JobVacancyEntity> {
+            
+        const job = await this.findOne({where : {jobTitle : dto.jobTitle}});
+        const today = new Date();
+        if (job && dto.endDate > today) {
+
+            throw new HttpException({ error: `Job Title with title '${dto.jobTitle}' already exists` }, HttpStatus.BAD_REQUEST);
+        }
+        const jobvacancy = new JobVacancyEntity();
+        //const jobvacancy = await this.create();
+        jobvacancy.createdBy = 'john@netopng.com';
+        jobvacancy.companyUrl = dto.companyUrl;
+        jobvacancy.contactType=dto.contactType;
+        jobvacancy.jobUrl=dto.jobUrl;
+        jobvacancy.jobLocation=dto.jobLocation;
+        jobvacancy.maxSalary=dto.maxSalary;
+        jobvacancy.minSalary=dto.minSalary;
+        jobvacancy.companyRegistrationNumber=dto.companyRegistrationNumber;
+        jobvacancy.nameOfCorporation=dto.nameOfCorporation;
+        jobvacancy.jobDescription=dto.jobDescription;
+        jobvacancy.minimumQualification=dto.minimumQualification;
+        jobvacancy.otherSkills=dto.otherSkills;
+        jobvacancy.jobTitle=dto.jobTitle;
+        jobvacancy.startDate=dto.startDate;
+        jobvacancy.endDate=dto.endDate;
+        jobvacancy.yearOfIncorporation=dto.yearOfIncorporation;
+        jobvacancy.workExperienceInYears=dto.workExperienceInYears;
+
+        return await this.save(jobvacancy);
+    }
+
+    async updateEntity(id: string, dto: UpdateJobVacancyDto): Promise<JobVacancyEntity> {
+
+        const jobvacancy = await this.findOne(id);
+
+        jobvacancy.updatedAt = new Date();
+        jobvacancy.updatedBy = dto.updatedBy;
+        jobvacancy.companyUrl = dto.companyUrl;
+        jobvacancy.contactType = dto.contactType;
+        jobvacancy.jobUrl = dto.jobUrl;
+        jobvacancy.jobLocation = dto.jobLocation;
+        jobvacancy.maxSalary = dto.maxSalary;
+        jobvacancy.minSalary = dto.minSalary;
+        jobvacancy.companyRegistrationNumber = dto.companyRegistrationNumber;
+        jobvacancy.nameOfCorporation = dto.nameOfCorporation;
+        jobvacancy.jobDescription = dto.jobDescription;
+        jobvacancy.minimumQualification = dto.minimumQualification;
+        jobvacancy.otherSkills = dto.otherSkills;
+        jobvacancy.jobTitle = dto.jobTitle;
+        jobvacancy.startDate = dto.startDate;
+        jobvacancy.endDate = dto.endDate;
+        jobvacancy.yearOfIncorporation = dto.yearOfIncorporation;
+        jobvacancy.workExperienceInYears = dto.workExperienceInYears;
+        return await jobvacancy.save();
+    }
+    async updateApprove(id:string, dto:ApproveJobVacancyDto): Promise<JobVacancyEntity>{
+        const jobvacancy = await this.findOne(id);
+       
+        jobvacancy.approvedOn = dto.approvedOn;
+        jobvacancy.approvedBy = dto.approvedBy;
+        jobvacancy.approved = dto.approved
+        return await jobvacancy.save()
+    }
+    
+    async updateReject(id:string, dto:RejectJobVacancyDto): Promise<JobVacancyEntity>{
+        const jobvacancy = await this.findOne(id);
+        jobvacancy.rejected = dto.rejected;
+        jobvacancy.rejectedBy = dto.rejectedBy;
+        jobvacancy.rejectionMessage = dto.rejectionMessage;
+
+        return await jobvacancy.save()
+    }
+
+    async deleteEntity(id: string): Promise<DeleteResult> {
+
+        const jobvacancy = await this.findOne(id);
+        return await this.delete({id:jobvacancy.id});
+        
+    }
+
+    async findById(id: string): Promise<JobVacancyEntity> {
+
+        const jobvacancy = await this.findOne(id);
+        return jobvacancy;
+    }
+
+    async findAll(): Promise<JobVacancyEntity[]> {
+        const jobvacancy = await this.find();
+        return jobvacancy;
+    }
+}
