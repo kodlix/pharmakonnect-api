@@ -2,7 +2,7 @@
     "host": "127.0.0.1",
     "port": 5432,
     "username": "postgres",
-    "password": "!pass4sure",
+    "password": "ifeanyi",
     "database": "pharmaconnectdb",
     "entities": ["dist/**/*.entity.js"],
     "synchronize": true
