@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 // import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
@@ -8,6 +9,7 @@ import { SectorModule } from './sector/sector.module';
 import { CountryModule } from './country/country.module';
 import { StateModule } from './state/state.module';
 import { CityModule } from './city/city.module';
+import { JobVacancyModule } from './jobvacancy/jobvacancy.module';
 
 @Module({
   imports: [
@@ -16,7 +18,8 @@ import { CityModule } from './city/city.module';
     SectorModule,
     CountryModule,
     StateModule,
-    CityModule
+    CityModule,
+    JobVacancyModule
   ],
   controllers: [AppController],
   providers: [AppService],
