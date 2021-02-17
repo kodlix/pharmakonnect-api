@@ -1,19 +1,16 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsNotEmpty, IsString } from "class-validator";
+/* eslint-disable prettier/prettier */
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
 
-export class RejectJobVacancyDto{
-    @ApiProperty()
-    @IsBoolean()
-    @IsNotEmpty()
-    rejected: boolean;
+export class RejectJobVacancyDto {
 
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
     rejectedBy: string;
-  
+
     @ApiProperty()
     @IsString()
-    @IsNotEmpty() 
+    @IsNotEmpty()
     rejectionMessage: string;
 }

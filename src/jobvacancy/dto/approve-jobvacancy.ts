@@ -1,23 +1,18 @@
 /* eslint-disable prettier/prettier */
 
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsEmpty, IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
 export class ApproveJobVacancyDto {
 
     @ApiProperty()
     @IsString()
-    @IsEmpty()
+    @IsNotEmpty()
     approvedOn: Date;
  
     @ApiProperty()
     @IsString()
-    @IsEmpty()
-    approvedBy: string;
-
-    @ApiProperty()
-    @IsBoolean()
     @IsNotEmpty()
-    approved: boolean;
+    approvedBy: string;
 
 }
