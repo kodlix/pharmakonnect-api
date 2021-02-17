@@ -14,9 +14,9 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
 
         const job = await this.findOne({ where: { jobTitle: dto.jobTitle } });
         const today = new Date();
-        if (job && dto.endDate > today) {
+        if (job && dto.endDate < today) {
 
-            throw new HttpException({ error: `End date of Job '${dto.jobTitle}' can not be greater than today` }, HttpStatus.BAD_REQUEST);
+            throw new HttpException({ error: `End date of Job '${dto.jobTitle}' can not be less than today` }, HttpStatus.BAD_REQUEST);
         }
 
         else if (job && dto.endDate < dto.startDate) {
@@ -76,8 +76,6 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         jobvacancy.approvedBy = dto.approvedBy;
         jobvacancy.approved = true;
         jobvacancy.rejected = false;
-        jobvacancy.rejectionMessage = null;
-        jobvacancy.rejectedBy = null;
         return await jobvacancy.save()
     }
 
@@ -88,7 +86,6 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         jobvacancy.approved = false;
         jobvacancy.rejectedBy = dto.rejectedBy;
         jobvacancy.rejectionMessage = dto.rejectionMessage;
-        jobvacancy.approvedBy = null;
 
         return await jobvacancy.save()
     }
