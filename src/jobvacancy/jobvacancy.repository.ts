@@ -20,7 +20,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         }
 
         else if (job && dto.endDate < dto.startDate) {
-            throw new HttpException({ error: `Start date of Job '${dto.jobTitle}' cant be greater End date` }, HttpStatus.BAD_REQUEST);
+            throw new HttpException({ error: `Start date of Job '${dto.jobTitle}' can not be greater than End date` }, HttpStatus.BAD_REQUEST);
         }
         const jobvacancy = new JobVacancyEntity();
         //const jobvacancy = await this.create();
