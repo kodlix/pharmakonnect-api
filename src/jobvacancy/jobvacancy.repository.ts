@@ -16,7 +16,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         const today = new Date();
         if (job && dto.endDate > today) {
 
-            throw new HttpException({ error: `Job Title with title '${dto.jobTitle}' already exists` }, HttpStatus.BAD_REQUEST);
+            throw new HttpException({ error: `End date of Job '${dto.jobTitle}' can not be greater than today` }, HttpStatus.BAD_REQUEST);
         }
 
         else if (job && dto.endDate < dto.startDate) {
