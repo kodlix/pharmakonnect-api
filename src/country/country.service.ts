@@ -18,10 +18,14 @@ export class CountryService {
     const query = this.countryRepository.createQueryBuilder('country');
     if (search) {
       query.andWhere('(country.code LIKE :search OR country.name LIKE :search OR country.capital LIKE :search)',
-       { search: `%${search}%` });
+        { search: `%${search}%` });
     }
     const result = await query.getMany();
     return this.buildArrRO(result);
+  }
+
+  public find() {
+    return this.countryRepository.find();
   }
 
   public async findOne(id: string): Promise<CountryRO> {
@@ -35,17 +39,17 @@ export class CountryService {
   }
 
   public async create(toCreate: CreateCountryDto): Promise<string> {
-    const { code, name, capital, createdBy } = toCreate;
+    const { code, name, capital, id } = toCreate;
     const isExists = await await this.countryRepository.findOne({ code });
     if (isExists) {
       throw new HttpException({ error: `${code} already exists`, status: HttpStatus.BAD_REQUEST },
         HttpStatus.BAD_REQUEST);
     }
     const country = new CountryEntity();
+    country.id = id;
     country.code = code;
     country.name = name;
     country.capital = capital;
-    country.createdBy = createdBy;
     try {
       await country.save();
       return 'Country successfully created';;
@@ -83,8 +87,6 @@ export class CountryService {
       code: data.code,
       name: data.name,
       capital: data.capital,
-      createdBy: data.createdBy,
-      createdAt: data.createdAt
     };
     return country;
   }

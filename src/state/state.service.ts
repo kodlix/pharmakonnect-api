@@ -19,7 +19,7 @@ export class StateService {
     const query = this.stateRepository.createQueryBuilder('state');
     if (search) {
       query.andWhere('(state.code LIKE :search OR state.name LIKE :search OR state.capital LIKE :search)',
-       { search: `%${search}%` });
+        { search: `%${search}%` });
     }
     const result = await query.getMany();
     return this.buildArrRO(result);
@@ -46,7 +46,7 @@ export class StateService {
   }
 
   public async create(toCreate: CreateStateDto): Promise<string> {
-    const { code, name, capital, createdBy } = toCreate;
+    const { code, name } = toCreate;
     const isExists = await await this.stateRepository.findOne({ code });
     if (isExists) {
       throw new HttpException({ error: `${code} already exists`, status: HttpStatus.BAD_REQUEST },
@@ -55,8 +55,6 @@ export class StateService {
     const country = new StateEntity();
     country.code = code;
     country.name = name;
-    country.capital = capital;
-    country.createdBy = createdBy;
     try {
       await country.save();
       return 'State successfully created';;
@@ -87,19 +85,30 @@ export class StateService {
     }
   }
 
+  public find() {
+    return this.stateRepository.find();
+  }
+
+  public addRange(states: StateEntity[]) {
+    try {
+      if (states.length > 0) {
+        this.stateRepository.save(states);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   private buildRO(data: StateEntity) {
     const state = {
       id: data.id,
       code: data.code,
       name: data.name,
-      capital: data.capital,
-      createdBy: data.createdBy,
-      createdAt: data.createdAt,
       countryId: data.countryId
     };
     return state;
   }
-  
+
   public buildArrRO(data: StateEntity[]) {
     let dataArr = [];
     data.forEach(item => {

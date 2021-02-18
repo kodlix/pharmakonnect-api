@@ -1,7 +1,5 @@
 export interface LgaRO {
-    code: string;
+    id: number;
     name: string;
-    createdAt: Date;
-    createdBy: string;
-    stateId: string;
+    stateId: number;
 }

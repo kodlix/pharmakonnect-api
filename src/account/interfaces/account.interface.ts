@@ -32,3 +32,10 @@ export interface CorperateRO {
     pcn: string;
     profileImage: string;
 }
+
+export interface RegisterSeedRO {
+    email: string;
+    password: string;
+    accountType: string;
+    isRegComplete: boolean;
+}

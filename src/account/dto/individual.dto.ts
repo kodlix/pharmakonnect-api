@@ -21,6 +21,5 @@ export class IndividualDTO extends BaseAccountDTO {
     @IsNotEmpty()
     @ApiProperty()
     readonly gender: string;
-    @ApiProperty()
-    readonly isRegComplete: boolean = false;
+    
 }

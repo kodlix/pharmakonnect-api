@@ -44,19 +44,16 @@ export class LgaService {
     return this.buildRO(result);
   }
 
-  public async create(toCreate: CreateLgaDto): Promise<string> {
-    const { code, name, createdBy } = toCreate;
-    const isExists = await await this.lgaRepository.findOne({ code });
+  public async create({ name }: CreateLgaDto): Promise<string> {
+    const isExists = await await this.lgaRepository.findOne({ where: { name: name } });
     if (isExists) {
-      throw new HttpException({ error: `${code} already exists`, status: HttpStatus.BAD_REQUEST },
+      throw new HttpException({ error: `${name} already exists`, status: HttpStatus.BAD_REQUEST },
         HttpStatus.BAD_REQUEST);
     }
-    const country = new LgaEntity();
-    country.code = code;
-    country.name = name;
-    country.createdBy = createdBy;
+    const lga = new LgaEntity();
+    lga.name = name;
     try {
-      await country.save();
+      await lga.save();
       return 'Lga successfully created';;
     } catch (error) {
       throw new HttpException({ error: `An error occured`, status: HttpStatus.INTERNAL_SERVER_ERROR },
@@ -65,14 +62,14 @@ export class LgaService {
   }
 
   public async update(id: string, toUpdate: UpdateLgaDto): Promise<LgaRO> {
-    const country = await this.lgaRepository.findOne(id);
-    if (!country) {
+    const lga = await this.lgaRepository.findOne(id);
+    if (!lga) {
       throw new HttpException({
         error: `lga with id ${id} does not exists`, status: HttpStatus.NOT_FOUND
       }, HttpStatus.NOT_FOUND);
     }
-    const result = await this.lgaRepository.merge(country, toUpdate);
-    await this.lgaRepository.save(country);
+    const result = await this.lgaRepository.merge(lga, toUpdate);
+    await this.lgaRepository.save(lga);
     return this.buildRO(result);
   }
 
@@ -85,13 +82,24 @@ export class LgaService {
     }
   }
 
+  public find() {
+    return this.lgaRepository.find();
+  }
+
+  public addRange(lgas: LgaEntity[]) {
+    try {
+      if (lgas.length > 0) {
+        this.lgaRepository.save(lgas);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   private buildRO(data: LgaEntity) {
     const lga = {
       id: data.id,
-      code: data.code,
       name: data.name,
-      createdBy: data.createdBy,
-      createdAt: data.createdAt,
       stateId: data.stateId
     };
     return lga;

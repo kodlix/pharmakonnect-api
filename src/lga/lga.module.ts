@@ -7,6 +7,7 @@ import { LgaEntity } from './entities/lga.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([LgaEntity])],
   controllers: [LgaController],
-  providers: [LgaService]
+  providers: [LgaService],
+  exports: [LgaService]
 })
 export class LgaModule {}

@@ -5,7 +5,7 @@ import { RegisterDTO, LoginDTO, LockUserDTO } from './dto/credential.dto';
 import { CorperateRO, IndividualRO, UserRO } from './interfaces/account.interface';
 import { JwtPayload, UserDataRO } from './interfaces/user.interface';
 import { JwtService } from '@nestjs/jwt';
-import { AccountRepository } from './AccountRepository';
+import { AccountRepository } from './accountRepository';
 
 @Injectable()
 export class AccountService {
@@ -48,10 +48,12 @@ export class AccountService {
   }
 
   public async updateIndividual(email: string, toUpdate: IndividualDTO): Promise<IndividualRO> {
+    toUpdate.isRegComplete = true;
     return await this.accountRepository.updateUser(email, toUpdate);
   }
 
   public async updateCorperate(email: string, toUpdate: CorperateDTO): Promise<CorperateRO> {
+    toUpdate.isRegComplete = true;
     return await this.accountRepository.updateUser(email, toUpdate);
   }
 

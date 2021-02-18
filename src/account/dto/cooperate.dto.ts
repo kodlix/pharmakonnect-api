@@ -15,7 +15,6 @@ export class CorperateDTO extends BaseAccountDTO {
     @IsInt()
     @ApiProperty()
     readonly numberofEmployees: number;
-    @IsString()
     @ApiProperty()
     readonly premisesImage: string;
     @IsString()

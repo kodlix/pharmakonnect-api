@@ -11,16 +11,9 @@ export class CreateStateDto {
     @IsNotEmpty()
     @ApiProperty()
     readonly name: string;
+    
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    readonly capital: string;
-
-    @IsString()
-    readonly createdBy: string;
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    readonly countryId: string;
+    readonly countryId: number;
 }

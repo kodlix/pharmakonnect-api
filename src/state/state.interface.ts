@@ -1,8 +1,6 @@
 export interface StateRO {
+    id: number;
     code: string;
     name: string;
-    capital: string;
-    createdAt: Date;
-    createdBy: string;
-    countryId: string
+    countryId: number
 }

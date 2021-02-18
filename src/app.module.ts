@@ -8,6 +8,7 @@ import { SectorModule } from './sector/sector.module';
 import { CountryModule } from './country/country.module';
 import { StateModule } from './state/state.module';
 import { LgaModule } from './lga/lga.module';
+import { SeederModule } from './seeder/seeder.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { LgaModule } from './lga/lga.module';
     SectorModule,
     CountryModule,
     StateModule,
-    LgaModule
+    LgaModule,
+    SeederModule
   ],
   controllers: [AppController],
   providers: [AppService],
