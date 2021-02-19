@@ -2,7 +2,7 @@
 
 import { ApiProperty } from "@nestjs/swagger";
 import { IsUrl } from "class-validator";
-import { IsBoolean, IsEmail, IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsString } from "class-validator";
 
 export class UpdateJobVacancyDto {
 
@@ -13,84 +13,77 @@ export class UpdateJobVacancyDto {
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message: 'Name of corporation is required'})
     nameOfCorporation: string;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
     yearOfIncorporation: Date;
 
     @ApiProperty()
     @IsInt()
-    @IsNotEmpty()
     companyRegistrationNumber: number;
-    
+
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
-    @IsUrl()
+    @IsUrl(undefined,{message: "Company Url is not valid."})
     companyUrl: string;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message: 'Description is required'})
     jobDescription: string;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message: 'Qualification is required'})
     minimumQualification: string;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message: 'Job title is required'})
     jobTitle: string;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message: 'Work experience is required'})
     workExperienceInYears: string;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message: 'Location is required'})
     jobLocation: string;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
     otherSkills: string;
 
     @ApiProperty()
     @IsInt()
-    @IsNotEmpty()
     minSalary: number;
 
     @ApiProperty()
     @IsInt()
-    @IsNotEmpty()
     maxSalary: number;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message: 'Start date is required'})
     startDate: Date;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message: 'End date is required'})
     endDate: Date;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
-    @IsUrl()
+    @IsUrl(undefined,{message: 'Job Url is not valid'})
     jobUrl: string;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message: 'Contract Type is required'})
     contactType: string;
 
 }

@@ -103,9 +103,9 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         return jobvacancy;
     }
 
-    async findByAccountId(accountId: string): Promise<JobVacancyEntity> {
+    async findByAccountId(accountId: string): Promise<JobVacancyEntity[]> {
 
-        const jobvacancy = await this.findOne(accountId);
+        const jobvacancy = await this.find({where : {accountId : accountId}});
         return jobvacancy;
     }
 

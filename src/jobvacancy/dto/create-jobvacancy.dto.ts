@@ -2,7 +2,7 @@
 
 import { ApiProperty } from '@nestjs/swagger';
 import { IsUrl } from 'class-validator';
-import { IsString, IsNotEmpty, IsInt, isURL } from 'class-validator';
+import { IsString, IsNotEmpty, IsInt } from 'class-validator';
 
 export class CreateJobVacancyDto {
     @ApiProperty()
@@ -12,23 +12,20 @@ export class CreateJobVacancyDto {
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
+    @IsNotEmpty({message: 'Name of corporation is required'})
     nameOfCorporation: string;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
     yearOfIncorporation: Date;
 
     @ApiProperty()
     @IsInt()
-    @IsNotEmpty()
     companyRegistrationNumber: number;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty({message: 'Url is required'})
-    @IsUrl(undefined,{message: "Company Url must be a URL."})
+    @IsUrl(undefined,{message: "Company Url is not valid."})
     companyUrl: string;
 
     @ApiProperty()
@@ -43,7 +40,7 @@ export class CreateJobVacancyDto {
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty({message: 'Jobtitle is require'})
+    @IsNotEmpty({message: 'Job title is required'})
     jobTitle: string;
 
     @ApiProperty()
@@ -58,22 +55,19 @@ export class CreateJobVacancyDto {
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty({message: 'Skills is required'})
     otherSkills: string;
 
     @ApiProperty()
     @IsInt()
-    @IsNotEmpty({message: 'Min salary is require'})
     minSalary: number;
 
     @ApiProperty()
     @IsInt()
-    @IsNotEmpty({message: 'Max salary is required'})
     maxSalary: number;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty({message: 'Start date is require'})
+    @IsNotEmpty({message: 'Start date is required'})
     startDate: Date;
 
     @ApiProperty()
@@ -83,8 +77,7 @@ export class CreateJobVacancyDto {
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty({message: 'Url is required'})
-    @IsUrl(undefined,{message: 'Job Url must be a url'})
+    @IsUrl(undefined,{message: 'Job Url is not valid'})
     jobUrl: string;
 
     @ApiProperty()

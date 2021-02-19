@@ -1,12 +1,11 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
 import { JobVacancyService } from './jobvacancy.service';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateJobVacancyDto } from './dto/create-jobvacancy.dto';
 import { UpdateJobVacancyDto } from './dto/update-jobvacancy.dto';
 import { ApproveJobVacancyDto } from './dto/approve-jobvacancy';
 import { RejectJobVacancyDto } from './dto/reject-jobvacancy';
-import { AuthGuard } from '@nestjs/passport';
 import { JobVacancyRO } from './jobvacancy.interface';
 
 @Controller('jobvacancy')
@@ -44,8 +43,8 @@ export class JobVacancyController {
   @ApiResponse({ status: 201, description: 'Success.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Get jobvacancy by AccountId' })
-  async findByAccountId(@Param('accountId') accountId: string): Promise<JobVacancyRO> {
-    return await this.jobvacancyService.findOne(accountId);
+  async findByAccountId(@Param('accountId') accountId: string): Promise<JobVacancyRO[]> {
+    return await this.jobvacancyService.findByAccountId(accountId);
   }
 
   @Put(':id')
