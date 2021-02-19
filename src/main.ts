@@ -28,6 +28,7 @@ async function bootstrap() {
     .setTitle('Pharma Connect API')
     .setDescription('Pharma Connect API description')
     .setVersion('1.0')
+    .addBearerAuth()
     .addTag('api')
     .build();
   const document = SwaggerModule.createDocument(app, config);
