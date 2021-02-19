@@ -103,6 +103,13 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         return jobvacancy;
     }
 
+    async findByAccountId(accountId: string): Promise<JobVacancyEntity> {
+
+        const jobvacancy = await this.findOne(accountId);
+        return jobvacancy;
+    }
+
+
     async findAll(): Promise<JobVacancyEntity[]> {
         const jobvacancy = await this.find();
         return jobvacancy;

@@ -1,7 +1,9 @@
+/* eslint-disable prettier/prettier */
 import { IsEmail, IsFQDN, Length } from "class-validator";
 import { AbstractBaseEntity } from "src/_common/base.entity";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 import * as bcrypt from 'bcrypt';
+import { JobVacancyEntity } from "src/jobvacancy/entities/jobvacancy.entity";
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
@@ -136,6 +138,9 @@ export class AccountEntity extends AbstractBaseEntity {
 
     @Column()
     public salt: string;
+
+    @OneToMany(() => JobVacancyEntity, s => s.account)
+    jobVacancy: JobVacancyEntity[];
 
     async validatePassword(password: string): Promise<boolean> {
         const hash = await bcrypt.hash(password, this.salt);

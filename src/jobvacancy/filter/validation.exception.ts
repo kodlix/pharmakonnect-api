@@ -1,9 +1,9 @@
-/* eslint-disable prettier/prettier */
-import { BadRequestException } from "@nestjs/common";
+// /* eslint-disable prettier/prettier */
+// import { BadRequestException } from "@nestjs/common";
 
 
-export class ValidationException extends BadRequestException{
-constructor (public validationError: string[] ){
-        super()
-    }
-}
+// export class ValidationException extends BadRequestException{
+// constructor (public validationError: string[] ){
+//         super()
+//     }
+// }
