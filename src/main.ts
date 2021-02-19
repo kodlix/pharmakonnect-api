@@ -1,29 +1,29 @@
-import { ValidationError, ValidationPipe } from '@nestjs/common';
+/* eslint-disable prettier/prettier */
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { ValidationException } from './jobvacancy/filter/validation.exception';
-import { ValidationFilter } from './jobvacancy/filter/validation.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // @TODO refactor error validations
-  app.useGlobalFilters(new ValidationFilter());
-  app.useGlobalPipes(
-    new ValidationPipe({
-      exceptionFactory: (errors: ValidationError[]) => {
-        const messages = errors.map(
-          (error) => `${error.property} has wrong value ${error.value},
-            ${Object.values(error.constraints).join(',')}`,
-        );
-        return new ValidationException(messages);
-      },
-    }),
-  );
+  // app.useGlobalFilters(
+  //   //new FallbackExceptionsFilter(),
+  //   //new HttpExceptionFilter(),
+  //   //new ValidationFilter()
+  // );
 
-  // app.useGlobalPipes(new ValidationPipe());
-  app.setGlobalPrefix('api');
+  // app.useGlobalPipes( new ValidationPipe({
+  //     // exceptionFactory: (errors: ValidationError[])=>{
+  //     //   const messages = errors.map(
+  //     //     error=> `${error.property} has wrong value ${error.value},
+  //     //     ${Object.values(error.constraints).join(',') }`
+  //     //   )
+  //     //     return new ValidationException(messages)
+  //     // }
+  //   })
+  // )
+  app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()
     .setTitle('Pharma Connect API')
     .setDescription('Pharma Connect API description')

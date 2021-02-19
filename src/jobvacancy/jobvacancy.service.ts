@@ -26,6 +26,10 @@ export class JobVacancyService {
     return await this.jobvacancyRepository.findById(id);
   }
 
+  async findByAccountId(accountId: string): Promise<JobVacancyRO[]> {
+    return await this.jobvacancyRepository.findByAccountId(accountId);
+  }
+
   async update(id: string, dto: UpdateJobVacancyDto): Promise<JobVacancyRO> {
     return await this.jobvacancyRepository.updateEntity(id, dto);
   }

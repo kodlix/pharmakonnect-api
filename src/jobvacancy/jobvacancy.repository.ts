@@ -103,8 +103,15 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         return jobvacancy;
     }
 
+    async findByAccountId(accountId: string): Promise<JobVacancyEntity[]> {
+
+        const jobvacancy = await this.find({ where: { accountId: accountId }, order: { approvedOn: 'DESC' } });
+        return jobvacancy;
+    }
+
+
     async findAll(): Promise<JobVacancyEntity[]> {
-        const jobvacancy = await this.find();
+        const jobvacancy = await this.find({ order: { approvedOn: 'DESC' } });
         return jobvacancy;
     }
 }
