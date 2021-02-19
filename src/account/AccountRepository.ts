@@ -3,15 +3,13 @@ import * as bcrypt from 'bcrypt';
 import { AccountEntity } from "./entities/account.entity";
 import { RegisterDTO, LoginDTO, LockUserDTO } from "./dto/credential.dto";
 import { HttpException, HttpStatus } from "@nestjs/common";
-import { CooperateRO, IndividualRO, UserFromDbRO } from "./interfaces/account.interface";
+import { UserFromDbRO } from "./interfaces/account.interface";
 import { UserDataRO } from "./interfaces/user.interface";
-import { CooperateDTO } from "./dto/cooperate.dto";
-import { IndividualDTO } from "./dto/individual.dto";
 
 @EntityRepository(AccountEntity)
 export class AccountRepository extends Repository<AccountEntity> {
 
-    public async register({ email, password, accountType }: RegisterDTO): Promise<string> {
+    public async register({ email, password, accountType, isRegComplete }: RegisterDTO): Promise<string> {
         const isExists = await await this.findOne({ email });
         if (isExists) {
             throw new HttpException({ error: `${email} already exists`, status: HttpStatus.BAD_REQUEST },
@@ -22,12 +20,12 @@ export class AccountRepository extends Repository<AccountEntity> {
         user.accountType = accountType;
         user.createdBy = email;
         user.accountPackage = 'Free';
+        user.isRegComplete = isRegComplete;
         user.salt = await bcrypt.genSalt();
         user.password = await this.hashPassword(password, user.salt);
         try {
             await user.save();
-            const message = 'Registration successful';
-            return message;
+            return 'Registration successful';
         } catch (error) {
             throw new HttpException({ error: `An error occured`, status: HttpStatus.INTERNAL_SERVER_ERROR },
                 HttpStatus.INTERNAL_SERVER_ERROR);

@@ -8,8 +8,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SectorModule } from './sector/sector.module';
 import { CountryModule } from './country/country.module';
 import { StateModule } from './state/state.module';
-import { CityModule } from './city/city.module';
 import { JobVacancyModule } from './jobvacancy/jobvacancy.module';
+import { LgaModule } from './lga/lga.module';
+import { SeederModule } from './seeder/seeder.module';
 
 @Module({
   imports: [
@@ -18,10 +19,11 @@ import { JobVacancyModule } from './jobvacancy/jobvacancy.module';
     SectorModule,
     CountryModule,
     StateModule,
-    CityModule,
-    JobVacancyModule
+    JobVacancyModule,
+    LgaModule,
+    SeederModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

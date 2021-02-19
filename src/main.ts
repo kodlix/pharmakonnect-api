@@ -7,6 +7,7 @@ import { ValidationFilter } from './jobvacancy/filter/validation.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+<<<<<<< HEAD
 
   app.useGlobalFilters(
     //new FallbackExceptionsFilter(),
@@ -26,6 +27,10 @@ async function bootstrap() {
       })
     )
 
+=======
+  app.useGlobalPipes(new ValidationPipe());
+  app.setGlobalPrefix('api');
+>>>>>>> origin/seeder
   const config = new DocumentBuilder()
     .setTitle('Pharma Connect API')
     .setDescription('Pharma Connect API description')

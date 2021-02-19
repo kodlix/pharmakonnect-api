@@ -40,7 +40,8 @@ export abstract class BaseAccountDTO {
     @IsNumber()
     @ApiProperty()
     readonly latitude: number;
-    @IsString()
     @ApiProperty()
     readonly profileImage: string;
+    @ApiProperty()
+    isRegComplete: boolean;
 }

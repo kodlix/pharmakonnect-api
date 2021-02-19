@@ -1,8 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsString } from "class-validator";
 import { BaseAccountDTO } from "./base-account.dto";
 
-export class CooperateDTO extends BaseAccountDTO {
+export class CorperateDTO extends BaseAccountDTO {
 
     @IsString()
     @IsNotEmpty()
@@ -15,7 +15,6 @@ export class CooperateDTO extends BaseAccountDTO {
     @IsInt()
     @ApiProperty()
     readonly numberofEmployees: number;
-    @IsString()
     @ApiProperty()
     readonly premisesImage: string;
     @IsString()

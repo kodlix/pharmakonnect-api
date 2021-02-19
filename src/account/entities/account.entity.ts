@@ -81,7 +81,7 @@ export class AccountEntity extends AbstractBaseEntity {
     public profileImage: string;
 
     @Column({ type: 'bool', default: false })
-    public isRegComplete: boolean = false;
+    public isRegComplete: boolean;
 
     // individual
     @Length(256)

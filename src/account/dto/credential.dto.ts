@@ -17,6 +17,8 @@ export class RegisterDTO {
     @IsNotEmpty()
     @ApiProperty()
     readonly accountType: string;
+
+    isRegComplete: boolean;
 }
 
 export class LoginDTO {

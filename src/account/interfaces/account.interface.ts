@@ -24,11 +24,18 @@ export interface IndividualRO {
     profileImage: string;
 }
 
-export interface CooperateRO {
+export interface CorperateRO {
     id: string;
     email: string;
     organizationName: string;
     phoneNumber: string;
     pcn: string;
     profileImage: string;
+}
+
+export interface RegisterSeedRO {
+    email: string;
+    password: string;
+    accountType: string;
+    isRegComplete: boolean;
 }
