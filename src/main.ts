@@ -7,30 +7,23 @@ import { ValidationFilter } from './jobvacancy/filter/validation.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-<<<<<<< HEAD
 
-  app.useGlobalFilters(
-    //new FallbackExceptionsFilter(),
-    //new HttpExceptionFilter(),
-    new ValidationFilter()
+  // @TODO refactor error validations
+  app.useGlobalFilters(new ValidationFilter());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      exceptionFactory: (errors: ValidationError[]) => {
+        const messages = errors.map(
+          (error) => `${error.property} has wrong value ${error.value},
+            ${Object.values(error.constraints).join(',')}`,
+        );
+        return new ValidationException(messages);
+      },
+    }),
   );
-  
-  
-    app.useGlobalPipes( new ValidationPipe({
-        exceptionFactory: (errors: ValidationError[])=>{
-          const messages = errors.map(
-            error=> `${error.property} has wrong value ${error.value},
-            ${Object.values(error.constraints).join(',') }`
-          )
-            return new ValidationException(messages)
-        }
-      })
-    )
 
-=======
-  app.useGlobalPipes(new ValidationPipe());
+  // app.useGlobalPipes(new ValidationPipe());
   app.setGlobalPrefix('api');
->>>>>>> origin/seeder
   const config = new DocumentBuilder()
     .setTitle('Pharma Connect API')
     .setDescription('Pharma Connect API description')
@@ -41,7 +34,6 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
 
   await app.listen(4500);
-  console.log("server running on http://127.0.0.1:4500 : " + new Date() );
-  
+  console.log('server running on http://127.0.0.1:4500 : ' + new Date());
 }
 bootstrap();
