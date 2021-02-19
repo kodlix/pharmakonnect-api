@@ -85,5 +85,6 @@ export class CreateJobVacancyDto {
     @IsNotEmpty({message: 'Contract Type is required'})
     contactType: string;
 
-  
+    @IsString()
+    accountId: string;
 }

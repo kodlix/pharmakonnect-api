@@ -39,7 +39,7 @@ export class JobVacancyController {
     return await this.jobvacancyService.findOne(id);
   }
 
-  @Get(':AccountId')
+  @Get(':accountId')
   @ApiResponse({ status: 201, description: 'Success.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Get jobvacancy by AccountId' })
@@ -56,7 +56,7 @@ export class JobVacancyController {
     return await this.jobvacancyService.update(id, updateJobVacancyDto);
   }
 
-  @Delete(':id/delete')
+  @Delete(':id')
   @ApiResponse({ status: 201, description: 'Delete Successfull.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Delete jobvacancy' })
@@ -68,7 +68,7 @@ export class JobVacancyController {
      }
     return await this.jobvacancyService.remove(id);
   }
-  @Put(':id/approve')
+  @Put('approve/:id')
   @ApiResponse({ status: 201, description: 'Approved.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Approve jobvacancy' })
@@ -77,7 +77,7 @@ export class JobVacancyController {
     return await this.jobvacancyService.updateApprove(id, approveJobVacancyDto)
   }
 
-  @Put(':id/reject')
+  @Put('reject/:id')
   @ApiResponse({ status: 201, description: 'Rejected.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Reject jobvacancy' })
