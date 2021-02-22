@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 
 import { ApiProperty } from "@nestjs/swagger";
-import { IsUrl } from "class-validator";
+import { IsUrl, Matches, Min } from "class-validator";
 import { IsInt, IsNotEmpty, IsString } from "class-validator";
 
 export class UpdateJobVacancyDto {
@@ -45,9 +45,10 @@ export class UpdateJobVacancyDto {
     jobTitle: string;
 
     @ApiProperty()
-    @IsString()
     @IsNotEmpty({message: 'Work experience is required'})
-    workExperienceInYears: string;
+    @IsInt()
+    @Min(0 , {message: 'Work Experience can not be a negative value'})
+    workExperienceInYears: number;
 
     @ApiProperty()
     @IsString()
@@ -59,11 +60,13 @@ export class UpdateJobVacancyDto {
     otherSkills: string;
 
     @ApiProperty()
-    @IsInt()
+    @IsInt({message: 'Salary should be in numbers'})
+    @Min(0 , {message: 'Salary can not be a negative value'})
     minSalary: number;
 
     @ApiProperty()
-    @IsInt()
+    @IsInt({message: 'Salary should be in numbers'})
+    @Min(0 , {message: 'Salary can not be a negative value'})
     maxSalary: number;
 
     @ApiProperty()

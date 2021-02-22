@@ -30,7 +30,7 @@ export class JobVacancyEntity extends AbstractBaseEntity {
   jobTitle: string;
 
   @Column({nullable: true})
-  workExperienceInYears: string;
+  workExperienceInYears: number;
 
   @Column({nullable: true})
   jobLocation: string;
@@ -77,6 +77,6 @@ export class JobVacancyEntity extends AbstractBaseEntity {
   @ManyToOne(() => AccountEntity, s => s.jobVacancy)
     account: AccountEntity;
 
-  @Column('uuid')
+  @Column({nullable: true})
     accountId: string;
 }

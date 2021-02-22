@@ -6,25 +6,37 @@ import { CreateJobVacancyDto } from './dto/create-jobvacancy.dto';
 import { RejectJobVacancyDto } from './dto/reject-jobvacancy';
 import { UpdateJobVacancyDto } from './dto/update-jobvacancy.dto';
 import { JobVacancyEntity } from './entities/jobvacancy.entity';
+import { AccountEntity } from 'src/account/entities/account.entity';
 
 
 @EntityRepository(JobVacancyEntity)
 export class JobVacancyRepository extends Repository<JobVacancyEntity> {
-    async createEntity(dto: CreateJobVacancyDto): Promise<JobVacancyEntity> {
+    async createEntity(dto: CreateJobVacancyDto, user: AccountEntity): Promise<JobVacancyEntity> {
 
         const job = await this.findOne({ where: { jobTitle: dto.jobTitle } });
         const today = new Date();
+        
+        const jobvacancy = new JobVacancyEntity();
         if (job && dto.endDate < today) {
 
-            throw new HttpException({ error: `End date of Job '${dto.jobTitle}' can not be less than today` }, HttpStatus.BAD_REQUEST);
+            throw new HttpException( `End date of Job '${dto.jobTitle}' can not be less than today`, HttpStatus.BAD_REQUEST);
         }
 
         else if (job && dto.endDate < dto.startDate) {
-            throw new HttpException({ error: `Start date of Job '${dto.jobTitle}' can not be greater than End date` }, HttpStatus.BAD_REQUEST);
+            throw new HttpException( `Start date of Job '${dto.jobTitle}' can not be greater than End date` , HttpStatus.BAD_REQUEST);
         }
-        const jobvacancy = new JobVacancyEntity();
+
+        else if (job &&  dto.maxSalary < dto.minSalary){
+            throw new HttpException(`Minimum salary of Job '${dto.jobTitle}' can not be greater than Maximum salary` , HttpStatus.BAD_REQUEST)
+        }
+
+        else if(job && dto.yearOfIncorporation < today){
+            throw new HttpException(`Year of Incorporation can not be less than today` , HttpStatus.BAD_REQUEST)
+        }
         //const jobvacancy = await this.create();
-        jobvacancy.createdBy = 'john@netopng.com';
+        //jobvacancy.createdBy = user.email;
+        //jobvacancy.accountId = user.id;
+        jobvacancy.createdBy = 'john@gmail.com'
         jobvacancy.companyUrl = dto.companyUrl;
         jobvacancy.contactType = dto.contactType;
         jobvacancy.jobUrl = dto.jobUrl;
@@ -41,6 +53,8 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         jobvacancy.endDate = dto.endDate;
         jobvacancy.yearOfIncorporation = dto.yearOfIncorporation;
         jobvacancy.workExperienceInYears = dto.workExperienceInYears;
+        console.log('jobvacancy',jobvacancy);
+        
 
         return await this.save(jobvacancy);
     }
@@ -48,6 +62,23 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     async updateEntity(id: string, dto: UpdateJobVacancyDto): Promise<JobVacancyEntity> {
 
         const jobvacancy = await this.findOne(id);
+        console.log('jobvacancy',jobvacancy)
+
+        const today = new Date();
+        console.log('jobvacancy',jobvacancy)
+
+        if (dto.endDate < today) {
+
+            throw new HttpException( `End date of Job '${dto.jobTitle}' can not be less than today`, HttpStatus.BAD_REQUEST);
+        }
+
+        else if (dto.endDate < dto.startDate) {
+            throw new HttpException( `Start date of Job '${dto.jobTitle}' can not be greater than End date` , HttpStatus.BAD_REQUEST);
+        }
+
+        else if (dto.maxSalary < dto.minSalary){
+            throw new HttpException(`Minimum salary of Job '${dto.jobTitle}' can not be greater than Maximum salary` , HttpStatus.BAD_REQUEST)
+        }
 
         jobvacancy.updatedAt = new Date();
         jobvacancy.updatedBy = dto.updatedBy;
@@ -67,7 +98,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         jobvacancy.endDate = dto.endDate;
         jobvacancy.yearOfIncorporation = dto.yearOfIncorporation;
         jobvacancy.workExperienceInYears = dto.workExperienceInYears;
-        return await jobvacancy.save();
+        return await this.save(jobvacancy);
     }
     async updateApprove(id: string, dto: ApproveJobVacancyDto): Promise<JobVacancyEntity> {
         const jobvacancy = await this.findOne(id);

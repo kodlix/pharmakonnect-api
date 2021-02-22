@@ -1,14 +1,10 @@
 /* eslint-disable prettier/prettier */
 
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUrl } from 'class-validator';
+import { IsUrl, Min } from 'class-validator';
 import { IsString, IsNotEmpty, IsInt } from 'class-validator';
 
 export class CreateJobVacancyDto {
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
-    createdBy: string;
 
     @ApiProperty()
     @IsString()
@@ -44,9 +40,10 @@ export class CreateJobVacancyDto {
     jobTitle: string;
 
     @ApiProperty()
-    @IsString()
+    @IsInt({message: 'Work experience should be in numbers'})
     @IsNotEmpty({message: 'Work experience is required'})
-    workExperienceInYears: string;
+    @Min(0 , {message: 'Work Experience can not be a negative value'})
+    workExperienceInYears: number;
 
     @ApiProperty()
     @IsString()
@@ -58,11 +55,13 @@ export class CreateJobVacancyDto {
     otherSkills: string;
 
     @ApiProperty()
-    @IsInt()
+    @IsInt({message: 'Salary should be in numbers'})
+    @Min(0 , {message: 'Salary can not be a negative value'})
     minSalary: number;
 
     @ApiProperty()
-    @IsInt()
+    @IsInt({message: 'Salary should be in numbers'})
+    @Min(0 , {message: 'Salary can not be a negative value'})
     maxSalary: number;
 
     @ApiProperty()
@@ -85,6 +84,4 @@ export class CreateJobVacancyDto {
     @IsNotEmpty({message: 'Contract Type is required'})
     contactType: string;
 
-    @IsString()
-    accountId: string;
 }
