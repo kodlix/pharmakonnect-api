@@ -35,7 +35,7 @@ export class SeederService implements OnModuleInit {
   }
 
   public async registerUser(): Promise<void> {
-    const data = await this.accountService.findAll();
+    const data = await this.accountService.find();
     if (data.length <= 0) {
       Account_Seed.forEach(item => {
         this.accountService.register(item)

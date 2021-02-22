@@ -34,7 +34,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
   app.enableCors();
-
   await app.listen(4500);
   console.log('server running on http://127.0.0.1:4500 : ' + new Date());
 }

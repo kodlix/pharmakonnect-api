@@ -1,16 +1,18 @@
+import { AccountEntity } from 'src/account/entities/account.entity';
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, UseGuards, Req } from '@nestjs/common';
 import { JobVacancyService } from './jobvacancy.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateJobVacancyDto } from './dto/create-jobvacancy.dto';
 import { UpdateJobVacancyDto } from './dto/update-jobvacancy.dto';
 import { ApproveJobVacancyDto } from './dto/approve-jobvacancy';
 import { RejectJobVacancyDto } from './dto/reject-jobvacancy';
 import { JobVacancyRO } from './jobvacancy.interface';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('jobvacancy')
-//@ApiBearerAuth()
-//@UseGuards(AuthGuard())
+@ApiBearerAuth()
+@UseGuards(AuthGuard())
 @ApiTags('jobvacancy')
 export class JobVacancyController {
   constructor(private readonly jobvacancyService: JobVacancyService) {}
@@ -19,15 +21,16 @@ export class JobVacancyController {
   @ApiOperation({ summary: 'Create jobvacancy' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 201, description: 'Jobvacancy successfully created' })
-  create(@Body() createJobVacancyDto: CreateJobVacancyDto) {
-    return this.jobvacancyService.create(createJobVacancyDto);
+  create(@Body() createJobVacancyDto: CreateJobVacancyDto, @Req() req: any) {
+    return this.jobvacancyService.create(createJobVacancyDto, req.user);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all jobvacancy' })
   @ApiResponse({ status: 201, description: 'Success.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
-  async findAll() :Promise<JobVacancyRO[]> {
+  async findAll(@Req() req: any) :Promise<JobVacancyRO[]> {
+    console.log(req.user);
     return await this.jobvacancyService.findAll();
   }
 

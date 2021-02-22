@@ -43,4 +43,3 @@ export class LockUserDTO {
     @ApiProperty()
     readonly isLocked: boolean;
 }
-

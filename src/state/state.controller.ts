@@ -23,14 +23,14 @@ export class StateController {
   @Get(':id')
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 200, description: 'Return state' })
-  async findOne(@Param('id') id: string): Promise<StateRO> {
+  async findOne(@Param('id') id: number): Promise<StateRO> {
     return await this.stateService.findOne(id);
   }
 
   @Get('/getbycountry/:countryid')
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 200, description: 'Return state' })
-  async findByCountry(@Param('countryid') countryid: string): Promise<StateRO> {
+  async findByCountry(@Param('countryid') countryid: number): Promise<StateRO[]> {
     return await this.stateService.findByCountry(countryid);
   }
 

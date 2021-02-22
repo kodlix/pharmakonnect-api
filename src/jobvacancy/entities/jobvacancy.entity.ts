@@ -75,8 +75,9 @@ export class JobVacancyEntity extends AbstractBaseEntity {
   rejectionMessage: string;
 
   @ManyToOne(() => AccountEntity, s => s.jobVacancy)
-    account: AccountEntity;
+  account: AccountEntity;
 
   @Column('uuid')
-    accountId: string;
+  accountId: string;
+  
 }

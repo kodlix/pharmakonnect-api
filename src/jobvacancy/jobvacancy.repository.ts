@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { AccountEntity } from 'src/account/entities/account.entity';
 import { Repository, EntityRepository, DeleteResult } from 'typeorm';
 import { ApproveJobVacancyDto } from './dto/approve-jobvacancy';
 import { CreateJobVacancyDto } from './dto/create-jobvacancy.dto';
@@ -10,7 +11,7 @@ import { JobVacancyEntity } from './entities/jobvacancy.entity';
 
 @EntityRepository(JobVacancyEntity)
 export class JobVacancyRepository extends Repository<JobVacancyEntity> {
-    async createEntity(dto: CreateJobVacancyDto): Promise<JobVacancyEntity> {
+    async createEntity(dto: CreateJobVacancyDto, user: AccountEntity): Promise<JobVacancyEntity> {
 
         const job = await this.findOne({ where: { jobTitle: dto.jobTitle } });
         const today = new Date();
@@ -24,7 +25,8 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         }
         const jobvacancy = new JobVacancyEntity();
         //const jobvacancy = await this.create();
-        jobvacancy.createdBy = 'john@netopng.com';
+        jobvacancy.createdBy = user.createdBy;
+        jobvacancy.accountId = user.id;
         jobvacancy.companyUrl = dto.companyUrl;
         jobvacancy.contactType = dto.contactType;
         jobvacancy.jobUrl = dto.jobUrl;

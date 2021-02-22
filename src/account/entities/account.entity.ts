@@ -30,13 +30,13 @@ export class AccountEntity extends AbstractBaseEntity {
     public accountStatus: string;
 
     @Column({ type: 'bool', default: false })
-    public isLocked: boolean = false;
+    public isLocked: boolean;
 
     @Column({ type: 'bool', default: true })
-    public isActive: boolean = true;
+    public isActive: boolean;
 
     @Column({ type: 'bool', default: false })
-    public pcnVerified: boolean = false;
+    public pcnVerified: boolean;
 
     @Column({ type: 'bool', default: false })
     public isReported: boolean;
@@ -98,7 +98,7 @@ export class AccountEntity extends AbstractBaseEntity {
     public dateOfBirth: Date;
 
     @Column({ type: 'bool', default: false })
-    public isPracticing: boolean = false;
+    public isPracticing: boolean;
 
     @Length(20)
     @Column({ length: 20, nullable: true })
@@ -126,10 +126,10 @@ export class AccountEntity extends AbstractBaseEntity {
     @Column({type: 'int', default: 0 })
     public yearofEstablishment: number;
 
-    @Column('timestamp', { default: (): string => 'LOCALTIMESTAMP' })
+    @Column('time', { default: (): string => 'LOCALTIMESTAMP' })
     public openingTime: Date;
 
-    @Column('timestamp', { default: (): string => 'LOCALTIMESTAMP' })
+    @Column('time', { default: (): string => 'LOCALTIMESTAMP' })
     public closingTime: Date;
 
     @IsFQDN()

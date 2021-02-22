@@ -5,10 +5,6 @@ import { IsUrl } from 'class-validator';
 import { IsString, IsNotEmpty, IsInt } from 'class-validator';
 
 export class CreateJobVacancyDto {
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
-    createdBy: string;
 
     @ApiProperty()
     @IsString()
@@ -85,6 +81,5 @@ export class CreateJobVacancyDto {
     @IsNotEmpty({message: 'Contract Type is required'})
     contactType: string;
 
-    @IsString()
-    accountId: string;
+    
 }

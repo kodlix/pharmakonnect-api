@@ -30,7 +30,7 @@ export class LgaController {
   @Get('/getbystate/:stateid')
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 200, description: 'Return state' })
-  async findByCountry(@Param('stateid') stateid: string): Promise<LgaRO> {
+  async findByCountry(@Param('stateid') stateid: string): Promise<LgaRO[]> {
     return await this.lgaService.findByState(stateid);
   }
 

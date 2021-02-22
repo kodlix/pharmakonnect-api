@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, UseGuards, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, UseGuards, Patch, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AccountService } from './account.service';
@@ -6,7 +6,8 @@ import { CorperateDTO } from './dto/cooperate.dto';
 import { IndividualDTO } from './dto/individual.dto';
 import { RegisterDTO, LoginDTO, LockUserDTO } from './dto/credential.dto';
 import { CorperateRO, IndividualRO, UserRO } from './interfaces/account.interface';
-import { UserDataRO } from './interfaces/user.interface';
+import { OrganizationRO, UserDataRO } from './interfaces/user.interface';
+import { FilterDto } from 'src/_common/filter.dto';
 
 @ApiTags('account')
 @Controller('account')
@@ -33,8 +34,8 @@ export class AccountController {
   @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Return all user' })
-  async findAll(): Promise<UserDataRO[]> {
-    return await this.accountService.findAll();
+  async findAll(@Query() filterDto: FilterDto): Promise<UserDataRO[]> {
+    return await this.accountService.findAll(filterDto);
   }
 
   @Get(':id')
@@ -85,6 +86,15 @@ export class AccountController {
   @ApiResponse({ status: 204, description: 'No content' })
   async lockAndUnlockUser(@Body() lockUserDto: LockUserDTO): Promise<UserDataRO> {
     return await this.accountService.lockAndUnlockUser(lockUserDto);
+  }
+
+  @Get('/organizations')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @ApiOperation({ summary: 'Get all organizations' })
+  @ApiResponse({ status: 200, description: 'Return all organizations' })
+  async findOrg(): Promise<OrganizationRO[]> {
+    return await this.accountService.findOrg();
   }
 
   // forget endpoint

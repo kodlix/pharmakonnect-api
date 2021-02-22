@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
+import { AccountEntity } from 'src/account/entities/account.entity';
 import { DeleteResult } from 'typeorm';
 import { ApproveJobVacancyDto } from './dto/approve-jobvacancy';
 import { CreateJobVacancyDto } from './dto/create-jobvacancy.dto';
@@ -14,8 +15,8 @@ export class JobVacancyService {
     private readonly jobvacancyRepository: JobVacancyRepository
   ) { }
 
-  async create(dto: CreateJobVacancyDto): Promise<JobVacancyRO> {
-    return await this.jobvacancyRepository.createEntity(dto);
+  async create(dto: CreateJobVacancyDto, user: AccountEntity): Promise<JobVacancyRO> {
+    return await this.jobvacancyRepository.createEntity(dto, user);
   }
 
   async findAll(): Promise<JobVacancyRO[]> {

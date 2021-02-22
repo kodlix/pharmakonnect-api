@@ -4,7 +4,7 @@ import { AccountEntity } from "./entities/account.entity";
 import { RegisterDTO, LoginDTO, LockUserDTO } from "./dto/credential.dto";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { UserFromDbRO } from "./interfaces/account.interface";
-import { UserDataRO } from "./interfaces/user.interface";
+import { OrganizationRO, UserDataRO } from "./interfaces/user.interface";
 
 @EntityRepository(AccountEntity)
 export class AccountRepository extends Repository<AccountEntity> {
@@ -94,33 +94,56 @@ export class AccountRepository extends Repository<AccountEntity> {
         return this.buildUserRO(result);
     }
 
+    public async findOrg(): Promise<OrganizationRO[]> {
+        const accType = "Corperate";
+        const account = await this.createQueryBuilder("account")
+            .where("account.accountType) = (:accType)", { accType }).getMany();
+        return this.buildOrgArrRO(account);
+    }
+
     private buildUserRO(user: AccountEntity) {
         const userRO = {
-          id: user.id,
-          pcn: user.pcn,
-          email: user.email,
-          isLocked: user.isLocked,
-          lastName: user.lastName,
-          latitude: user.latitude,
-          firstName: user.firstName,   
-          longitude: user.longitude,
-          phoneNumber: user.phoneNumber,
-          profileImage: user.profileImage,
-          accountPackage: user.accountPackage,
-          organizationName: user.organizationName,
-          organizationType: user.organizationType,
-          isRegComplete: user.isRegComplete,
-          accountType: user.accountType
+            id: user.id,
+            pcn: user.pcn,
+            email: user.email,
+            isLocked: user.isLocked,
+            lastName: user.lastName,
+            latitude: user.latitude,
+            firstName: user.firstName,
+            longitude: user.longitude,
+            phoneNumber: user.phoneNumber,
+            profileImage: user.profileImage,
+            accountPackage: user.accountPackage,
+            organizationName: user.organizationName,
+            organizationType: user.organizationType,
+            isRegComplete: user.isRegComplete,
+            accountType: user.accountType
         };
         return userRO;
-      }
+    }
 
-      public buildUserArrRO(users: AccountEntity[]) {
+    public buildUserArrRO(users: AccountEntity[]) {
         let userArr = [];
         users.forEach(user => {
             userArr.push(this.buildUserRO(user));
         })
         return userArr;
-      }
+    }
+
+    private buildOrgArrRO(users: AccountEntity[]) {
+        let userArr = [];
+        users.forEach(user => {
+            const userRO = {
+                pcn: user.pcn,
+                latitude: user.latitude,
+                longitude: user.longitude,
+                organizationName: user.organizationName,
+                organizationType: user.organizationType,
+                companyRegistrationNumber: user.companyRegistrationNumber
+            };
+            userArr.push(userRO);
+        })
+        return userArr;
+    }
 
 }
