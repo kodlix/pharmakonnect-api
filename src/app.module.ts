@@ -11,6 +11,8 @@ import { StateModule } from './state/state.module';
 import { JobVacancyModule } from './jobvacancy/jobvacancy.module';
 import { LgaModule } from './lga/lga.module';
 import { SeederModule } from './seeder/seeder.module';
+import { ChatModule } from './chat/chat.module';
+import { ContactModule } from './contact/contact.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { SeederModule } from './seeder/seeder.module';
     JobVacancyModule,
     LgaModule,
     SeederModule,
+    ChatModule,
+    ContactModule
   ],
   controllers: [AppController],
   providers: [AppService],
