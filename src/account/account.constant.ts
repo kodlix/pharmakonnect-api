@@ -1,4 +1,4 @@
 export enum accountTypes {
-  INDIVIDUAL = 'Individual',
-  CORPORATE = 'Corporate',
+  INDIVIDUAL = 'individual',
+  CORPORATE = 'corporate',
 }

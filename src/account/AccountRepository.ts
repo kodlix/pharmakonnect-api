@@ -5,6 +5,7 @@ import { RegisterDTO, LoginDTO, LockUserDTO } from "./dto/credential.dto";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { UserFromDbRO } from "./interfaces/account.interface";
 import { OrganizationRO, UserDataRO } from "./interfaces/user.interface";
+import { accountTypes } from "./account.constant";
 
 @EntityRepository(AccountEntity)
 export class AccountRepository extends Repository<AccountEntity> {
@@ -95,7 +96,7 @@ export class AccountRepository extends Repository<AccountEntity> {
     }
 
     public async findOrg(): Promise<OrganizationRO[]> {
-        const accType = "Corperate";
+        const accType = accountTypes.CORPORATE
         const account = await this.createQueryBuilder("account")
             .where("account.accountType) = (:accType)", { accType }).getMany();
         return this.buildOrgArrRO(account);
