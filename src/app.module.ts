@@ -5,12 +5,16 @@ import { AppService } from './app.service';
 import { AccountModule } from './account/account.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SectorModule } from './sector/sector.module';
+import { ChatModule } from './chat/chat.module';
+import { ContactModule } from './contact/contact.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(),
     AccountModule,
-    SectorModule
+    SectorModule,
+    ChatModule,
+    ContactModule
   ],
   controllers: [AppController],
   providers: [AppService],
