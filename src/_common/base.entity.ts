@@ -3,7 +3,7 @@ import { Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, Bas
 export abstract class AbstractBaseEntity extends BaseEntity {
 
     @PrimaryGeneratedColumn('uuid')
-    id: number;
+    id: string;
 
     @Column()
     createdBy: string
