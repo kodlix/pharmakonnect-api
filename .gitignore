@@ -1,7 +1,8 @@
 # compiled output
 /dist
 /node_modules
-
+uploads
+ormconfig.json
 # Logs
 logs
 *.log
