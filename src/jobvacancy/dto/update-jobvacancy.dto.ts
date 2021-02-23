@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUrl, Matches, Min } from 'class-validator';
+import { IsUrl, Matches, Min, ValidateIf } from 'class-validator';
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class UpdateJobVacancyDto {
@@ -18,6 +18,8 @@ export class UpdateJobVacancyDto {
   companyRegistrationNumber: number;
 
   @ApiProperty()
+  @ValidateIf(o => o.  companyUrl
+    === 'value')
   @IsString()
   @IsUrl(undefined, { message: 'Company Url is not valid.' })
   companyUrl: string;
@@ -40,7 +42,7 @@ export class UpdateJobVacancyDto {
   @ApiProperty()
   @IsNotEmpty({ message: 'Work experience is required' })
   @IsInt()
-  @Min(0, { message: 'Work Experience can not be a negative value' })
+  @Min(-1, { message: 'Work Experience can not be a negative value' })
   workExperienceInYears: number;
 
   @ApiProperty()
@@ -53,13 +55,13 @@ export class UpdateJobVacancyDto {
   otherSkills: string;
 
   @ApiProperty()
-  @IsInt({ message: 'Salary should be in numbers' })
-  @Min(0, { message: 'Salary can not be a negative value' })
+  @IsInt({ message: 'Minimum Salary should be in numbers' })
+  @Min(-1, { message: 'Minimum Salary can not be a negative value' })
   minSalary: number;
 
   @ApiProperty()
-  @IsInt({ message: 'Salary should be in numbers' })
-  @Min(0, { message: 'Salary can not be a negative value' })
+  @IsInt({ message: 'Maximum Salary should be in numbers' })
+  @Min(-1, { message: 'Maximum Salary can not be a negative value' })
   maxSalary: number;
 
   @ApiProperty()
@@ -73,6 +75,8 @@ export class UpdateJobVacancyDto {
   endDate: Date;
 
   @ApiProperty()
+  @ValidateIf(o => o.  jobUrl
+    === 'value')
   @IsString()
   @IsUrl(undefined, { message: 'Job Url is not valid' })
   jobUrl: string;
