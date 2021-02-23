@@ -12,6 +12,7 @@ import {
   HttpStatus,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { JobVacancyService } from './jobvacancy.service';
 import {
@@ -46,9 +47,9 @@ export class JobVacancyController {
   @ApiOperation({ summary: 'Get all jobvacancy' })
   @ApiResponse({ status: 201, description: 'Success.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
-  async findAll(@Req() req: any): Promise<JobVacancyRO[]> {
+  async findAll(@Query('page') page: number, @Req() req: any): Promise<JobVacancyRO[]> {
     console.log(req.user);
-    return await this.jobvacancyService.findAll();
+    return await this.jobvacancyService.findAll(page);
   }
 
   @Get(':id')
@@ -63,11 +64,11 @@ export class JobVacancyController {
   @ApiResponse({ status: 201, description: 'Success.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Get jobvacancy by AccountId' })
-  async findByAccountId(@Req() req
+  async findByAccountId(@Query('page') page: number, @Req() req
   ): Promise<JobVacancyRO[]> {
     const { user } = req;
 
-    return await this.jobvacancyService.findByAccountId(user.id);
+    return await this.jobvacancyService.findByAccountId(user.id,page);
   }
 
   @Put(':id')

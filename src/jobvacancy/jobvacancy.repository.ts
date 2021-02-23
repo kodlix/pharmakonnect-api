@@ -91,7 +91,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     }
 
     jobvacancy.updatedAt = new Date();
-    jobvacancy.updatedBy = user.updatedBy;
+    jobvacancy.updatedBy = user.createdBy;
     jobvacancy.accountId = user.id;
     jobvacancy.companyUrl = dto.companyUrl;
     jobvacancy.contactType = dto.contactType;
@@ -148,16 +148,22 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     return jobvacancy;
   }
 
-  async findByAccountId(accountId: string): Promise<JobVacancyEntity[]> {
+  async findByAccountId(accountId: string,page: number = 1): Promise<JobVacancyEntity[]> {
     const jobvacancy = await this.find({
       where: { accountId: accountId },
       order: { approvedOn: 'DESC' },
-    });
+      take: 25,
+
+      skip: 25 * (page - 1)});
     return jobvacancy;
   }
 
-  async findAll(): Promise<JobVacancyEntity[]> {
-    const jobvacancy = await this.find({ order: { approvedOn: 'DESC' } });
+  async findAll(page: number = 1): Promise<JobVacancyEntity[]> {
+    const jobvacancy = await this.find({ order: { approvedOn: 'DESC' },
+    take: 25,
+
+    skip: 25 * (page - 1),});
+    
     return jobvacancy;
   }
 }

@@ -20,16 +20,16 @@ export class JobVacancyService {
     return await this.jobvacancyRepository.createEntity(dto, user);
   }
 
-  async findAll(): Promise<JobVacancyRO[]> {
-    return await this.jobvacancyRepository.findAll();
+  async findAll(page): Promise<JobVacancyRO[]> {
+    return await this.jobvacancyRepository.findAll(page);
   }
 
   async findOne(id: string): Promise<JobVacancyRO> {
     return await this.jobvacancyRepository.findById(id);
   }
 
-  async findByAccountId(accountId: string): Promise<JobVacancyRO[]> {
-    return await this.jobvacancyRepository.findByAccountId(accountId);
+  async findByAccountId(accountId: string,page): Promise<JobVacancyRO[]> {
+    return await this.jobvacancyRepository.findByAccountId(accountId,page);
   }
 
   async update(id: string, dto: UpdateJobVacancyDto, user: AccountEntity): Promise<JobVacancyRO> {
