@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUrl, Min, ValidateIf } from 'class-validator';
+import { IsOptional, IsUrl, Min, ValidateIf } from 'class-validator';
 import { IsString, IsNotEmpty, IsInt } from 'class-validator';
 
 export class CreateJobVacancyDto {
@@ -10,9 +10,11 @@ export class CreateJobVacancyDto {
 
   @ApiProperty()
   @IsString()
+  @IsNotEmpty({message: 'Year of InCorporation is required'})
   yearOfIncorporation: Date;
 
   @ApiProperty()
+  @IsOptional()
   @IsInt()
   companyRegistrationNumber: number;
 
@@ -50,6 +52,7 @@ export class CreateJobVacancyDto {
   jobLocation: string;
 
   @ApiProperty()
+  @IsOptional()
   @IsString()
   otherSkills: string;
 
