@@ -1,10 +1,10 @@
 {
     "type": "postgres",
-    "host": "127.0.0.1",
+    "host": "ec2-34-247-118-233.eu-west-1.compute.amazonaws.com",
     "port": 5432,
-    "username": "postgres",
+    "username": "dqryixgixidblr",
     "password": "!pass4sure",
-    "database": "pharmaconnectdb",
+    "database": "dcalfvu0p9p5kp",
     "entities": ["dist/**/*.entity.js"],
     "synchronize": true
   }
