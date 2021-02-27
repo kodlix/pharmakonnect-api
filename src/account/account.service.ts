@@ -5,7 +5,7 @@ import { RegisterDTO, LoginDTO, LockUserDTO } from './dto/credential.dto';
 import { CorperateRO, IndividualRO, UserRO } from './interfaces/account.interface';
 import { JwtPayload, OrganizationRO, UserDataRO } from './interfaces/user.interface';
 import { JwtService } from '@nestjs/jwt';
-import { AccountRepository } from './accountRepository';
+import { AccountRepository } from './account.repository';
 import { FilterDto } from 'src/_common/filter.dto';
 
 @Injectable()
