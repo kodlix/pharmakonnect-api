@@ -11,9 +11,7 @@ export class ChatConverationService {
     ){}
 
   async create(dto: CreateConversationDto): Promise<CreateConversationDto> {
-    //do all checks and pass the conversationdto to conversation
-    // check if it's groupchat b4 binding
-    //the chat end point will also be here
+   
     return await this.conversationrepo.createOrUpdateConversation(dto)
   }
 

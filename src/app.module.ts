@@ -13,6 +13,7 @@ import { LgaModule } from './lga/lga.module';
 import { SeederModule } from './seeder/seeder.module';
 import { ChatModule } from './chat/chat.module';
 import { ContactModule } from './contact/contact.module';
+import { GroupchatModule } from './groupchat/groupchat.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { ContactModule } from './contact/contact.module';
     LgaModule,
     SeederModule,
     ChatModule,
-    ContactModule
+    ContactModule,
+    GroupchatModule
   ],
   controllers: [AppController],
   providers: [AppService],

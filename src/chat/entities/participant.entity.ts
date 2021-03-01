@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne } from "typeorm";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { AccountEntity } from "src/account/entities/account.entity"
-import { GroupChatEntity } from "src/chat/entities/chat.groupChat"
+import { GroupChatEntity } from "src/groupchat/entities/groupChat.entity"
 
 @Entity("Participant")
 export class ParticipantEntity extends AbstractBaseEntity{

@@ -2,7 +2,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { Repository, EntityRepository, getConnection, getRepository, Connection } from 'typeorm';
 import { MessagerRO } from 'src/chat/chat.interface'
 import { CreateMessageDto } from 'src/chat/dto/create-chat.dto'
-import { MessageEntity } from '../entities/chat.message';
+import { MessageEntity } from '../entities/message.entity';
 
 @EntityRepository(MessageEntity)
 export class MessageRepository extends Repository<MessageEntity>{

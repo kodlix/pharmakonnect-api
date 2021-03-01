@@ -4,18 +4,19 @@ import { AlertGateway } from './chat.chatservice';
 import { CreateConversationDto } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+//import { ChatGroupChatService } from './services/chat.groupChatService';
 
 @Controller('chat')
 @ApiTags('chat')
 export class ChatController {
   constructor(private readonly chatService: ChatConverationService, private readonly alertgatway: AlertGateway) {}
 
-  @Post()
+  @Post('conversation')
   create(@Body() createChatDto: CreateConversationDto) {
-    return this.chatService.create(createChatDto);
+    return this.chatService.create(createChatDto); 
   }
 
-  @Post()
+  @Post('gateway')
     @HttpCode(200)
     sendAlertToAll(@Body() dto: { message: string }) {
         this.alertgatway.sendToAll(dto.message);

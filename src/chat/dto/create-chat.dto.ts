@@ -1,84 +1,43 @@
 import { IsNotEmpty, IsString, IsBoolean, isBoolean } from "class-validator"
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateConversationDto {
     @IsString()
     @IsNotEmpty()
+    @ApiProperty()
     readonly title : string
 
     @IsString()
     @IsNotEmpty()
+    @ApiProperty()
     readonly creatorId : string
 
     @IsString()
     @IsNotEmpty()
+    @ApiProperty()
     readonly channelId : string
 
     @IsBoolean()
     @IsNotEmpty()
+    @ApiProperty()
     readonly isGroupChat : boolean 
 
     @IsString()
     @IsNotEmpty()
+    @ApiProperty()
     readonly createdBy: string
 
     @IsString()
     @IsNotEmpty()
+    @ApiProperty()
     readonly updatedBy: string
 
 }
 
-
-export class CreateGroupChatDto{
-    @IsString()
-    @IsNotEmpty()
-    readonly creatorId : string
-
-    @IsString()
-    @IsNotEmpty()
-    readonly sectorId : string
-
-    @IsString()
-    @IsNotEmpty()
-    readonly name : string
-
-    @IsString()
-    @IsNotEmpty()
-    readonly description : string
-
-    @IsString()
-    @IsNotEmpty()
-    readonly onlyAdminCanPost : boolean
-
-    @IsString()
-    @IsNotEmpty()
-    readonly isActive : boolean
-
-    @IsString()
-    @IsNotEmpty()
-    readonly activateOn : Date
-
-    @IsString()
-    @IsNotEmpty()
-    readonly expiresOn : Date
-
-    @IsString()
-    @IsNotEmpty()
-    readonly createdBy : string
-
-
-    @IsString()
-    @IsNotEmpty()
-    readonly participants : []
-
-    @IsString()
-    @IsNotEmpty()
-    readonly messages : []
-}
-
-
 export class CreateMessageDto{
     @IsString()
     @IsNotEmpty()
+    @ApiProperty()
     groupChatID : string
 
 
@@ -122,4 +81,32 @@ export class CreateMessageDto{
     @IsNotEmpty()
     postedOn: Date
 
+}
+
+
+export class CreateParticipantDto{
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    readonly accountId: string
+    
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    readonly canPost: boolean
+    
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    readonly createdBy: string
+    
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    readonly groupChatID: string
+    
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    readonly updatedBy: string
 }

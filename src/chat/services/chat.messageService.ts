@@ -1,6 +1,6 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
-import { GroupChatRepository } from '../repository/chat.groupChatRepository';
-import { MessageEntity } from '../entities/chat.message';
+//import { GroupChatRepository } from '../repository/chat.groupChatRepository';
+import { MessageEntity } from '../entities/message.entity';
 import { CreateMessageDto } from '../dto/create-chat.dto';
 import { MessageRepository } from '../repository/chat.messageRepository';
 

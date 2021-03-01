@@ -1,15 +1,16 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
-import { GroupChatRepository } from '../repository/chat.groupChatRepository';
-import { GroupChatEntity } from '../entities/chat.groupChat';
-import { CreateGroupChatDto } from '../dto/create-chat.dto';
+import { GroupChatRepository } from './repository/chat.groupChatRepository';
+import { GroupChatEntity } from './entities/groupChat.entity';
+import { CreateGroupChatDto } from './dto/create-groupchat.dto';
+import { UpdateGroupchatDto } from './dto/update-groupchat.dto';
 
 
 
-@Injectable()
-export class ChatGroupChatService{
+@Injectable() 
+export class GroupchatService{
     constructor(private readonly groupchatrepo: GroupChatRepository){}
 
-    async create(dto: GroupChatEntity): Promise<GroupChatEntity> {
+    async create(dto: CreateGroupChatDto): Promise<CreateGroupChatDto> {
         return await this.groupchatrepo.createGroup(dto)
       }
 
@@ -21,7 +22,7 @@ export class ChatGroupChatService{
         return await this.groupchatrepo.getAllGroupChat();
       }
     
-      async update(id: string, dto: GroupChatEntity) {
+      async update(id: string, dto: UpdateGroupchatDto) {
         return await this.groupchatrepo.updateGroupChat(id, dto)
       }
     

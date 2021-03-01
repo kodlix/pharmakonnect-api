@@ -1,8 +1,8 @@
 import { Column, Entity, OneToMany, ManyToOne } from "typeorm";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { AccountEntity } from "src/account/entities/account.entity"
-import { ParticipantEntity } from "./chat.participant";
-import { MessageEntity } from "./chat.message";
+import { ParticipantEntity } from "src/chat/entities/participant.entity";
+import { MessageEntity } from "src/chat/entities/message.entity";
 
 @Entity("GroupChat")
 export class GroupChatEntity extends AbstractBaseEntity{
