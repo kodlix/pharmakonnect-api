@@ -11,16 +11,10 @@ import { StateModule } from './state/state.module';
 import { JobVacancyModule } from './jobvacancy/jobvacancy.module';
 import { LgaModule } from './lga/lga.module';
 import { SeederModule } from './seeder/seeder.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      exclude: ['/api*'],
-    }),
     AccountModule,
     SectorModule,
     CountryModule,
