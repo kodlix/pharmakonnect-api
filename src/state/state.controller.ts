@@ -1,16 +1,14 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common';
 import { StateService } from './state.service';
 import { CreateStateDto } from './dto/create-state.dto';
 import { UpdateStateDto } from './dto/update-state.dto';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { FilterDto } from 'src/_common/filter.dto';
 import { StateRO } from './state.interface';
 
 @ApiBearerAuth()
 @ApiTags('state')
 @Controller('state')
-@UseGuards(AuthGuard())
 export class StateController {
   constructor(private readonly stateService: StateService) { }
 
@@ -23,14 +21,14 @@ export class StateController {
   @Get(':id')
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 200, description: 'Return state' })
-  async findOne(@Param('id') id: number): Promise<StateRO> {
+  async findOne(@Param('id') id: string): Promise<StateRO> {
     return await this.stateService.findOne(id);
   }
 
   @Get('/getbycountry/:countryid')
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 200, description: 'Return state' })
-  async findByCountry(@Param('countryid') countryid: number): Promise<StateRO[]> {
+  async findByCountry(@Param('countryid') countryid: string): Promise<StateRO> {
     return await this.stateService.findByCountry(countryid);
   }
 

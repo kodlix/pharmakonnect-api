@@ -1,6 +1,5 @@
 import { CountryRO } from './country.interface';
-import { Controller, Get, Post, Body, Put, Param, Delete, Query, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilterDto } from 'src/_common/filter.dto';
 import { CountryService } from './country.service';
@@ -10,7 +9,6 @@ import { UpdateCountryDto } from './dto/update-country.dto';
 @ApiBearerAuth()
 @ApiTags('country')
 @Controller('country')
-@UseGuards(AuthGuard())
 export class CountryController {
   constructor(private readonly countryService: CountryService) { }
 

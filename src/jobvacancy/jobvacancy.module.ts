@@ -4,12 +4,10 @@ import { JobVacancyService } from './jobvacancy.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JobVacancyRepository } from './jobvacancy.repository';
 import { JobVacancyController } from './jobvacancy.controller';
-import { AccountModule } from 'src/account/account.module';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([JobVacancyRepository]),
-    AccountModule
+    TypeOrmModule.forFeature([JobVacancyRepository])
   ],
   controllers: [JobVacancyController],
   providers: [JobVacancyService]

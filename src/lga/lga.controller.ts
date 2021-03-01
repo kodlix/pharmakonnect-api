@@ -1,16 +1,14 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common';
 import { LgaService } from './lga.service';
 import { CreateLgaDto } from './dto/create-lga.dto';
 import { UpdateLgaDto } from './dto/update-lga.dto';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { FilterDto } from 'src/_common/filter.dto';
 import { LgaRO } from './lga.interface';
 
 @ApiBearerAuth()
 @ApiTags('lga')
 @Controller('lga')
-@UseGuards(AuthGuard())
 export class LgaController {
   constructor(private readonly lgaService: LgaService) { }
 
@@ -30,7 +28,7 @@ export class LgaController {
   @Get('/getbystate/:stateid')
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 200, description: 'Return state' })
-  async findByCountry(@Param('stateid') stateid: string): Promise<LgaRO[]> {
+  async findByCountry(@Param('stateid') stateid: string): Promise<LgaRO> {
     return await this.lgaService.findByState(stateid);
   }
 

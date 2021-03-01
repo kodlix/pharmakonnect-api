@@ -3,10 +3,9 @@ import { LgaService } from './lga.service';
 import { LgaController } from './lga.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LgaEntity } from './entities/lga.entity';
-import { AccountModule } from 'src/account/account.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([LgaEntity]), AccountModule],
+  imports: [TypeOrmModule.forFeature([LgaEntity])],
   controllers: [LgaController],
   providers: [LgaService],
   exports: [LgaService]

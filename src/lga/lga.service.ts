@@ -34,14 +34,14 @@ export class LgaService {
     return this.buildRO(result);
   }
 
-  public async findByState(stateId: string): Promise<LgaRO[]> {
-    const result = await this.lgaRepository.find({ where: { stateId: stateId } });
+  public async findByState(stateId: string): Promise<LgaRO> {
+    const result = await this.lgaRepository.findOne({ where: { stateId: stateId } });
     if (!result) {
       throw new HttpException({
-        error: `state with id ${stateId} does not exists`, status: HttpStatus.NOT_FOUND
+        error: `country with id ${stateId} does not exists`, status: HttpStatus.NOT_FOUND
       }, HttpStatus.NOT_FOUND);
     }
-    return this.buildArrRO(result);
+    return this.buildRO(result);
   }
 
   public async create({ name }: CreateLgaDto): Promise<string> {

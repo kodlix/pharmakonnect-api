@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { AbstractBaseEntity } from 'src/_common/base.entity';
 import { AccountEntity } from 'src/account/entities/account.entity';
@@ -29,7 +30,7 @@ export class JobVacancyEntity extends AbstractBaseEntity {
   jobTitle: string;
 
   @Column({nullable: true})
-  workExperienceInYears: number;
+  workExperienceInYears: string;
 
   @Column({nullable: true})
   jobLocation: string;
@@ -74,9 +75,8 @@ export class JobVacancyEntity extends AbstractBaseEntity {
   rejectionMessage: string;
 
   @ManyToOne(() => AccountEntity, s => s.jobVacancy)
-  account: AccountEntity;
+    account: AccountEntity;
 
   @Column('uuid')
-  accountId: string;
-  
+    accountId: string;
 }

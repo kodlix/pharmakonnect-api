@@ -25,7 +25,7 @@ export class StateService {
     return this.buildArrRO(result);
   }
 
-  public async findOne(id: number): Promise<StateRO> {
+  public async findOne(id: string): Promise<StateRO> {
     const result = await this.stateRepository.findOne(id);
     if (!result) {
       throw new HttpException({
@@ -35,19 +35,19 @@ export class StateService {
     return this.buildRO(result);
   }
 
-  public async findByCountry(countryId: number): Promise<StateRO[]> {
-    const result = await this.stateRepository.find({ where: { countryId: countryId } });
+  public async findByCountry(countryId: string): Promise<StateRO> {
+    const result = await this.stateRepository.findOne({ where: { countryId: countryId } });
     if (!result) {
       throw new HttpException({
         error: `country with id ${countryId} does not exists`, status: HttpStatus.NOT_FOUND
       }, HttpStatus.NOT_FOUND);
     }
-    return this.buildArrRO(result);
+    return this.buildRO(result);
   }
 
   public async create(toCreate: CreateStateDto): Promise<string> {
     const { code, name } = toCreate;
-    const isExists = await await this.stateRepository.findOne({ where: { code: code } });
+    const isExists = await await this.stateRepository.findOne({ code });
     if (isExists) {
       throw new HttpException({ error: `${code} already exists`, status: HttpStatus.BAD_REQUEST },
         HttpStatus.BAD_REQUEST);

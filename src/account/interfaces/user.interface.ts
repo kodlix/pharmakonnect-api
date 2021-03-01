@@ -19,12 +19,3 @@ export interface UserDataRO {
 export interface JwtPayload {
     email: string;
 }
-
-export interface OrganizationRO {
-    organizationName: string;
-    organizationType: string;
-    companyRegistrationNumber: string;
-    pcn: string;
-    longitude: number;
-    latitude: number;
-}
