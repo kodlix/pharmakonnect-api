@@ -74,10 +74,9 @@ export class ConversationRepository extends Repository<ConversationEntity>{
             //update
 
             if (dto.isGroupChat) {
-                await ConversationEntity.update({creatorId: exist.creatorId}, {updatedOn: new Date()})
-                const result = await ConversationEntity.save(exist);
+               var result = await ConversationEntity.update({creatorId: exist.creatorId}, {updatedOn: new Date()})
                 //Call create MESSAGE end point
-                return result
+                return exist
 
             } else {
                 exist.updatedOn = new Date();
