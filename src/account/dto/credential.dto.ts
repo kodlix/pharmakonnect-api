@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsString, Matches, MinLength } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString, Matches, MinLength, isValidationOptions, IsIn, IsEnum } from "class-validator";
+import { accountTypes } from "../account.constant";
 
 export class RegisterDTO {
     @IsString()
@@ -16,6 +17,7 @@ export class RegisterDTO {
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
+    @IsEnum(accountTypes, {message: "Account type can either be 'Individual' or 'Corporate'"})
     readonly accountType: string;
 
     isRegComplete: boolean;
@@ -43,4 +45,3 @@ export class LockUserDTO {
     @ApiProperty()
     readonly isLocked: boolean;
 }
-

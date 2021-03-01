@@ -14,8 +14,26 @@ export interface UserDataRO {
     isLocked: boolean;
     isRegComplete: boolean;
     accountType: string;
+    country: string;
+    state: string;
+    lga: string;
+    city: string;
+    address: string;
 }
-
 export interface JwtPayload {
     email: string;
 }
+export interface OrganizationRO {
+    organizationName: string;
+    organizationType: string;
+    companyRegistrationNumber: string;
+    pcn: string;
+    longitude: number;
+    latitude: number;
+    website: string;
+    openningTime: string;
+    closingTime: string;
+    numberofEmployees: string;
+    yearofEstablishment: string;
+}
+

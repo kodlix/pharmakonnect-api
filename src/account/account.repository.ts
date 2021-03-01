@@ -140,6 +140,8 @@ export class AccountRepository extends Repository<AccountEntity> {
       id: user.id,
       pcn: user.pcn,
       email: user.email,
+      dateOfBirth: user.dateOfBirth,
+      gender: user.gender,
       isLocked: user.isLocked,
       lastName: user.lastName,
       latitude: user.latitude,
@@ -152,6 +154,17 @@ export class AccountRepository extends Repository<AccountEntity> {
       organizationType: user.organizationType,
       isRegComplete: user.isRegComplete,
       accountType: user.accountType,
+      address: user.address,
+      country: user.country,
+      city: user.city,
+      lga: user.lga,
+      state: user.state,
+      website: user.website,
+      openningTime: user.openingTime,
+      closingTime: user.closingTime,
+      companyRegistrationNumber: user.companyRegistrationNumber,
+      yearofEstablishment: user.yearofEstablishment,
+      numberofEmployees: user.numberofEmployees
     };
     return userRO;
   }

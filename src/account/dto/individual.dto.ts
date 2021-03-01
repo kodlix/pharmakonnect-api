@@ -16,10 +16,14 @@ export class IndividualDTO extends BaseAccountDTO {
     @ApiProperty()
     readonly dateOfBirth: Date;
     @ApiProperty()
-    readonly isPracticing: boolean = false;
+    readonly isPracticing: boolean;
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
     readonly gender: string;
+    @ApiProperty()
+    readonly organizationName: string;
+    @ApiProperty()
+    readonly organizationType: string;
     
 }

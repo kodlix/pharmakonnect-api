@@ -1,29 +1,19 @@
-import {  Controller, Get, Post, Body, Put, Param, UseGuards, Patch, UseInterceptors, UploadedFile, HttpStatus, Res } from '@nestjs/common';
-import { diskStorage } from 'multer';
-import { editFileName, imageFileFilter } from 'src/_utility/fileupload.util';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Put, Param, UseGuards, Patch, Query } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AccountService } from './account.service';
 import { CorperateDTO } from './dto/cooperate.dto';
 import { IndividualDTO } from './dto/individual.dto';
 import { RegisterDTO, LoginDTO, LockUserDTO } from './dto/credential.dto';
-import {
-  CorperateRO,
-  IndividualRO,
-  UserRO,
-} from './interfaces/account.interface';
-import { UserDataRO } from './interfaces/user.interface';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { CorperateRO, IndividualRO, UserRO } from './interfaces/account.interface';
+import { OrganizationRO, UserDataRO } from './interfaces/user.interface';
+import { FilterDto } from 'src/_common/filter.dto';
 
 @ApiTags('account')
 @Controller('account')
 export class AccountController {
-  constructor(private readonly accountService: AccountService) {}
+
+  constructor(private readonly accountService: AccountService) { }
 
   @Post('/login')
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -34,26 +24,23 @@ export class AccountController {
 
   @Post('/register')
   @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({
-    status: 201,
-    description: 'The record has been successfully created',
-  })
+  @ApiResponse({ status: 201, description: 'The record has been successfully created' })
   async register(@Body() registerDto: RegisterDTO): Promise<string> {
     return await this.accountService.register(registerDto);
   }
 
   @Get()
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Return all user' })
-  async findAll(): Promise<UserDataRO[]> {
-    return await this.accountService.findAll();
+  async findAll(@Query() filterDto: FilterDto): Promise<UserDataRO[]> {
+    return await this.accountService.findAll(filterDto);
   }
 
   @Get(':id')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Get user' })
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 200, description: 'Return user' })
@@ -63,7 +50,7 @@ export class AccountController {
 
   @Get('/getbyemail/:email')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Get user by email' })
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 200, description: 'Return user' })
@@ -73,84 +60,43 @@ export class AccountController {
 
   @Put('/individual/:email')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'update individual account' })
   @ApiResponse({ status: 404, description: 'Not found' })
-  @ApiResponse({
-    status: 201,
-    description: 'The record has been successfully updated',
-  })
-  async individual(
-    @Param('email') email: string,
-    @Body() toUpdate: IndividualDTO,
-  ): Promise<IndividualRO> {
+  @ApiResponse({ status: 201, description: 'The record has been successfully updated' })
+  async individual(@Param('email') email: string, @Body() toUpdate: IndividualDTO): Promise<IndividualRO> {
     return this.accountService.updateIndividual(email, toUpdate);
   }
 
   @Put('/cooperate/:email')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'update cooperate account' })
   @ApiResponse({ status: 404, description: 'Not found' })
-  @ApiResponse({
-    status: 201,
-    description: 'The record has been successfully updated',
-  })
-  async cooperate(
-    @Param('email') email: string,
-    @Body() toUpdate: CorperateDTO,
-  ): Promise<CorperateRO> {
+  @ApiResponse({ status: 201, description: 'The record has been successfully updated' })
+  async cooperate(@Param('email') email: string, @Body() toUpdate: CorperateDTO): Promise<CorperateRO> {
     return this.accountService.updateCorperate(email, toUpdate);
   }
 
   @Patch()
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Enable and disable user endpoint' })
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 204, description: 'No content' })
-  async lockAndUnlockUser(
-    @Body() lockUserDto: LockUserDTO,
-  ): Promise<UserDataRO> {
+  async lockAndUnlockUser(@Body() lockUserDto: LockUserDTO): Promise<UserDataRO> {
     return await this.accountService.lockAndUnlockUser(lockUserDto);
   }
 
-  // upload single file
-  @Post('/upload')
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: editFileName,
-      }),
-      fileFilter: imageFileFilter,
-    }),
-  )
-  async uploadedFile(@UploadedFile() file) {
-    if (!file) {
-      return {
-        status: HttpStatus.BAD_REQUEST,
-        message: 'no file to upload',
-        data: file,
-      };
-    }
-    const response = {
-      originalname: file.originalname,
-      filename: file.filename,
-    };
-    return {
-      status: HttpStatus.OK,
-      message: 'Image uploaded successfully!',
-      data: response,
-    };
+  @Get('/corporate/organizations')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard()) 
+  @ApiOperation({ summary: 'Get all organizations' })
+  @ApiResponse({ status: 200, description: 'Return all organizations' })
+  async findOrg(): Promise<OrganizationRO[]> {
+    return await this.accountService.findOrg();
   }
 
-  @Get('/uploads/:file')
-  getImage(@Param('file') image, @Res() res) {
-    const response = res.sendFile(image, { root: './uploads' });
-    return {
-      status: HttpStatus.OK,
-      data: response,
-    };
-  }
+  // forget endpoint
+
 }
