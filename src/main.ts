@@ -6,23 +6,6 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
-  // app.useGlobalFilters(
-  //   //new FallbackExceptionsFilter(),
-  //   //new HttpExceptionFilter(),
-  //   //new ValidationFilter()
-  // );
-
-  // app.useGlobalPipes( new ValidationPipe({
-  //     // exceptionFactory: (errors: ValidationError[])=>{
-  //     //   const messages = errors.map(
-  //     //     error=> `${error.property} has wrong value ${error.value},
-  //     //     ${Object.values(error.constraints).join(',') }`
-  //     //   )
-  //     //     return new ValidationException(messages)
-  //     // }
-  //   })
-  // )
   app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()
     .setTitle('Pharma Connect API')
@@ -34,8 +17,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
   app.enableCors();
-
-  await app.listen(4500);
-  console.log('server running on http://127.0.0.1:4500 : ' + new Date());
+  await app.listen(process.env.PORT || 3000);
+  console.log(`server running on ${app.getUrl()} : ` + new Date());
 }
 bootstrap();
