@@ -7,6 +7,7 @@ import { JwtPayload, OrganizationRO, UserDataRO } from './interfaces/user.interf
 import { JwtService } from '@nestjs/jwt';
 import { AccountRepository } from './account.repository';
 import { FilterDto } from 'src/_common/filter.dto';
+import { Not } from 'typeorm';
 
 @Injectable()
 export class AccountService {
@@ -63,9 +64,8 @@ export class AccountService {
   public async updateCorperate(email: string, toUpdate: CorperateDTO): Promise<CorperateRO> {
     toUpdate.isRegComplete = true;
     const orgName = toUpdate.organizationName;
-    const account = await this.accountRepository.createQueryBuilder("account")
-     .where("LOWER(account.organizationName) = LOWER(:orgName)", { orgName }).getMany();
-    if (account.length > 0) {
+    const account = await this.accountRepository.findOne({where: { organizationName: orgName, id: Not(toUpdate.id) } });
+    if (account) {
       throw new HttpException({
         error: `${orgName} already exists`, status: HttpStatus.NOT_FOUND
       }, HttpStatus.NOT_FOUND);

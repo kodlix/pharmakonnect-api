@@ -4,6 +4,7 @@ import { BaseAccountDTO } from "./base-account.dto";
 
 export class CorperateDTO extends BaseAccountDTO {
 
+    readonly id: string;
     @IsString()
     @IsNotEmpty()
     @ApiProperty()

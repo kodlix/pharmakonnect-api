@@ -160,7 +160,7 @@ export class AccountRepository extends Repository<AccountEntity> {
       lga: user.lga,
       state: user.state,
       website: user.website,
-      openningTime: user.openingTime,
+      openingTime: user.openingTime,
       closingTime: user.closingTime,
       companyRegistrationNumber: user.companyRegistrationNumber,
       yearofEstablishment: user.yearofEstablishment,

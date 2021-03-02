@@ -31,7 +31,7 @@ export interface OrganizationRO {
     longitude: number;
     latitude: number;
     website: string;
-    openningTime: string;
+    openingTime: string;
     closingTime: string;
     numberofEmployees: string;
     yearofEstablishment: string;
