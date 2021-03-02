@@ -12,7 +12,7 @@ export class ScheduleMeetingEntity extends AbstractBaseEntity{
     @Column({type: "varchar", length: 128})
     description: string;
 
-    @Column({type: 'string'})
+    @Column({type: 'varchar'})
     duration: string;
 
     @Column({ name: 'startDate', default: new Date()})
