@@ -10,7 +10,7 @@ export class UpdateJobVacancyDto {
   nameOfCorporation: string;
 
   @ApiProperty()
-  @IsInt()
+  @IsString()
   @IsNotEmpty({ message: 'Year of Incorporation is required' })
   yearOfIncorporation: Date;
 
