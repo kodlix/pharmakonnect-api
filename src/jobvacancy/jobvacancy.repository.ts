@@ -59,7 +59,13 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     jobvacancy.workExperienceInYears = dto.workExperienceInYears;
     console.log('jobvacancy', jobvacancy);
 
-    return await this.save(jobvacancy);
+    try {
+      return await this.save(jobvacancy);
+    } catch (error) {
+      console.log("error occured while savinhg job vanacy");      
+      console.log(error);      
+    }
+
   }
 
   async updateEntity(
