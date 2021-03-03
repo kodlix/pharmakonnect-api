@@ -12,6 +12,7 @@ import { JobVacancyModule } from './jobvacancy/jobvacancy.module';
 import { LgaModule } from './lga/lga.module';
 import { SeederModule } from './seeder/seeder.module';
 import { ScheduleMeetingsModule } from './video-conferencing/schedule-meetings/schedule-meetings.module';
+import { EventsModule } from './video-conferencing/events/events.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ScheduleMeetingsModule } from './video-conferencing/schedule-meetings/s
     LgaModule,
     SeederModule,
     ScheduleMeetingsModule,
+    EventsModule
   ],
   controllers: [AppController],
   providers: [AppService],
