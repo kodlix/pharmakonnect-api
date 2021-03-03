@@ -84,9 +84,33 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
             return await this.save(updated);
         }
 
-        throw new HttpException('Assailant',  HttpStatus.NOT_FOUND);
+        throw new HttpException(`The meeting with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
     }
 
+
+    async startMeeting(id: string): Promise<ScheduleMeetingsRO> {
+        const meeting = await this.findOne(id);
+        if(meeting) {
+             meeting.meetingStarted = true;
+             const updated = plainToClassFromExist(ScheduleMeetingEntity, meeting);
+            return await this.save(updated);
+        }
+
+        throw new HttpException(`The meeting with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
+
+    }
+
+    async endMeeting(id: string): Promise<ScheduleMeetingsRO> {
+        const meeting = await this.findOne(id);
+        if(meeting) {
+             meeting.meetingEnded = true;
+             const updated = plainToClassFromExist(ScheduleMeetingEntity, meeting);
+            return await this.save(updated);
+        }
+
+        throw new HttpException(`The meeting with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
+
+    }
    
 
 }

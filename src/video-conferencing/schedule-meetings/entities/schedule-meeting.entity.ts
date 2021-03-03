@@ -44,4 +44,13 @@ export class ScheduleMeetingEntity extends AbstractBaseEntity{
 
     @Column('uuid')
     accountId: string;
+
+    @Column({ type: 'bool', default: false})
+    muteParticipantOnEntry: boolean;
+
+    @Column({ type: 'bool', default: false})
+    recordMeeting: boolean;
+
+    @Column({ type: 'bool', default: false})
+    allowParticipantJoinAnytime: boolean;
 }

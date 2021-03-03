@@ -27,6 +27,14 @@ export class ScheduleMeetingsService {
     return await this.scheduleMeetingsRepo.updateMeeting(id, updateScheduleMeetingDto);
   }
 
+  async startMeeting(id: string): Promise<ScheduleMeetingsRO> {
+    return await this.scheduleMeetingsRepo.startMeeting(id);
+  }
+
+  async endMeeting(id: string) : Promise<ScheduleMeetingsRO>{
+    return await this.scheduleMeetingsRepo.endMeeting(id);
+  }
+
   async remove(id: string) : Promise<DeleteResult>{
     return await this.scheduleMeetingsRepo.deleteMeeting(id);
   }

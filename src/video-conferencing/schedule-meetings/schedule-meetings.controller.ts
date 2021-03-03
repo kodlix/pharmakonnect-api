@@ -2,12 +2,15 @@ import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Query } fro
 import { ScheduleMeetingsService } from './schedule-meetings.service';
 import { CreateScheduleMeetingDto } from './dto/create-schedule-meeting.dto';
 import { UpdateScheduleMeetingDto } from './dto/update-schedule-meeting.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ScheduleMeetingsRO } from './interfaces/schedule-meetings.interface';
 import { AuthGuard } from '@nestjs/passport';
 import { FilterDto } from 'src/_common/filter.dto';
 
 @Controller('meeting')
+@ApiBearerAuth()
+@UseGuards(AuthGuard())
+@ApiTags('schedule-meeting')
 export class ScheduleMeetingsController {
   constructor(private readonly scheduleMeetingsService: ScheduleMeetingsService) {}
 
@@ -20,8 +23,6 @@ export class ScheduleMeetingsController {
   }
 
   @Get()
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Get all meetings' })
   @ApiResponse({ status: 200, description: 'Return all meetings' })
   async findAll(@Query() filterDto: FilterDto) : Promise<ScheduleMeetingsRO[]>{
@@ -29,8 +30,6 @@ export class ScheduleMeetingsController {
   }
 
   @Get(':id')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Get a meeting' })
   @ApiResponse({ status: 200, description: 'Return a meeting' })
   async findOne(@Param('id') id: string) : Promise<ScheduleMeetingsRO> {
@@ -38,12 +37,25 @@ export class ScheduleMeetingsController {
   }
 
   @Put(':id')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Update a meeting' })
   @ApiResponse({ status: 200, description: 'Return meeting successfully updated' })
   async update(@Param('id') id: string, @Body() updateScheduleMeetingDto: UpdateScheduleMeetingDto) {
     return await this.scheduleMeetingsService.update(id, updateScheduleMeetingDto);
+  }
+
+  
+  @Put('start-meeting/:id')
+  @ApiOperation({ summary: 'Start a meeting' })
+  @ApiResponse({ status: 200, description: 'Return meeting successfully started' })
+  async startMeeting(@Param('id') id: string) {
+    return await this.scheduleMeetingsService.startMeeting(id);
+  }
+
+  @Put('end-meeting/:id')
+  @ApiOperation({ summary: 'End a meeting' })
+  @ApiResponse({ status: 200, description: 'Return meeting successfully ended' })
+  async endMeeting(@Param('id') id: string) {
+    return await this.scheduleMeetingsService.endMeeting(id);
   }
 
   @Delete(':id')

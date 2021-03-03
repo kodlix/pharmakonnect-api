@@ -14,6 +14,8 @@ export interface ScheduleMeetingsRO {
     participantVideo : boolean;
     meetingEnded: boolean;
     meetingStarted: boolean;
-
+    muteParticipantOnEntry: boolean;
+    recordMeeting: boolean;
+    allowParticipantJoinAnytime: boolean;
 }
   
