@@ -11,39 +11,46 @@ import { JobVacancyRepository } from './jobvacancy.repository';
 
 @Injectable()
 export class JobVacancyService {
-  constructor(
-    private readonly jobvacancyRepository: JobVacancyRepository
-  ) { }
+  constructor(private readonly jobvacancyRepository: JobVacancyRepository) {}
 
-  async create(dto: CreateJobVacancyDto, user: AccountEntity): Promise<JobVacancyRO> {
+  async create(
+    dto: CreateJobVacancyDto,
+    user: AccountEntity,
+  ): Promise<JobVacancyRO> {
     return await this.jobvacancyRepository.createEntity(dto, user);
   }
 
-  async findAll(): Promise<JobVacancyRO[]> {
-    return await this.jobvacancyRepository.findAll();
+  async findAll(page): Promise<JobVacancyRO[]> {
+    return await this.jobvacancyRepository.findAll(page);
   }
 
   async findOne(id: string): Promise<JobVacancyRO> {
     return await this.jobvacancyRepository.findById(id);
   }
 
-  async findByAccountId(accountId: string): Promise<JobVacancyRO[]> {
-    return await this.jobvacancyRepository.findByAccountId(accountId);
+  async findByAccountId(accountId: string,page): Promise<JobVacancyRO[]> {
+    return await this.jobvacancyRepository.findByAccountId(accountId,page);
   }
 
-  async update(id: string, dto: UpdateJobVacancyDto): Promise<JobVacancyRO> {
-    return await this.jobvacancyRepository.updateEntity(id, dto);
+  async update(id: string, dto: UpdateJobVacancyDto, user: AccountEntity): Promise<JobVacancyRO> {
+    return await this.jobvacancyRepository.updateEntity(id, dto, user);
   }
 
-  async updateApprove(id: string, dto: ApproveJobVacancyDto): Promise<JobVacancyRO> {
+  async updateApprove(
+    id: string,
+    dto: ApproveJobVacancyDto,
+  ): Promise<JobVacancyRO> {
     return await this.jobvacancyRepository.updateApprove(id, dto);
   }
 
-  async updateReject(id: string, dto: RejectJobVacancyDto): Promise<JobVacancyRO> {
+  async updateReject(
+    id: string,
+    dto: RejectJobVacancyDto,
+  ): Promise<JobVacancyRO> {
     return await this.jobvacancyRepository.updateReject(id, dto);
   }
 
   async remove(id: string) {
-    return await this.jobvacancyRepository.deleteEntity(id);  
+    return await this.jobvacancyRepository.deleteEntity(id);
   }
 }

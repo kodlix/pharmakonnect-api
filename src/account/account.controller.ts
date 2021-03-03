@@ -88,9 +88,9 @@ export class AccountController {
     return await this.accountService.lockAndUnlockUser(lockUserDto);
   }
 
-  @Get('/organizations')
+  @Get('/corporate/organizations')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard()) 
   @ApiOperation({ summary: 'Get all organizations' })
   @ApiResponse({ status: 200, description: 'Return all organizations' })
   async findOrg(): Promise<OrganizationRO[]> {
