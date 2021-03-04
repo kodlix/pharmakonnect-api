@@ -2,7 +2,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { Repository, EntityRepository, getConnection, getRepository, getManager } from 'typeorm';
 import { GetgroupchatRO } from 'src/chat/chat.interface'
 import { ParticipantEntity } from 'src/chat/entities/participant.entity'
-import { GroupChatEntity } from '../entities/groupChat.entity';
+import { GroupChatEntity } from '../entities/groupchat.entity';
 import { ConversationRepository } from 'src/chat/repository/chat.conversationRepository';
 import { CreateGroupChatDto } from '../dto/create-groupchat.dto';
 import { UpdateGroupchatDto } from '../dto/update-groupchat.dto';
