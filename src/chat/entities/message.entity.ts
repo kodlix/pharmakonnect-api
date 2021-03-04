@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, CreateDateColumn } from "typeorm";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { AccountEntity } from "src/account/entities/account.entity"
-import { GroupChatEntity } from "src/groupchat/entities/groupChat.entity"
+import { GroupChatEntity } from "src/groupchat/entities/groupchat.entity"
 import { ConversationEntity } from "src/chat/entities/conversation.entity"
 import { text } from "express";
 
