@@ -23,7 +23,7 @@ import {
     @SubscribeMessage('subscribe')
     public handleSubscribe(client: Socket, data: any) {
 
-        //check if room is in use by other conferencers
+      //check if room is in use by other conferencers
         const isRooMInUse = this.rooms.find(x => x.room.toLowerCase() === data.room.split("_")[0].toLowerCase());
         if(isRooMInUse) {
             return this.server.emit( 'roomExist', {message: `The room "${isRooMInUse.room}" is in use.` } );
@@ -57,7 +57,7 @@ import {
 
         // callback function called in the client to show participants count
         if ( client.adapter.rooms[data.room].length === 1 ) {
-          return { count: this.rooms[this.rooms.length - 1].users.length, name: data.user };
+          this.server.to(data.socketId).emit('count', { count: this.rooms[this.rooms.length - 1].users.length, name: data.user });
         }
 
     }
@@ -65,6 +65,7 @@ import {
     @SubscribeMessage('join')
     public handleJoinRoom(client: Socket, data: any) {
 
+      console.log(data);
         //check if room user wants to join is available
         const isRooMAvail = this.rooms.find(x => x.room.toLowerCase() === data.room.split("_")[0].toLowerCase());
         if(!isRooMAvail) {
