@@ -10,8 +10,9 @@ import {
 
   import { Server, Socket } from 'socket.io';
   
-  @WebSocketGateway({namespace: '/stream'})
-  export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  //Websocket gateway for quick video conferencing
+  @WebSocketGateway({namespace: '/flatmeetinggateway'})
+  export class FlatMeetingGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     
     @WebSocketServer() server: Server;
     rooms: Array<any> = [];

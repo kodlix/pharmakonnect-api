@@ -12,7 +12,7 @@ import { JobVacancyModule } from './jobvacancy/jobvacancy.module';
 import { LgaModule } from './lga/lga.module';
 import { SeederModule } from './seeder/seeder.module';
 import { ScheduleMeetingsModule } from './video-conferencing/schedule-meetings/schedule-meetings.module';
-import { EventsModule } from './video-conferencing/events/events.module';
+import { FlatMeetingModule } from './video-conferencing/events/flat-meeting-gateway/flat-meeting.module';
 
 @Module({
   imports: [
@@ -25,7 +25,7 @@ import { EventsModule } from './video-conferencing/events/events.module';
     LgaModule,
     SeederModule,
     ScheduleMeetingsModule,
-    EventsModule
+    FlatMeetingModule
   ],
   controllers: [AppController],
   providers: [AppService],
