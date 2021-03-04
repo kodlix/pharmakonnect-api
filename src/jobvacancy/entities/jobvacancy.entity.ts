@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { AbstractBaseEntity } from 'src/_common/base.entity';
 import { AccountEntity } from 'src/account/entities/account.entity';
@@ -11,7 +12,7 @@ export class JobVacancyEntity extends AbstractBaseEntity {
   nameOfCorporation: string;
 
   @Column({nullable: true})
-  yearOfIncorporation: Date;
+  yearOfIncorporation: string;
 
   @Column({nullable: true})
   companyRegistrationNumber: number;

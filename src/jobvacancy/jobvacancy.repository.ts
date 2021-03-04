@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Repository, EntityRepository, DeleteResult } from 'typeorm';
 import { ApproveJobVacancyDto } from './dto/approve-jobvacancy';
@@ -32,12 +33,13 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         `Minimum salary of Job '${dto.jobTitle}' can not be greater than Maximum salary`,
         HttpStatus.BAD_REQUEST,
       );
-    } else if (job && dto.yearOfIncorporation < today) {
-      throw new HttpException(
-        `Year of Incorporation can not be less than today`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    } 
+    //  if (dto.yearOfIncorporation < 2022) {
+    //   throw new HttpException(
+    //     `Year of Incorporation can not be greater than today`,
+    //     HttpStatus.BAD_REQUEST,
+    //   );
+    // }
     //const jobvacancy = await this.create();
     jobvacancy.createdBy = user.createdBy;
     jobvacancy.accountId = user.id;
@@ -59,13 +61,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     jobvacancy.workExperienceInYears = dto.workExperienceInYears;
     console.log('jobvacancy', jobvacancy);
 
-    try {
-      return await this.save(jobvacancy);
-    } catch (error) {
-      console.log("error occured while savinhg job vanacy");      
-      console.log(error);      
-    }
-
+    return await this.save(jobvacancy);
   }
 
   async updateEntity(
