@@ -25,8 +25,7 @@ import {
         //check if room is in use by other conferencers
         const isRooMInUse = this.rooms.find(x => x.room.toLowerCase() === data.room.split("_")[0].toLowerCase());
         if(isRooMInUse) {
-            this.server.emit( 'roomExist', {message: `The room "${isRooMInUse.room}" is in use.` } );
-            return;
+            return this.server.emit( 'roomExist', {message: `The room "${isRooMInUse.room}" is in use.` } );
         }
 
         //create a room
@@ -57,19 +56,18 @@ import {
 
         // callback function called in the client to show participants count
         if ( client.adapter.rooms[data.room].length === 1 ) {
-          return { count: this.rooms[this.rooms.length - 1].this.users.length, name: data.user };
+          return { count: this.rooms[this.rooms.length - 1].users.length, name: data.user };
         }
 
     }
 
     @SubscribeMessage('join')
-    public joinRoom(client: Socket, data: any): void {
+    public handleJoinRoom(client: Socket, data: any) {
 
         //check if room user wants to join is available
         const isRooMAvail = this.rooms.find(x => x.room.toLowerCase() === data.room.split("_")[0].toLowerCase());
         if(!isRooMAvail) {
-            this.server.emit( 'roomDoesNotExist', {  message: 'Meeting has ended or the meeting ID is invalid.' } );
-            return;
+            return this.server.emit( 'roomDoesNotExist', {  message: 'Meeting has ended or the meeting ID is invalid.' } );
         }
 
         //join a room
@@ -95,9 +93,6 @@ import {
     public handleNewUserStart(client: Socket, data: any): void {
 
         this.server.to( data.to ).emit( 'newUserStart', { sender: data.sender } );
-
-        // client.leave(room);
-        // client.emit('leftRoom', room);
     }
 
     @SubscribeMessage('sdp')
