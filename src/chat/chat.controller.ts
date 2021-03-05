@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, HttpCode } from '@nestjs/common';
-import { ChatConverationService } from './services/chat.conversationService';
+import { ChatConverationService } from './services/chat.conversation.service';
 import { AlertGateway } from './chat.chatservice';
 import { CreateConversationDto } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';

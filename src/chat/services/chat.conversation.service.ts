@@ -1,7 +1,7 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { CreateConversationDto } from '../dto/create-chat.dto';
 import { UpdateChatDto } from '../dto/update-chat.dto';
-import { ConversationRepository } from '../repository/chat.conversationRepository';
+import { ConversationRepository } from '../repository/chat.conversation.repository';
 import { ConversationRO } from '../chat.interface'
 
 @Injectable()

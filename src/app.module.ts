@@ -14,6 +14,8 @@ import { SeederModule } from './seeder/seeder.module';
 import { ChatModule } from './chat/chat.module';
 import { ContactModule } from './contact/contact.module';
 import { GroupchatModule } from './groupchat/groupchat.module';
+import { ScheduleMeetingsModule } from './video-conferencing/schedule-meetings/schedule-meetings.module';
+import { FlatMeetingModule } from './video-conferencing/events/flat-meeting-gateway/flat-meeting.module';
 
 @Module({
   imports: [
@@ -25,9 +27,8 @@ import { GroupchatModule } from './groupchat/groupchat.module';
     JobVacancyModule,
     LgaModule,
     SeederModule,
-    ChatModule,
-    ContactModule,
-    GroupchatModule
+    ScheduleMeetingsModule,
+    FlatMeetingModule
   ],
   controllers: [AppController],
   providers: [AppService],
