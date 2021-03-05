@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne } from "typeorm";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { AccountEntity } from "src/account/entities/account.entity"
-import { GroupChatEntity } from "src/groupchat/entities/groupChat.entity"
+import { GroupChatEntity } from "src/groupchat/entities/groupchat.entity"
 
 @Entity("Participant")
 export class ParticipantEntity extends AbstractBaseEntity{
@@ -13,7 +13,7 @@ export class ParticipantEntity extends AbstractBaseEntity{
     @Column({default : "pharmaceutical"})
     sectorId : string
 
-    @ManyToOne(()=> GroupChatEntity, groupchat => groupchat.id, { onDelete: 'CASCADE'})
+    // @ManyToOne(()=> GroupChatEntity, groupchat => groupchat.id, { onDelete: 'CASCADE'})
     @Column({nullable : true})
     groupChatID : string
 
