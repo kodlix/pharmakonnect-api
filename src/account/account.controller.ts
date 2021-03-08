@@ -101,7 +101,7 @@ export class AccountController {
   }
 
   // upload single file
-  @Post('/uploads')
+  @Put('/uploads')
   @UseGuards(AuthGuard())
   @UseInterceptors(
     FileInterceptor('image', {
