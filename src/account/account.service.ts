@@ -86,4 +86,10 @@ export class AccountService {
     return await this.accountRepository.findOrg();
   }
 
+
+  async updateProfileImage(filename: string, userId: string) {
+    return await this.accountRepository.updateProfileImage(filename, userId);
+  }
+
+
 }
