@@ -28,7 +28,9 @@ import { FlatMeetingModule } from './video-conferencing/events/flat-meeting-gate
     LgaModule,
     SeederModule,
     ScheduleMeetingsModule,
-    FlatMeetingModule
+    FlatMeetingModule,
+    ChatModule,
+    ContactModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -9,6 +9,7 @@ import { GroupChatRepository } from './repository/groupchat.repository';
     TypeOrmModule.forFeature([GroupChatRepository])
   ],
   controllers: [GroupchatController],
-  providers: [GroupchatService]
+  providers: [GroupchatService],
+  exports:[GroupchatService]
 })
 export class GroupchatModule {}
