@@ -1,33 +1,53 @@
-import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsEmpty, IsNotEmpty, IsNumber, IsString } from "class-validator"
+import { IsDate, IsEmpty, IsNotEmpty, IsNumber, IsString} from "class-validator";
+import { Exclude, Expose } from "class-transformer";
+
 
 
 export class UpdateScheduleMeetingDto {
+
+    @Expose()
     @IsString()
     @ApiProperty()
     @IsNotEmpty({message: 'Topic cannot be empty'})
     topic: string;
 
+    @Expose()
     @IsString()
     @ApiProperty()
     description: string;
 
-    @IsString()
+    @Expose()
+    @IsNumber()
     @ApiProperty()
-    @IsNotEmpty({message: 'Duration cannot be empty'})
-    duration: string;
+    @IsNotEmpty({message: 'Duration in hours cannot be empty'})
+    durationInHours: number;
 
+    @Expose()
+    @IsNumber()
+    @ApiProperty()
+    @IsNotEmpty({message: 'Duration in minutes cannot be empty'})
+    durationInMinutes: number;
+
+    @Expose()
     @IsDate()
     @ApiProperty()
     @IsNotEmpty({message: 'Start Date cannot be empty'})
     startDate: Date;
 
+    @Expose()
+    @IsDate()
+    @ApiProperty()
+    @IsNotEmpty({message: 'Start Time cannot be empty'})
+    startTime: Date
+
+    @Expose()
     @IsString()
     @ApiProperty()
     @IsNotEmpty({message: 'Meeting ID cannot be empty'})
     meetingID: string;
 
+    @Expose()
     @IsString()
     @ApiProperty()
     passcode: string;
