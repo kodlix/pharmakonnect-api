@@ -57,4 +57,28 @@ export class CreateScheduleMeetingDto {
     @IsString()
     @ApiProperty()
     passcode: string;
+
+    @ApiProperty()
+    @IsOptional()
+    muteParticipantOnEntry: boolean;
+
+    @ApiProperty()
+    @IsOptional()
+    recordMeeting: boolean;
+
+    @ApiProperty()
+    @IsOptional()
+    allowParticipantJoinAnytime: boolean;
+
+    @ApiProperty()
+    @IsOptional()
+    waitingRoom: boolean
+
+    @ApiProperty()
+    @IsOptional()
+    hostVideo: boolean;
+
+    @ApiProperty()
+    @IsOptional()
+    participantVideo: boolean;
 }
