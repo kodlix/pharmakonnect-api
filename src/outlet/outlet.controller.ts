@@ -25,11 +25,11 @@ export class OutletController {
     @ApiOperation({ summary: 'Get all Outlet' })
     @ApiResponse({ status: 201, description: 'Success.' })
     @ApiResponse({ status: 404, description: 'Not Found.' })
-    async findAll(@Query('page') page: number, @Req() req: any): Promise<OutletRO[]> {
-        return await this.outletService.findAll(page);
+    async findAll(@Req() req: any, @Query('page') page?: number, @Query('search') searchParam?: string): Promise<OutletRO[]> {
+        return await this.outletService.findAll(page, searchParam);
     }
 
-    @Get(':id')
+    @Get(':id') 
     @ApiResponse({ status: 201, description: 'Success.' })
     @ApiResponse({ status: 404, description: 'Not Found.' })
     @ApiOperation({ summary: 'Get outlet by Id' })
@@ -73,5 +73,4 @@ export class OutletController {
         }
         return await this.outletService.remove(id);
     }
-
 }

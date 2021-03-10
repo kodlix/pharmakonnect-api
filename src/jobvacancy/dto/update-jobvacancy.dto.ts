@@ -10,14 +10,14 @@ export class UpdateJobVacancyDto {
   nameOfCorporation: string;
 
   @ApiProperty()
-  @IsInt()
+  @IsString()
   @IsNotEmpty({ message: 'Year of Incorporation is required' })
   yearOfIncorporation: Date;
 
   @ApiProperty()
   @IsOptional()
-  @IsInt()
-  companyRegistrationNumber: number;
+  @IsString()
+  companyRegistrationNumber: string;
 
   @ApiProperty()
   @ValidateIf(o => o.  companyUrl

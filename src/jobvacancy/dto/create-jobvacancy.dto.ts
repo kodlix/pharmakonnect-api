@@ -15,14 +15,13 @@ export class CreateJobVacancyDto {
 
   @ApiProperty()
   @IsOptional()
-  @IsInt()
-  companyRegistrationNumber: number;
+  @IsString()
+  companyRegistrationNumber: string;
 
   @ApiProperty()
-  @ValidateIf(o => o.  companyUrl
-    === 'value')
+  @IsOptional()
   @IsString()
-  @IsUrl(undefined, { message: 'Company Url is not valid.' })
+  //@IsUrl(undefined, { message: 'Company Url is not valid.' })
   companyUrl: string;
 
   @ApiProperty()
@@ -77,10 +76,9 @@ export class CreateJobVacancyDto {
   endDate: Date;
 
   @ApiProperty()
-  @ValidateIf(o => o.  jobUrl
-    === 'value')
+  @IsOptional()
   @IsString()
-  @IsUrl(undefined, { message: 'Job Url is not valid' })
+//@IsUrl(undefined, { message: 'Job Url is not valid' })
   jobUrl: string;
 
   @ApiProperty()

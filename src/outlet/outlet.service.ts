@@ -19,9 +19,9 @@ export class OutletService {
     ): Promise<OutletRO> {
         return await this.outletRepository.createEntity(dto, user);
     }
-    async findAll(page): Promise<OutletRO[]> {
-        return await this.outletRepository.findAll(page);
-      }
+    async findAll(page, searchParam): Promise<OutletRO[]> {
+        return await this.outletRepository.findAll(page, searchParam);
+    }
 
     async findOne(id: string): Promise<OutletRO> {
         return await this.outletRepository.findById(id);
@@ -38,5 +38,4 @@ export class OutletService {
     async remove(id: string) {
         return await this.outletRepository.deleteEntity(id);
     }
-
 }
