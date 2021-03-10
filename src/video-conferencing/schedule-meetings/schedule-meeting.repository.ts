@@ -7,12 +7,20 @@ import {validate} from 'class-validator';
 import { FilterDto } from "src/_common/filter.dto";
 import { ScheduleMeetingsRO } from "./interfaces/schedule-meetings.interface";
 import { UpdateScheduleMeetingDto } from "./dto/update-schedule-meeting.dto";
+import {ILike} from "typeorm";
+
 
 
 @EntityRepository(ScheduleMeetingEntity)
 export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity> {
 
     async saveMeetingSchedule(payload: CreateScheduleMeetingDto) : Promise<ScheduleMeetingsRO> {
+        
+        const isMeetingTopicExist = this.findOne({where: {topic: ILike(`%${payload.topic}%`)}});
+        if(isMeetingTopicExist) {
+            throw new HttpException( `Meeting with ${payload.topic} already exist`, HttpStatus.BAD_REQUEST);
+        }
+        
         const today = new Date();
 
         if(!payload.accountId) {
@@ -20,7 +28,7 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
         }
 
         if(today > payload.startDate) {
-            throw new HttpException( `Meeting Start Date${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
+            throw new HttpException( `Meeting Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
         }
 
         const newMeetings = plainToClass(ScheduleMeetingEntity, payload);
@@ -38,8 +46,8 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
         if(search) {
             const meetings = await this.find({ 
                 where: [
-                    { topic: Like(`%${search} #%`) },
-                    { meetingID: Like(`%${search} #%`)}
+                    { topic: ILike(`%${search}%`) },
+                    { meetingID: ILike(`%${search}%`)}
                 ]
             });
 
@@ -79,7 +87,14 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
 
     async updateMeeting(id: string, payload: UpdateScheduleMeetingDto) : Promise<ScheduleMeetingsRO> {
         const meeting = await this.findOne(id);
-        if (meeting) {
+        if (meeting && meeting.topic != payload.topic) {
+            
+            const topicExist = await this.findOne({where: {topic: ILike(`%${payload.topic}%`)}});
+            
+            if(topicExist){
+                throw new HttpException( `Meeting with ${payload.topic} is already in use`, HttpStatus.BAD_REQUEST);
+            }
+
             const updated = plainToClassFromExist(meeting, payload);
             return await this.save(updated);
         }

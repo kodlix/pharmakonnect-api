@@ -5,8 +5,10 @@ export interface ScheduleMeetingsRO {
     accountId: string;
     topic: string;
     description: string;
-    duration: string;
+    durationInHours: number;
+    durationInMinutes: number;
     startDate: Date;
+    startTime: Date;
     passcode: string;
     meetingID: string;
     waitingRoom: boolean;

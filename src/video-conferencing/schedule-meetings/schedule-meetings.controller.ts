@@ -59,6 +59,8 @@ export class ScheduleMeetingsController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete a meeting' })
+  @ApiResponse({ status: 200, description: 'Meeting successfully deleted' })
   async remove(@Param('id') id: string) {
     return await this.scheduleMeetingsService.remove(id);
   }

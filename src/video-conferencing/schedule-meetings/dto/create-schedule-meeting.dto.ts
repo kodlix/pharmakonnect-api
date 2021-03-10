@@ -24,16 +24,28 @@ export class CreateScheduleMeetingDto {
     description: string;
 
     @Expose()
-    @IsString()
+    @IsNumber()
     @ApiProperty()
-    @IsNotEmpty({message: 'Duration cannot be empty'})
-    duration: string;
+    @IsNotEmpty({message: 'Duration in hours cannot be empty'})
+    durationInHours: number;
+
+    @Expose()
+    @IsNumber()
+    @ApiProperty()
+    @IsNotEmpty({message: 'Duration in minutes cannot be empty'})
+    durationInMinutes: number;
 
     @Expose()
     @IsDate()
     @ApiProperty()
     @IsNotEmpty({message: 'Start Date cannot be empty'})
     startDate: Date;
+
+    @Expose()
+    @IsDate()
+    @ApiProperty()
+    @IsNotEmpty({message: 'Start Time cannot be empty'})
+    startTime: Date
 
     @Expose()
     @IsString()
@@ -45,4 +57,28 @@ export class CreateScheduleMeetingDto {
     @IsString()
     @ApiProperty()
     passcode: string;
+
+    @ApiProperty()
+    @IsOptional()
+    muteParticipantOnEntry: boolean;
+
+    @ApiProperty()
+    @IsOptional()
+    recordMeeting: boolean;
+
+    @ApiProperty()
+    @IsOptional()
+    allowParticipantJoinAnytime: boolean;
+
+    @ApiProperty()
+    @IsOptional()
+    waitingRoom: boolean
+
+    @ApiProperty()
+    @IsOptional()
+    hostVideo: boolean;
+
+    @ApiProperty()
+    @IsOptional()
+    participantVideo: boolean;
 }
