@@ -24,6 +24,10 @@ export class JobVacancyService {
     return await this.jobvacancyRepository.findAll(page);
   }
 
+  async findJob(page, searchParam): Promise<JobVacancyRO[]> {
+    return await this.jobvacancyRepository.findJob(page, searchParam);
+}
+
   async findOne(id: string): Promise<JobVacancyRO> {
     return await this.jobvacancyRepository.findById(id);
   }

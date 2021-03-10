@@ -16,6 +16,7 @@ import { ContactModule } from './contact/contact.module';
 import { GroupchatModule } from './groupchat/groupchat.module';
 import { ScheduleMeetingsModule } from './video-conferencing/schedule-meetings/schedule-meetings.module';
 import { FlatMeetingModule } from './video-conferencing/events/flat-meeting-gateway/flat-meeting.module';
+import { OutletModule } from './outlet/outlet.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { FlatMeetingModule } from './video-conferencing/events/flat-meeting-gate
     ScheduleMeetingsModule,
     FlatMeetingModule,
     ChatModule,
-    ContactModule
+    ContactModule,
+    OutletModule
   ],
   controllers: [AppController],
   providers: [AppService],
