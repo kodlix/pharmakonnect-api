@@ -6,7 +6,7 @@ import { UpdateOutletDto } from "./dto/update-outlet.dto";
 import { OutletRO } from "./outlet.interface";
 import { OutletService } from "./outlet.service";
 
-@Controller('oulet')
+@Controller('outlet')
 @ApiBearerAuth()
 @UseGuards(AuthGuard())
 @ApiTags('outlet')
