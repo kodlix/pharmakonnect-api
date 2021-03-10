@@ -19,7 +19,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
 
     const jobvacancy = new JobVacancyEntity();
 
-    if (job.jobTitle === dto.jobTitle &&  job.nameOfCorporation === dto.nameOfCorporation && job.endDate > today) {
+    if (job && job.jobTitle === dto.jobTitle &&  job.nameOfCorporation === dto.nameOfCorporation && job.endDate > today) {
       throw new HttpException(
         `Job with title '${dto.jobTitle}' already exisits`,
         HttpStatus.BAD_REQUEST,
@@ -92,7 +92,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     const today = new Date();
     console.log('jobvacancy', jobvacancy);
 
-    if (job.jobTitle === dto.jobTitle &&  job.nameOfCorporation === dto.nameOfCorporation && job.endDate > today) {
+    if (job && job.jobTitle === dto.jobTitle &&  job.nameOfCorporation === dto.nameOfCorporation && job.endDate > today) {
       throw new HttpException(
         `Job with title '${dto.jobTitle}' already exisits`,
         HttpStatus.BAD_REQUEST,
