@@ -45,11 +45,6 @@ export class CreateOutletDto{
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    organizationName: string;
-
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
     country: string;
 
     @ApiProperty()

@@ -45,11 +45,6 @@ export class UpdateOutletDto{
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    organizationName: string;
-
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
     country: string;
 
     @ApiProperty()

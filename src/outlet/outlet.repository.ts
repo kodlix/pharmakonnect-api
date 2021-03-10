@@ -1,8 +1,6 @@
+/* eslint-disable prettier/prettier */
 import { AccountEntity } from "src/account/entities/account.entity";
-import { CountryEntity } from "src/country/entities/country.entity";
-import { LgaEntity } from "src/lga/entities/lga.entity";
-import { StateEntity } from "src/state/entities/state.entity";
-import { DeleteResult, EntityRepository, ILike, Like, Repository } from "typeorm";
+import { DeleteResult, EntityRepository, ILike, Repository } from "typeorm";
 import { CreateOutletDto } from "./dto/create-outlet.dto";
 import { UpdateOutletDto } from "./dto/update-outlet.dto";
 import { OutletEntity } from "./entity/outlet.entity";
@@ -23,7 +21,7 @@ export class OutletRepository extends Repository<OutletEntity>{
     outlet.pcn = dto.pcn;
     outlet.openingTime = dto.openingTime;
     outlet.closingTime = dto.closingTime;
-    outlet.organizationName = dto.organizationName;
+    outlet.organizationName = user.organizationName;
     outlet.createdBy = user.createdBy;
     outlet.accountId = user.id;
     outlet.createdBy = user.createdBy;
@@ -50,7 +48,6 @@ export class OutletRepository extends Repository<OutletEntity>{
     outlet.pcn = dto.pcn;
     outlet.openingTime = dto.openingTime;
     outlet.closingTime = dto.closingTime;
-    outlet.organizationName = dto.organizationName;
     outlet.country = dto.country;
     outlet.state = dto.state;
     outlet.lga = dto.lga;
@@ -70,7 +67,7 @@ export class OutletRepository extends Repository<OutletEntity>{
     return outlet;
   }
 
-  async findByAccountId(accountId: string, page: number = 1): Promise<OutletEntity[]> {
+  async findByAccountId(accountId: string, page = 1): Promise<OutletEntity[]> {
     const outlet = await this.find({
       where: { accountId: accountId },
       order: { createdAt: 'DESC' },
@@ -81,7 +78,7 @@ export class OutletRepository extends Repository<OutletEntity>{
     return outlet;
   }
 
-  async findAll(page: number = 1, searchParam: string): Promise<OutletEntity[]> {
+  async findAll(page = 1, searchParam: string): Promise<OutletEntity[]> {
     if (searchParam) {
       const param = `%${searchParam}%`
       const searchResult = await this.find({
