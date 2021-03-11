@@ -8,13 +8,14 @@ import { FilterDto } from "src/_common/filter.dto";
 import { ScheduleMeetingsRO } from "./interfaces/schedule-meetings.interface";
 import { UpdateScheduleMeetingDto } from "./dto/update-schedule-meeting.dto";
 import {ILike} from "typeorm";
+import { AccountEntity } from "src/account/entities/account.entity";
 
 
 
 @EntityRepository(ScheduleMeetingEntity)
 export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity> {
 
-    async saveMeetingSchedule(payload: CreateScheduleMeetingDto) : Promise<ScheduleMeetingsRO> {
+    async saveMeetingSchedule(payload: CreateScheduleMeetingDto, user: AccountEntity) : Promise<ScheduleMeetingsRO> {
         
         const isMeetingTopicExist = await this.findOne({where: {topic: ILike(`%${payload.topic}%`)}});
         if(isMeetingTopicExist) {
@@ -23,8 +24,8 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
         
         const today = new Date();
 
-        if(!payload.accountId) {
-            throw new HttpException( `User ID is required`, HttpStatus.BAD_REQUEST);
+        if(!user.id) {
+            throw new HttpException( `User ID is required`, HttpStatus.UNAUTHORIZED);
         }
 
         if(today > payload.startDate) {
@@ -32,6 +33,8 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
         }
 
         const newMeetings = plainToClass(ScheduleMeetingEntity, payload);
+
+        newMeetings.accountId = user.id;
 
         console.log(newMeetings);
         const errors = await validate(newMeetings);

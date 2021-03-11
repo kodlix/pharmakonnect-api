@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Query, Req } from '@nestjs/common';
 import { ScheduleMeetingsService } from './schedule-meetings.service';
 import { CreateScheduleMeetingDto } from './dto/create-schedule-meeting.dto';
 import { UpdateScheduleMeetingDto } from './dto/update-schedule-meeting.dto';
@@ -18,8 +18,8 @@ export class ScheduleMeetingsController {
   @ApiOperation({ summary: 'Save meeting scheduling' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 201, description: 'The record has been successfully created' })
-  async create(@Body() createScheduleMeetingDto: CreateScheduleMeetingDto) : Promise<ScheduleMeetingsRO> {
-    return await this.scheduleMeetingsService.create(createScheduleMeetingDto);
+  async create(@Body() createScheduleMeetingDto: CreateScheduleMeetingDto,  @Req() req: any) : Promise<ScheduleMeetingsRO> {
+    return await this.scheduleMeetingsService.create(createScheduleMeetingDto, req.user);
   }
 
   @Get()
