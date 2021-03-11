@@ -106,6 +106,8 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
                 throw new HttpException( `Meeting with ${payload.topic} is already in use`, HttpStatus.BAD_REQUEST);
             }
 
+            meeting.updatedAt = new Date();
+            meeting.updatedBy = payload.updatedBy;
             const updated = plainToClassFromExist(meeting, payload);
 
             try {

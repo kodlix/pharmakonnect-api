@@ -74,4 +74,9 @@ export class UpdateScheduleMeetingDto {
     @ApiProperty()
     @IsOptional()
     participantVideo: boolean;
+
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
+    updatedBy: string;
 }
