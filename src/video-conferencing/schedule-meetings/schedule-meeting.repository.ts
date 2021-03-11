@@ -16,10 +16,10 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
 
     async saveMeetingSchedule(payload: CreateScheduleMeetingDto) : Promise<ScheduleMeetingsRO> {
         
-        const isMeetingTopicExist = this.findOne({where: {topic: ILike(`%${payload.topic}%`)}});
-        if(isMeetingTopicExist) {
-            throw new HttpException( `Meeting with ${payload.topic} already exist`, HttpStatus.BAD_REQUEST);
-        }
+        // const isMeetingTopicExist = this.findOne({where: {topic: ILike(`%${payload.topic}%`)}});
+        // if(isMeetingTopicExist) {
+        //     throw new HttpException( `Meeting with ${payload.topic} already exist`, HttpStatus.BAD_REQUEST);
+        // }
         
         const today = new Date();
 
@@ -105,7 +105,21 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
 
     async startMeeting(id: string): Promise<ScheduleMeetingsRO> {
         const meeting = await this.findOne(id);
+
         if(meeting) {
+
+            // function hourwithAMPM(dateInput) {
+            //     var d = new Date(dateInput);
+            //     var ampm = (d.getHours() >= 12) ? "PM" : "AM";
+            //     var hours = (d.getHours() >= 12) ? d.getHours()-12 : d.getHours();
+            //     return `$`
+            //     return hours+':'+d.getMinutes()+' '+ampm;
+             
+            //  }
+             //console.log(hourwithAMPM(new Date()))
+
+             //const today = new Date();
+
              meeting.meetingStarted = true;
              const updated = plainToClassFromExist(ScheduleMeetingEntity, meeting);
             return await this.save(updated);
