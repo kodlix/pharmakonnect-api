@@ -10,6 +10,7 @@ import { FilterDto } from 'src/_common/filter.dto';
 import { Not } from 'typeorm';
 import * as nodemailer from 'nodemailer';
 import { default as config } from './config';
+import { AccountEntity } from './entities/account.entity';
 
 @Injectable()
 export class AccountService {
@@ -39,7 +40,7 @@ export class AccountService {
   public async register(registerDto: RegisterDTO): Promise<string> {
     if (await this.accountRepository.register(registerDto)) {
       if (await this.createEmailToken(registerDto.email)) {
-          await this.sendEmailVerification(registerDto.email);
+        await this.sendEmailVerification(registerDto.email);
       }
       return "Registration successfully";
     }
@@ -211,5 +212,12 @@ export class AccountService {
     return sended;
   }
 
+  public async getOneUserByEmail(email: string): Promise<AccountEntity> {
+    return await this.accountRepository.findOneOrFail({ where: { email } });
+  }
+
+  public async getOneUserById(id: string): Promise<AccountEntity> {
+    return await this.accountRepository.findOneOrFail({ where: { id } });
+  }
 
 }

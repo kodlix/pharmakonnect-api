@@ -1,10 +1,18 @@
 import { ArticleEntity } from 'src/blog/article/entities/article.entity';
-import { AbstractBaseEntity } from 'src/_common/base.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 
 @Entity('Comment')
-export class CommentEntity extends AbstractBaseEntity {
+export class CommentEntity {
+
+  @PrimaryGeneratedColumn('uuid')
+  id?: string;
+
+  @Column()
+  createdBy?: string
+
+  @CreateDateColumn()
+  createdAt?: Date
 
   @Column({ type: 'text' })
   message?: string;
@@ -24,7 +32,7 @@ export class CommentEntity extends AbstractBaseEntity {
   @Column({ default: 0 })
   dislikes?: number;
 
-  @ManyToOne(type => ArticleEntity, article => article.comment)
+  @ManyToOne(type => ArticleEntity, article => article.comments)
   article?: ArticleEntity;
 
 }

@@ -1,14 +1,17 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsDefined, IsNotEmpty } from 'class-validator';
 
 export class ArticleDto {
 
-  @IsNotEmpty()
+  createdBy: string
+
+  @IsNotEmpty() @ApiProperty()
   title: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty() @ApiProperty()
   body: string;
 
-  @IsDefined()
-  categoryIds: number[];
+  @IsDefined() @ApiProperty()
+  categoryIds: string[];
 
 }

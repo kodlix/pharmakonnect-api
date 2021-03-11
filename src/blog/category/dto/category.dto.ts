@@ -1,11 +1,14 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Allow, IsNotEmpty } from 'class-validator';
 
 export class CategoryDto {
+  
+  createdBy?: string
 
-  @IsNotEmpty()
+  @IsNotEmpty() @ApiProperty() 
   title?: string;
 
-  @Allow()
+  @Allow() @ApiProperty()  
   body?: string;
 
 }

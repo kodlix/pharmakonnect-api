@@ -1,33 +1,71 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Query, UseGuards, Req } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiTags } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
 import { CategoryDto } from './dto/category.dto';
 
+@ApiTags('category')
 @Controller('category')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(private readonly categoryService: CategoryService) { }
 
-  @Post()
-  create(@Body() createCategoryDto: CategoryDto) {
-    return this.categoryService.create(createCategoryDto);
+  @Get('/count')
+  async getCount() {
+    try {
+      return await this.categoryService.getCount();
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NO_CONTENT);
+    }
   }
 
   @Get()
-  findAll() {
-    return this.categoryService.findAll();
+  findAll(@Query('page') page: number, @Query('take') take: number) {
+    try {
+      return this.categoryService.findAll(page, take);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoryService.findOne(+id);
+  @Get(':categoryId')
+  async findOne(@Param('categoryId') categoryId: string) {
+    try {
+      return await this.categoryService.findOne(categoryId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
   }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: CategoryDto) {
-    return this.categoryService.update(+id, updateCategoryDto);
+  @Post()
+  @UseGuards(AuthGuard())
+  async create(@Body() catDto: CategoryDto, @Req() req: any) {
+    try {
+      catDto.createdBy = req.user.createdBy;
+      return await this.categoryService.create(catDto);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_ACCEPTABLE);
+    }
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.categoryService.remove(+id);
+  @Put(':categoryId')
+  @UseGuards(AuthGuard())
+  async update(@Param('categoryId') categoryId: string, @Body() categoryDto: CategoryDto) {
+    try {
+      return await this.categoryService.update(categoryId, categoryDto);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_ACCEPTABLE);
+    }
   }
+
+  @Delete(':categoryId')
+  @UseGuards(AuthGuard())
+  async remove(@Param('categoryId') categoryId: string) {
+    try {
+      return await this.categoryService.remove(categoryId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
+  }
+
+
 }

@@ -1,33 +1,120 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Query, Req, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiTags } from '@nestjs/swagger';
+import { AccountService } from 'src/account/account.service';
+import { CategoryService } from '../category/category.service';
 import { ArticleService } from './article.service';
 import { ArticleDto } from './dto/article.dto';
 
+@ApiTags('article')
 @Controller('article')
 export class ArticleController {
-  constructor(private readonly articleService: ArticleService) {}
+  constructor(
+    private readonly articleService: ArticleService,
+    private readonly categoryService: CategoryService,
+    private readonly userService: AccountService,
+  ) { }
 
-  @Post()
-  create(@Body() createArticleDto: ArticleDto) {
-    return this.articleService.create(createArticleDto);
+  @Get('/count')
+  async getCount() {
+    try {
+      return await this.articleService.getCount();
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NO_CONTENT);
+    }
   }
 
   @Get()
-  findAll() {
-    return this.articleService.findAll();
+  findAll(@Query('page') page: number, @Query('take') take: number) {
+    try {
+      return this.articleService.findAll(page, take);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.articleService.findOne(+id);
+  @Get(':articleId')
+  async findOne(@Param('articleId') articleId: string) {
+    try {
+      return await this.articleService.findOne(articleId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
   }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateArticleDto: ArticleDto) {
-    return this.articleService.update(+id, updateArticleDto);
+  @Post()
+  @UseGuards(AuthGuard())
+  async create(@Body() articleDto: ArticleDto, @Req() req: any) {
+    try {
+      articleDto.createdBy = req.user.createdBy;
+      return await this.articleService.create(articleDto, req.user.email);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_ACCEPTABLE);
+    }
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.articleService.remove(+id);
+  @Put(':articleId')
+  @UseGuards(AuthGuard())
+  async update(@Param('articleId') articleId: string, @Body() articleDto: ArticleDto) {
+    try {
+      return await this.articleService.update(articleId, articleDto);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_ACCEPTABLE);
+    }
   }
+
+  @Delete(':articleId')
+  @UseGuards(AuthGuard())
+  async remove(@Param('articleId') articleId: string) {
+    try {
+      return await this.articleService.remove(articleId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Get('category/:categoryId/count')
+  async getCountByCategory(@Param('categoryId') categoryId: string) {
+    try {
+      const category = await this.categoryService.getOneCategory(categoryId);
+      return await this.articleService.getArticlesCountByCategory(category);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NO_CONTENT);
+    }
+  }
+
+  @Get('category/:categoryId')
+  async getByCategory(
+    @Param('categoryId') categoryId: string,
+    @Query('page') page: number, @Query('take') take: number) {
+    try {
+      const category = await this.categoryService.getOneCategory(categoryId);
+      return await this.articleService.getArticlesByCategory(category, page, take);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NO_CONTENT);
+    }
+  }
+
+  @Get('user/:userId/count')
+  async getCountByAuthor(@Param('userId') userId: string) {
+    try {
+      const author = await this.userService.getOneUserById(userId);
+      return await this.articleService.getArticlesCountByAuthor(author);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NO_CONTENT);
+    }
+  }
+
+  @Get('user/:userId')
+  async getByAuthor(
+    @Param('userId') userId: string,
+    @Query('page') page: number, @Query('take') take: number) {
+    try {
+      const author = await this.userService.getOneUserById(userId);
+      return await this.articleService.getArticlesByAuthor(author, page, take);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NO_CONTENT);
+    }
+  }
+
 }

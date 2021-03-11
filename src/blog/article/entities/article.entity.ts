@@ -1,19 +1,29 @@
 import { AccountEntity } from 'src/account/entities/account.entity';
 import { CategoryEntity } from 'src/blog/category/entities/category.entity';
 import { CommentEntity } from 'src/blog/comment/entities/comment.entity';
-import { AbstractBaseEntity } from 'src/_common/base.entity';
 import {
     Column,
+  CreateDateColumn,
     Entity,
     JoinTable,
     ManyToMany,
     ManyToOne,
     OneToMany,
+    PrimaryGeneratedColumn,
   } from 'typeorm';
     
   @Entity('Article')
-  export class ArticleEntity extends AbstractBaseEntity {
+  export class ArticleEntity {
    
+    @PrimaryGeneratedColumn('uuid')
+    id?: string;
+
+    @Column()
+    createdBy?: string
+  
+    @CreateDateColumn()
+    createdAt?: Date
+
     @Column()
     title?: string;
   
@@ -33,13 +43,13 @@ import {
     views?: number;
   
     @OneToMany(type => CommentEntity, comment => comment.article)
-    comment?: CommentEntity[];
+    comments?: CommentEntity[];
   
     @ManyToOne(type => AccountEntity, user => user.articles)
     author?: AccountEntity;
   
     @ManyToMany(type => CategoryEntity, category => category.articles)
     @JoinTable({ name: 'article_category'})
-    category?: CategoryEntity[];
+    categories?: CategoryEntity[];
   }
   

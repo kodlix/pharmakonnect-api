@@ -1,33 +1,61 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query, HttpException, HttpStatus, UseGuards, Req } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiTags } from '@nestjs/swagger';
 import { CommentService } from './comment.service';
 import { CommentDto } from './dto/comment.dto';
 
-@Controller('comment')
+@ApiTags('comment')
+@Controller('article/:articleId/comment')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
-
-  @Post()
-  create(@Body() createCommentDto: CommentDto) {
-    return this.commentService.create(createCommentDto);
-  }
+  constructor(private readonly commentService: CommentService) { }
 
   @Get()
-  findAll() {
-    return this.commentService.findAll();
+  findAll(@Param('articleId') articleId: string, @Query('page') page: number, @Query('take') take: number) {
+    try {
+      return this.commentService.findAll(articleId, page, take);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentService.findOne(+id);
+  @Get(':commentId')
+  async findOne(@Param('commentId') commentId: string) {
+    try {
+      return await this.commentService.findOne(commentId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
   }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateCommentDto: CommentDto) {
-    return this.commentService.update(+id, updateCommentDto);
+  @Post()
+  @UseGuards(AuthGuard())
+  async create(@Param('articleId') articleId: string, @Body() commentDto: CommentDto, @Req() req: any) {
+    try {
+      commentDto.createdBy = req.user.createdBy;
+      return await this.commentService.create(articleId, commentDto, req.user.email);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_ACCEPTABLE);
+    }
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.commentService.remove(+id);
+  @Put(':commentId')
+  @UseGuards(AuthGuard())
+  async update(@Param('commentId') commentId: string, @Body() commentDto: CommentDto) {
+    try {
+      return await this.commentService.update(commentId, commentDto);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_ACCEPTABLE);
+    }
   }
+
+  @Delete(':commentId')
+  @UseGuards(AuthGuard())
+  async remove(@Param('commentId') commentId: string) {
+    try {
+      return await this.commentService.remove(commentId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
+  }
+
 }
