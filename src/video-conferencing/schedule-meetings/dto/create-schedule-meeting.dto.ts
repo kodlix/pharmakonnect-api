@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude, Expose } from "class-transformer";
-import { IsDate, IsEmpty, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
+import { IsDate, IsDateString, IsEmpty, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
 
 @Exclude()
 export class CreateScheduleMeetingDto {
@@ -36,13 +36,13 @@ export class CreateScheduleMeetingDto {
     durationInMinutes: number;
 
     @Expose()
-    @IsDate()
+    @IsDateString()
     @ApiProperty()
     @IsNotEmpty({message: 'Start Date cannot be empty'})
     startDate: Date;
 
     @Expose()
-    @IsDate()
+    @IsDateString()
     @ApiProperty()
     @IsNotEmpty({message: 'Start Time cannot be empty'})
     startTime: Date
