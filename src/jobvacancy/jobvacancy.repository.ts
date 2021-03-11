@@ -182,7 +182,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     return jobvacancy;
   }
 
-  async findByAccountId(accountId: string,page: number = 1): Promise<JobVacancyEntity[]> {
+  async findByAccountId(accountId: string,page = 1): Promise<JobVacancyEntity[]> {
     const jobvacancy = await this.find({
       where: { accountId: accountId },
       order: { approvedOn: 'DESC' },
@@ -192,17 +192,17 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     return jobvacancy;
   }
 
-  async findAll(page: number = 1): Promise<JobVacancyEntity[]> {
-    const jobvacancy = await this.find({ order: { approvedOn: 'DESC' },
-    take: 25,
+  // async findAll(page = 1): Promise<JobVacancyEntity[]> {
+  //   const jobvacancy = await this.find({ order: { approvedOn: 'DESC' },
+  //   take: 25,
 
-    skip: 25 * (page - 1),});
+  //   skip: 25 * (page - 1),});
     
-    return jobvacancy;
-  }
+  //   return jobvacancy;
+  //}
 
 
-  async findJob(page: number = 1, searchParam: string): Promise<JobVacancyEntity[]> {
+  async findJob(page = 1, searchParam: string): Promise<JobVacancyEntity[]> {
     if (searchParam) {
       const param = `%${searchParam}%`
       const searchResult = await this.find({

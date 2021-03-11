@@ -18,6 +18,7 @@ import { JobVacancyService } from './jobvacancy.service';
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -43,22 +44,25 @@ export class JobVacancyController {
     return this.jobvacancyService.create(createJobVacancyDto, req.user);
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Get all jobvacancy' })
-  @ApiResponse({ status: 201, description: 'Success.' })
-  @ApiResponse({ status: 404, description: 'Not Found.' })
-  async findAll(@Query('page') page: number, @Req() req: any): Promise<JobVacancyRO[]> {
-    console.log(req.user);
-    return await this.jobvacancyService.findAll(page);
-  }
+  // @Get()
+  // @ApiOperation({ summary: 'Get jobvacancy' })
+  // @ApiResponse({ status: 201, description: 'Success.' })
+  // @ApiResponse({ status: 404, description: 'Not Found.' })
+  // async findAll(@Query('page') page: number, @Req() req: any): Promise<JobVacancyRO[]> {
+  //   console.log(req.user);
+  //   return await this.jobvacancyService.findAll(page);
+  // }
 
   @Get()
     @ApiOperation({ summary: 'Get all JobVacancy' })
     @ApiResponse({ status: 201, description: 'Success.' })
     @ApiResponse({ status: 404, description: 'Not Found.' })
+    @ApiQuery({ name: 'page', required: false})
+    @ApiQuery({ name: 'search', required: false})
     async findJob(@Req() req: any, @Query('page') page?: number, @Query('search') searchParam?: string): Promise<JobVacancyRO[]> {
         return await this.jobvacancyService.findJob(page, searchParam);
-    }
+  }
+
   @Get(':id')
   @ApiResponse({ status: 201, description: 'Success.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
