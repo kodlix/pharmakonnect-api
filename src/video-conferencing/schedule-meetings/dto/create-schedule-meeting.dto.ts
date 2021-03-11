@@ -42,7 +42,6 @@ export class CreateScheduleMeetingDto {
     startDate: Date;
 
     @Expose()
-    @IsDateString()
     @ApiProperty()
     @IsNotEmpty({message: 'Start Time cannot be empty'})
     startTime: Date
