@@ -8,12 +8,6 @@ export class CreateScheduleMeetingDto {
     @Expose()
     @IsString()
     @ApiProperty()
-    @IsNotEmpty({message: 'User Id cannot be empty'})
-    accountId: string;
-
-    @Expose()
-    @IsString()
-    @ApiProperty()
     @IsNotEmpty({message: 'Topic cannot be empty'})
     topic: string;
 
