@@ -4,6 +4,8 @@ import { AbstractBaseEntity } from "src/_common/base.entity";
 import { Column, Entity, OneToMany } from "typeorm";
 import * as bcrypt from 'bcrypt';
 import { JobVacancyEntity } from "src/jobvacancy/entities/jobvacancy.entity";
+import { ScheduleMeetingEntity } from "src/video-conferencing/schedule-meetings/entities/schedule-meeting.entity";
+import { ArticleEntity } from "src/blog/article/entities/article.entity";
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
@@ -139,10 +141,22 @@ export class AccountEntity extends AbstractBaseEntity {
     @Column()
     public salt: string;
 
+    @Column({ type: 'bool', default: false })
+    public isEmailVerified: boolean;
+
+    @Column({ nullable: true })
+    public emailToken: string;
+
     @OneToMany(() => JobVacancyEntity, s => s.account)
     jobVacancy: JobVacancyEntity[];
 
-    async validatePassword(password: string): Promise<boolean> {
+    @OneToMany(() => ScheduleMeetingEntity, s => s.account)
+    meeting: ScheduleMeetingEntity[];
+
+    @OneToMany(type => ArticleEntity, article => article.author)
+    articles?: ArticleEntity[];
+
+    public async validatePassword(password: string): Promise<boolean> {
         const hash = await bcrypt.hash(password, this.salt);
         return hash === this.password;
     }

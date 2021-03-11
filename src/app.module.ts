@@ -11,6 +11,12 @@ import { StateModule } from './state/state.module';
 import { JobVacancyModule } from './jobvacancy/jobvacancy.module';
 import { LgaModule } from './lga/lga.module';
 import { SeederModule } from './seeder/seeder.module';
+import { ChatModule } from './chat/chat.module';
+import { ContactModule } from './contact/contact.module';
+import { GroupchatModule } from './groupchat/groupchat.module';
+import { ScheduleMeetingsModule } from './video-conferencing/schedule-meetings/schedule-meetings.module';
+import { FlatMeetingModule } from './video-conferencing/events/flat-meeting-gateway/flat-meeting.module';
+
 
 @Module({
   imports: [
@@ -22,6 +28,8 @@ import { SeederModule } from './seeder/seeder.module';
     JobVacancyModule,
     LgaModule,
     SeederModule,
+    ScheduleMeetingsModule,
+    FlatMeetingModule
   ],
   controllers: [AppController],
   providers: [AppService],
