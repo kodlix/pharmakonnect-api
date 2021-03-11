@@ -35,6 +35,7 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
         const newMeetings = plainToClass(ScheduleMeetingEntity, payload);
 
         newMeetings.accountId = user.id;
+        newMeetings.createdBy = user.createdBy;
 
         console.log(newMeetings);
         const errors = await validate(newMeetings);
