@@ -16,10 +16,10 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
 
     async saveMeetingSchedule(payload: CreateScheduleMeetingDto) : Promise<ScheduleMeetingsRO> {
         
-        // const isMeetingTopicExist = this.findOne({where: {topic: ILike(`%${payload.topic}%`)}});
-        // if(isMeetingTopicExist) {
-        //     throw new HttpException( `Meeting with ${payload.topic} already exist`, HttpStatus.BAD_REQUEST);
-        // }
+        const isMeetingTopicExist = await this.findOne({where: {topic: ILike(`%${payload.topic}%`)}});
+        if(isMeetingTopicExist) {
+            throw new HttpException( `Meeting with ${payload.topic} already exist`, HttpStatus.BAD_REQUEST);
+        }
         
         const today = new Date();
 
@@ -32,13 +32,20 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
         }
 
         const newMeetings = plainToClass(ScheduleMeetingEntity, payload);
+
+        console.log(newMeetings);
         const errors = await validate(newMeetings);
 
         if(errors.length > 0) {
             throw new HttpException(errors, HttpStatus.BAD_REQUEST);
         }
 
-        return await this.save(newMeetings);
+        try {
+            return await this.save(newMeetings);
+
+        } catch(error)  {
+            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
     }
 
@@ -96,7 +103,13 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
             }
 
             const updated = plainToClassFromExist(meeting, payload);
-            return await this.save(updated);
+
+            try {
+                return await this.save(updated);
+
+            } catch (error) {
+                throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
 
         throw new HttpException(`The meeting with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
