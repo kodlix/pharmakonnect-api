@@ -6,7 +6,7 @@ import { Column, Entity, ManyToOne } from "typeorm";
 @Entity('Meetings')
 export class ScheduleMeetingEntity extends AbstractBaseEntity{
 
-    @Column({ type: "varchar", length: 128})
+    @Column({unique: true, type: "varchar", length: 128})
     topic: string;
 
     @Column({type: "varchar", length: 128})
