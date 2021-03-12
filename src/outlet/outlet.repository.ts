@@ -18,6 +18,7 @@ export class OutletRepository extends Repository<OutletEntity>{
     outlet.contactPerson = dto.contactPerson;
     outlet.address = dto.address;
     outlet.contactPersonPhonenumber = dto.contactPersonPhonenumber;
+    outlet.contactPersonEmail = dto.contactPersonEmail;
     outlet.pcn = dto.pcn;
     outlet.openingTime = dto.openingTime;
     outlet.closingTime = dto.closingTime;
@@ -45,6 +46,7 @@ export class OutletRepository extends Repository<OutletEntity>{
     outlet.contactPerson = dto.contactPerson;
     outlet.address = dto.address;
     outlet.contactPersonPhonenumber = dto.contactPersonPhonenumber;
+    outlet.contactPersonEmail = dto.contactPersonEmail;
     outlet.pcn = dto.pcn;
     outlet.openingTime = dto.openingTime;
     outlet.closingTime = dto.closingTime;
