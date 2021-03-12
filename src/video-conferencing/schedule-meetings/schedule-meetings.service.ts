@@ -12,7 +12,7 @@ export class ScheduleMeetingsService {
   
   constructor(private readonly scheduleMeetingsRepo: ScheduleMeetingRepository) {}
 
-  async create(request: CreateScheduleMeetingDto, user: AccountEntity) : Promise<ScheduleMeetingsRO> {
+  async create(request: CreateScheduleMeetingDto, user: AccountEntity) : Promise<string> {
       return await this.scheduleMeetingsRepo.saveMeetingSchedule(request, user);
   }
 
@@ -24,15 +24,15 @@ export class ScheduleMeetingsService {
     return await this.scheduleMeetingsRepo.findMeetingById(id);
   }
 
-  async update(id: string, updateScheduleMeetingDto: UpdateScheduleMeetingDto) : Promise<ScheduleMeetingsRO> {
+  async update(id: string, updateScheduleMeetingDto: UpdateScheduleMeetingDto) : Promise<string> {
     return await this.scheduleMeetingsRepo.updateMeeting(id, updateScheduleMeetingDto);
   }
 
-  async startMeeting(id: string): Promise<ScheduleMeetingsRO> {
+  async startMeeting(id: string): Promise<string> {
     return await this.scheduleMeetingsRepo.startMeeting(id);
   }
 
-  async endMeeting(id: string) : Promise<ScheduleMeetingsRO>{
+  async endMeeting(id: string) : Promise<string>{
     return await this.scheduleMeetingsRepo.endMeeting(id);
   }
 

@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Exclude, Expose } from "class-transformer";
 import { IsDate, IsDateString, IsEmpty, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
 
@@ -15,6 +15,7 @@ export class CreateScheduleMeetingDto {
     @IsString()
     @ApiProperty()
     @IsOptional()
+    @ApiPropertyOptional()
     description: string;
 
     @Expose()
@@ -48,30 +49,38 @@ export class CreateScheduleMeetingDto {
 
     @Expose()
     @IsString()
+    @IsNotEmpty({message: 'Passcode cannot be empty'})
     @ApiProperty()
     passcode: string;
 
-    @ApiProperty()
+    @ApiProperty({default: false})
+    @ApiPropertyOptional()
     @IsOptional()
     muteParticipantOnEntry: boolean;
 
-    @ApiProperty()
+    @ApiProperty({default: false})
+    @ApiPropertyOptional()
     @IsOptional()
     recordMeeting: boolean;
 
     @ApiProperty()
+    @ApiPropertyOptional()
     @IsOptional()
     allowParticipantJoinAnytime: boolean;
 
-    @ApiProperty()
+    @ApiProperty({default: false})
+    @ApiPropertyOptional()
     @IsOptional()
     waitingRoom: boolean
 
     @ApiProperty()
+    @ApiPropertyOptional()
     @IsOptional()
     hostVideo: boolean;
 
     @ApiProperty()
+    @ApiPropertyOptional()
     @IsOptional()
     participantVideo: boolean;
+
 }

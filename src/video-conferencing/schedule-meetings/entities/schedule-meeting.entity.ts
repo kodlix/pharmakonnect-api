@@ -57,6 +57,6 @@ export class ScheduleMeetingEntity extends AbstractBaseEntity{
     @Column({ type: 'bool', default: false})
     recordMeeting: boolean;
 
-    @Column({ type: 'bool', default: false})
+    @Column({ type: 'bool', default: true})
     allowParticipantJoinAnytime: boolean;
 }
