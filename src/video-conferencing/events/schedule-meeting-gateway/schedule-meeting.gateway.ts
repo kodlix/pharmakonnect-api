@@ -110,7 +110,7 @@ import { Connection } from 'typeorm';
 
         //if user wants to join with the passcode, make sure he/she has the correct passcode
         if(data.passcode) {
-          if (meeting.passcode != data.passcode) {
+          if (data.passcode != meeting.passcode) {
             throw new WsException(`The passcode for the meeting is incorrect`);
           } 
         }
@@ -133,7 +133,7 @@ import { Connection } from 'typeorm';
 
         //Inform other members in the room of new user's arrival
         if ( client.adapter.rooms[data.meetingId].length > 1 ) {
-            client.to( data.room ).emit( 'new user', { socketId: data.socketId, name: data.name, participantCount: meetings.length, users: meetings} );
+            client.to( data.meetingId ).emit( 'new user', { socketId: data.socketId, name: data.name, participantCount: meetings.length, users: meetings} );
             this.server.to( data.socketId ).emit( 'socketResponse', {socketResponse: { participantCount: meetings.length, name: userThatJoinedInfo.name } });
         }
 

@@ -32,11 +32,12 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
             throw new HttpException( `Meeting Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
         }
 
-        const todayTime = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
-
-        if(todayTime > payload.startTime.toTimeString()) {
-            throw new HttpException( `Meeting Start Time cannot be in the past`, HttpStatus.BAD_REQUEST);
-        }
+        // const todayTime = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+        // const startTime = `${payload.startTime.getHours()}:${payload.startTime.getMinutes()}:${payload.startTime.getSeconds()}`;
+        
+        // if(todayTime > startTime) {
+        //     throw new HttpException( `Meeting Start Time cannot be in the past`, HttpStatus.BAD_REQUEST);
+        // }
 
         const newMeetings = plainToClass(ScheduleMeetingEntity, payload);
 
@@ -120,11 +121,11 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
                 throw new HttpException( `Meeting Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
             }
     
-            const todayTime = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+            // const todayTime = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
 
-            if(todayTime > payload.startTime.toTimeString()) {
-                throw new HttpException( `Meeting Start Time cannot be in the past`, HttpStatus.BAD_REQUEST);
-            }
+            // if(todayTime > payload.startTime.toTimeString()) {
+            //     throw new HttpException( `Meeting Start Time cannot be in the past`, HttpStatus.BAD_REQUEST);
+            // }
 
             meeting.updatedAt = new Date();
             meeting.updatedBy = payload.updatedBy;
@@ -141,67 +142,5 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
 
         throw new HttpException(`The meeting with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
     }
-
-
-    async startMeeting(id: string): Promise<string> {
-        const meeting = await this.findOne(id);
-
-        if(!meeting) {
-            throw new HttpException(`The meeting with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
-        }
-
-        if(meeting.meetingStarted) {
-            throw new HttpException(`Meeting already started`, HttpStatus.BAD_REQUEST);
-        } else if (meeting.meetingEnded) {
-            throw new HttpException(`Meeting already ended`, HttpStatus.BAD_REQUEST);
-        }
-        
-        meeting.meetingStarted = true;
-
-        const updated = plainToClassFromExist(ScheduleMeetingEntity, meeting);
-        await this.save(updated);
-
-        return "Meeting started successfully";
-
-    }
-
-    async endMeeting(id: string): Promise<string> {
-        const meeting = await this.findOne(id);
-        if(!meeting) {
-            throw new HttpException(`The meeting with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
-        }
-
-        if(!meeting.meetingStarted) {
-            throw new HttpException(`Cannot end a meeting that has not started yet`, HttpStatus.BAD_REQUEST);
-        }
-
-        meeting.meetingEnded = true;
-        const updated = plainToClassFromExist(ScheduleMeetingEntity, meeting);
-        await this.save(updated);
-
-        await this.delete({ id: meeting.id });
-
-        return "Meeting ended successfully"
-
-    }
-   
-
-    async getMeetingStartingNow(): Promise<ScheduleMeetingsRO[]> {
-        const today = new Date();
-        const timeReacheds =  await this.find({
-            select: ['accountId', 'startTime']
-        })
-
-        return timeReacheds;
-    }
-
-    // const isToday = (someDate) => {
-    //     const today = new Date()
-    //     return someDate.getDate() === today.getDate() &&
-    //       someDate.getMonth() === today.getMonth() &&
-    //       someDate.getFullYear() === today.getFullYear()
-    //   }
-    //   const today = isToday(new Date("03/12/2021"))
-    //   console.log(today);
 
 }
