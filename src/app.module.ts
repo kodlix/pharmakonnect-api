@@ -13,6 +13,10 @@ import { LgaModule } from './lga/lga.module';
 import { SeederModule } from './seeder/seeder.module';
 import { ScheduleMeetingsModule } from './video-conferencing/schedule-meetings/schedule-meetings.module';
 import { FlatMeetingModule } from './video-conferencing/events/flat-meeting-gateway/flat-meeting.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { SendItemReminderModule } from './video-conferencing/tasks/send-item-reminder/send-item-reminder.module';
+import { ScheduleMeetingGatewayModule } from './video-conferencing/events/schedule-meeting-gateway/schedule-meeting-gateway.module';
+
 
 @Module({
   imports: [
@@ -25,7 +29,10 @@ import { FlatMeetingModule } from './video-conferencing/events/flat-meeting-gate
     LgaModule,
     SeederModule,
     ScheduleMeetingsModule,
-    FlatMeetingModule
+    FlatMeetingModule,
+    ScheduleMeetingGatewayModule,
+    ScheduleModule.forRoot(),
+    //SendItemReminderModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -44,19 +44,19 @@ export class ScheduleMeetingsController {
   }
 
   
-  @Patch('start-meeting/:id')
-  @ApiOperation({ summary: 'Start a meeting' })
-  @ApiResponse({ status: 200, description: 'Return meeting successfully started' })
-  async startMeeting(@Param('id') id: string): Promise<string> {
-    return await this.scheduleMeetingsService.startMeeting(id);
-  }
+  // @Patch('start-meeting/:id')
+  // @ApiOperation({ summary: 'Start a meeting' })
+  // @ApiResponse({ status: 200, description: 'Return meeting successfully started' })
+  // async startMeeting(@Param('id') id: string): Promise<string> {
+  //   return await this.scheduleMeetingsService.startMeeting(id);
+  // }
 
-  @Patch('end-meeting/:id')
-  @ApiOperation({ summary: 'End a meeting' })
-  @ApiResponse({ status: 200, description: 'Return meeting successfully ended' })
-  async endMeeting(@Param('id') id: string): Promise<string> {
-    return await this.scheduleMeetingsService.endMeeting(id);
-  }
+  // @Patch('end-meeting/:id')
+  // @ApiOperation({ summary: 'End a meeting' })
+  // @ApiResponse({ status: 200, description: 'Return meeting successfully ended' })
+  // async endMeeting(@Param('id') id: string): Promise<string> {
+  //   return await this.scheduleMeetingsService.endMeeting(id);
+  // }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a meeting' })

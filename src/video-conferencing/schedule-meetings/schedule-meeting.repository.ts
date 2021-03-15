@@ -7,7 +7,7 @@ import {validate} from 'class-validator';
 import { FilterDto } from "src/_common/filter.dto";
 import { ScheduleMeetingsRO } from "./interfaces/schedule-meetings.interface";
 import { UpdateScheduleMeetingDto } from "./dto/update-schedule-meeting.dto";
-import {ILike} from "typeorm";
+import {ILike, Equal} from "typeorm";
 import { AccountEntity } from "src/account/entities/account.entity";
 
 
@@ -146,43 +146,62 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
     async startMeeting(id: string): Promise<string> {
         const meeting = await this.findOne(id);
 
-        if(meeting) {
-
-            // function hourwithAMPM(dateInput) {
-            //     var d = new Date(dateInput);
-            //     var ampm = (d.getHours() >= 12) ? "PM" : "AM";
-            //     var hours = (d.getHours() >= 12) ? d.getHours()-12 : d.getHours();
-            //     return `$`
-            //     return hours+':'+d.getMinutes()+' '+ampm;
-             
-            //  }
-             //console.log(hourwithAMPM(new Date()))
-
-             //const today = new Date();
-
-             meeting.meetingStarted = true;
-             const updated = plainToClassFromExist(ScheduleMeetingEntity, meeting);
-             await this.save(updated);
-             return "Meeting started successfully";
+        if(!meeting) {
+            throw new HttpException(`The meeting with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
         }
 
-        throw new HttpException(`The meeting with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
+        if(meeting.meetingStarted) {
+            throw new HttpException(`Meeting already started`, HttpStatus.BAD_REQUEST);
+        } else if (meeting.meetingEnded) {
+            throw new HttpException(`Meeting already ended`, HttpStatus.BAD_REQUEST);
+        }
+        
+        meeting.meetingStarted = true;
+
+        const updated = plainToClassFromExist(ScheduleMeetingEntity, meeting);
+        await this.save(updated);
+
+        return "Meeting started successfully";
 
     }
 
     async endMeeting(id: string): Promise<string> {
         const meeting = await this.findOne(id);
-        if(meeting) {
-             meeting.meetingEnded = true;
-             const updated = plainToClassFromExist(ScheduleMeetingEntity, meeting);
-             await this.save(updated);
-
-             return "Meeting ended successfully"
+        if(!meeting) {
+            throw new HttpException(`The meeting with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
         }
 
-        throw new HttpException(`The meeting with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
+        if(!meeting.meetingStarted) {
+            throw new HttpException(`Cannot end a meeting that has not started yet`, HttpStatus.BAD_REQUEST);
+        }
+
+        meeting.meetingEnded = true;
+        const updated = plainToClassFromExist(ScheduleMeetingEntity, meeting);
+        await this.save(updated);
+
+        await this.delete({ id: meeting.id });
+
+        return "Meeting ended successfully"
 
     }
    
+
+    async getMeetingStartingNow(): Promise<ScheduleMeetingsRO[]> {
+        const today = new Date();
+        const timeReacheds =  await this.find({
+            select: ['accountId', 'startTime']
+        })
+
+        return timeReacheds;
+    }
+
+    // const isToday = (someDate) => {
+    //     const today = new Date()
+    //     return someDate.getDate() === today.getDate() &&
+    //       someDate.getMonth() === today.getMonth() &&
+    //       someDate.getFullYear() === today.getFullYear()
+    //   }
+    //   const today = isToday(new Date("03/12/2021"))
+    //   console.log(today);
 
 }
