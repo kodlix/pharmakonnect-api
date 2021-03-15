@@ -7,7 +7,7 @@ import { MessageEntity } from "src/chat/entities/message.entity";
 @Entity("GroupChat")
 export class GroupChatEntity extends AbstractBaseEntity{
 
-    @ManyToOne(()=> AccountEntity, account => account.id)
+    // @ManyToOne(()=> AccountEntity, account => account.id)
     @Column()
     creatorId : string
 
@@ -33,7 +33,7 @@ export class GroupChatEntity extends AbstractBaseEntity{
     expiresOn : Date
 
 
-    @OneToMany(() => ParticipantEntity, participant => participant.groupChatID, {eager: true,  cascade: true})
+    // @OneToMany(() => ParticipantEntity, participant => participant.groupChatID, {eager: true,  cascade: true})
     participants : ParticipantEntity[]
 
     @OneToMany(() => MessageEntity, message => message.groupChatID, {eager: true, cascade: true})

@@ -17,8 +17,8 @@ export class UpdateJobVacancyDto {
 
   @ApiProperty()
   @IsOptional()
-  @IsInt()
-  companyRegistrationNumber: number;
+  @IsString()
+  companyRegistrationNumber: string;
 
   @ApiProperty()
   @ValidateIf(o => o.  companyUrl

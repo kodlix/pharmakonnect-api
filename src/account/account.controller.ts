@@ -1,5 +1,7 @@
-import { Controller, Get, Post, Body, Put, Param, UseGuards, Patch, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, UseGuards, Patch, Query, UseInterceptors, HttpStatus, UploadedFile, Res, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { diskStorage } from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AccountService } from './account.service';
 import { CorperateDTO } from './dto/cooperate.dto';
@@ -8,6 +10,7 @@ import { RegisterDTO, LoginDTO, LockUserDTO } from './dto/credential.dto';
 import { CorperateRO, IndividualRO, UserRO } from './interfaces/account.interface';
 import { OrganizationRO, UserDataRO } from './interfaces/user.interface';
 import { FilterDto } from 'src/_common/filter.dto';
+import { editFileName, imageFileFilter } from 'src/_utility/fileupload.util';
 
 @ApiTags('account')
 @Controller('account')
@@ -97,6 +100,48 @@ export class AccountController {
     return await this.accountService.findOrg();
   }
 
-  // forget endpoint
+  // upload single file
+  @Put('/uploads')
+  @UseGuards(AuthGuard())
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async uploadedFile(@UploadedFile() file, @Req() req) {
+    if (!file) {
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: 'no file to upload',
+        data: file,
+      };
+    }
+    const response = {
+      originalname: file.originalname,
+      filename: file.filename,
+    };
+
+    await this.accountService.updateProfileImage(file.filename, req.user.id);
+
+    return {
+      status: HttpStatus.OK,
+      message: 'Image uploaded successfully!',
+      data: response,
+    };
+  }
+
+  @Get('/uploads/:file')
+  getImage(@Param('file') image, @Res() res) {
+    const response = res.sendFile(image, { root: './uploads' });
+    return {
+      status: HttpStatus.OK,
+      data: response,
+    };
+  }
+
 
 }

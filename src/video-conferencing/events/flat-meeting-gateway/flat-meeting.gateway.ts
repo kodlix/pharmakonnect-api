@@ -23,10 +23,10 @@ import {
     @SubscribeMessage('subscribe')
     public handleSubscribe(client: Socket, data: any) {
 
-        //check if room is in use by other conferencers
-        const isRooMInUse = this.rooms.find(x => x.room.toLowerCase() === data.room.split("_")[0].toLowerCase());
-        if(isRooMInUse) {
-            return this.server.emit( 'roomExist', {message: `The room "${isRooMInUse.room}" is in use.` } );
+      //check if room is in use by other conferencers
+        const isRoomInUse = this.rooms.find(x => x.room.toLowerCase() === data.room.split("_")[0].toLowerCase());
+        if(isRoomInUse) {
+            return client.emit( 'roomExist', {message: `The room "${isRoomInUse.room}" is in use.` } );
         }
 
         //create a room
@@ -52,12 +52,12 @@ import {
         
         //Inform other members in the room of new user's arrival
         if ( client.adapter.rooms[data.room].length > 1 ) {
-          this.server.to( data.room ).emit( 'new user', { socketId: data.socketId, user: data.user} );
+          client.to( data.room ).emit( 'new user', { socketId: data.socketId, user: data.user} );
         }
 
         // callback function called in the client to show participants count
         if ( client.adapter.rooms[data.room].length === 1 ) {
-          return { count: this.rooms[this.rooms.length - 1].users.length, name: data.user };
+          this.server.to(data.socketId).emit('count', { count: this.rooms[this.rooms.length - 1].users.length, name: this.rooms[this.rooms.length - 1].users, isNew: data.isNew });
         }
 
     }
@@ -66,9 +66,9 @@ import {
     public handleJoinRoom(client: Socket, data: any) {
 
         //check if room user wants to join is available
-        const isRooMAvail = this.rooms.find(x => x.room.toLowerCase() === data.room.split("_")[0].toLowerCase());
-        if(!isRooMAvail) {
-            return this.server.emit( 'roomDoesNotExist', {  message: 'Meeting has ended or the meeting ID is invalid.' } );
+        const isRoomAvailable = this.rooms.find(x => x.room.toLowerCase() === data.room.split("_")[0].toLowerCase());
+        if(!isRoomAvailable) {
+            return client.emit( 'roomDoesNotExist', {  message: 'Meeting has ended or the meeting ID is invalid.' } );
         }
 
         //join a room
@@ -77,15 +77,16 @@ import {
 
         this.users[data.socketId] = `${data.user}*${data.room}`;
 
-        let userRoomDetailsIndex = this.rooms.indexOf(isRooMAvail);
-        isRooMAvail.users.push(data.user);
+        let userRoomDetailsIndex = this.rooms.indexOf(isRoomAvailable);
+        isRoomAvailable.users.push(data.user);
 
-        this.rooms[userRoomDetailsIndex] = isRooMAvail;
+        this.rooms[userRoomDetailsIndex] = isRoomAvailable;
 
 
         //Inform other members in the room of new user's arrival
         if ( client.adapter.rooms[data.room].length > 1 ) {
-            this.server.to( data.room ).emit( 'new user', { socketId: data.socketId, user: data.user, userCount: isRooMAvail.users.length, users: isRooMAvail.users } );
+            client.to( data.room ).emit( 'new user', { socketId: data.socketId, user: data.user, userCount: isRoomAvailable.users.length, users: isRoomAvailable.users } );
+            this.server.to( data.socketId ).emit( 'count', { count: isRoomAvailable.users.length, name: isRoomAvailable.users, isNew: data.isNew } );
         }
 
     }
@@ -93,23 +94,23 @@ import {
     @SubscribeMessage('newUserStart')
     public handleNewUserStart(client: Socket, data: any): void {
 
-        this.server.to( data.to ).emit( 'newUserStart', { sender: data.sender } );
+        client.to( data.to ).emit( 'newUserStart', { sender: data.sender } );
     }
 
     @SubscribeMessage('sdp')
     public handleSDP(client: Socket, data: any): void  {
-        this.server.to( data.to ).emit( 'sdp', { description: data.description, sender: data.sender } );
+        client.to( data.to ).emit( 'sdp', { description: data.description, sender: data.sender } );
     }
 
     @SubscribeMessage('ice candidates')
     public handleIceCandidates(client: Socket, data: any): void  {
-        this.server.to( data.to ).emit( 'ice candidates', { candidate: data.candidate, sender: data.sender } );
+        client.to( data.to ).emit( 'ice candidates', { candidate: data.candidate, sender: data.sender } );
     }
 
 
     @SubscribeMessage('chat')
     public handleOnChat(client: Socket, data: any): void {
-      this.server.to( data.room ).emit( 'chat', { sender: data.sender, msg: data.msg } );
+      client.to( data.room ).emit( 'chat', { sender: data.sender, msg: data.msg } );
     }
 
 
@@ -119,8 +120,6 @@ import {
     }
   
     public handleDisconnect(client: Socket): void {
-
-      console.log("client disconnected", client.id);
 
         let room = '';
         client.id = client.id.split('#')[1];
@@ -133,10 +132,11 @@ import {
         }
 
         let userRoomDetails = this.rooms.find(x => x.room === room );
+
         
         if(userRoomDetails) {
             
-            userRoomDetails.users.length = userRoomDetails.users.length - 1;
+            userRoomDetails.users = userRoomDetails.users.filter(x => x.toLowerCase() != userName.split('*')[0].toLowerCase());
             
             let userRoomDetailsIndex = this.rooms.indexOf(userRoomDetails);
             this.rooms[userRoomDetailsIndex] = userRoomDetails;
@@ -147,7 +147,7 @@ import {
         }
         
         if(userName) {
-            this.server.to(userName.split('*')[1]).emit( 'userLeft', { name: userName.split('*')[0], userCount: userRoomDetails.users.length, users: userRoomDetails.users  })
+            client.to(userName.split('*')[1]).emit( 'userLeft', { name: userName.split('*')[0], userCount: userRoomDetails.users.length, users: userRoomDetails.users  })
         }
     }
   

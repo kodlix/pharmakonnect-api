@@ -135,6 +135,20 @@ export class AccountRepository extends Repository<AccountEntity> {
     return this.buildOrgArrRO(account);
   }
 
+  public async updateProfileImage(filename: string, userId: string) {
+    const user = await this.findOne({ id: userId });
+    if (!user) {
+      throw new HttpException(
+        `User does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }   
+
+    user.profileImage = filename;
+        
+    return await user.save();
+  }
+
   private buildUserRO(user: AccountEntity) {
     const userRO = {
       id: user.id,
