@@ -180,7 +180,7 @@ import { Connection } from 'typeorm';
         try {
           await this.scheduleMeetingRepo.save(updated);
           await this.scheduleMeetingRepo.delete({ id: meeting.id });
-          client.to( data.room ).emit( 'meetingEnded', { message: "The meeting has ended" } );
+          client.to( data.meetingId ).emit( 'meetingEnded', { message: "The meeting has ended" } );
         
         } catch (error) {
           throw new WsException(`Unable to end meeting - Error: ${error.message}`);
