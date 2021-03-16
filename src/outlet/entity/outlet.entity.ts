@@ -41,6 +41,15 @@ export class OutletEntity extends AbstractBaseEntity {
   @Column({ nullable: true })
   organizationName: string;
 
+  @Column('uuid')
+  accountId: string;
+
+  // @Column()
+  // country: string;
+
+  // @Column()
+  // state: string;
+
   @Column({ nullable: true })
   countryId: string;
 
@@ -59,9 +68,10 @@ export class OutletEntity extends AbstractBaseEntity {
   @Column()
   lgaName: string;
 
-  @Column()
-  lga: string;
+  // @Column()
+  // lga: string;
 
   @ManyToOne(() => AccountEntity, (x) => x.outlet)
   account: AccountEntity;
+
 }
