@@ -25,9 +25,12 @@ export class OutletRepository extends Repository<OutletEntity>{
     outlet.createdBy = user.createdBy;
     outlet.accountId = user.id;
     outlet.createdBy = user.createdBy;
-    outlet.country = dto.country;
-    outlet.state = dto.state;
-    outlet.lga = dto.lga;
+    outlet.countryName = dto.countryName;
+    outlet.countryId = dto.countryId;
+    outlet.stateName = dto.stateName;
+    outlet.stateId = dto.stateId;
+    outlet.lgaName = dto.lgaName;
+    outlet.lgaId = dto.lgaId;
 
 
     return await this.save(outlet);
@@ -48,9 +51,12 @@ export class OutletRepository extends Repository<OutletEntity>{
     outlet.pcn = dto.pcn;
     outlet.openingTime = dto.openingTime;
     outlet.closingTime = dto.closingTime;
-    outlet.country = dto.country;
-    outlet.state = dto.state;
-    outlet.lga = dto.lga;
+    outlet.countryName = dto.countryName;
+    outlet.countryId = dto.countryId;
+    outlet.stateName = dto.stateName;
+    outlet.stateId = dto.stateId;
+    outlet.lgaName = dto.lgaName;
+    outlet.lgaId = dto.lgaId;
     outlet.accountId = user.id;
     outlet.updatedBy = user.createdBy;
     return await this.save(outlet);
