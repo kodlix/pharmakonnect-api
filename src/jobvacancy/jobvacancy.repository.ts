@@ -92,12 +92,6 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     const today = new Date();
     console.log('jobvacancy', jobvacancy);
 
-    if (job && job.jobTitle === dto.jobTitle &&  job.nameOfCorporation === dto.nameOfCorporation && job.endDate > today) {
-      throw new HttpException(
-        `Job with title '${dto.jobTitle}' already exisits`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
 
     if (dto.endDate < today) {
       throw new HttpException(
@@ -110,12 +104,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         HttpStatus.BAD_REQUEST,
       );
     } 
-    if ( (jobvacancy.jobTitle === dto.jobTitle) && (jobvacancy.nameOfCorporation === dto.nameOfCorporation) && (jobvacancy.endDate > today)  ){
-      throw new HttpException(
-        `Job with title '${dto.jobTitle}' already exisits`,
-        HttpStatus.BAD_REQUEST,
-    );
-  }
+  
     
     // if (dto.maxSalary < dto.minSalary) {
     //   throw new HttpException(
