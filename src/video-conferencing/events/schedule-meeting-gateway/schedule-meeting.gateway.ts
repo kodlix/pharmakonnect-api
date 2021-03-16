@@ -66,7 +66,7 @@ import { Connection } from 'typeorm';
 
           this.meetings.push(meetingObj);
 
-          this.server.to(data.socketId).emit('socketResponse', { socketResponse: {participantCount: this.meetings.length, name: `${this.meetings[this.meetings.length - 1].name}(Host, Me)`}});
+          this.server.to(data.socketId).emit('socketResponse', { socketResponse: {participantCount: this.meetings.length, name: this.meetings[this.meetings.length - 1].name}});
 
       } catch (error) {
         throw new WsException(`Unable to start meeting - Error: ${error.message}`);
