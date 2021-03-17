@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Query, Req, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Query, Req, Patch, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import { ScheduleMeetingsService } from './schedule-meetings.service';
 import { CreateScheduleMeetingDto } from './dto/create-schedule-meeting.dto';
 import { UpdateScheduleMeetingDto } from './dto/update-schedule-meeting.dto';
@@ -22,6 +22,7 @@ export class ScheduleMeetingsController {
     return await this.scheduleMeetingsService.create(createScheduleMeetingDto, req.user);
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   @ApiOperation({ summary: 'Get all meetings' })
   @ApiResponse({ status: 200, description: 'Return all meetings' })

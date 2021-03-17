@@ -18,7 +18,7 @@ import { GroupchatModule } from './groupchat/groupchat.module';
 import { ScheduleMeetingsModule } from './video-conferencing/schedule-meetings/schedule-meetings.module';
 import { FlatMeetingModule } from './video-conferencing/events/flat-meeting-gateway/flat-meeting.module';
 import { OutletModule } from './outlet/outlet.module';
-import { SendItemReminderModule } from './video-conferencing/tasks/send-item-reminder/send-item-reminder.module';
+import { StartMeetingReminderModule } from './video-conferencing/tasks/start-meeting-reminder/start-meeting-reminder.module';
 import { ScheduleMeetingGatewayModule } from './video-conferencing/events/schedule-meeting-gateway/schedule-meeting-gateway.module';
 
 
@@ -39,7 +39,7 @@ import { ScheduleMeetingGatewayModule } from './video-conferencing/events/schedu
     OutletModule,
     ScheduleMeetingGatewayModule,
     ScheduleModule.forRoot(),
-    //SendItemReminderModule
+    StartMeetingReminderModule
   ],
   controllers: [AppController],
   providers: [AppService],
