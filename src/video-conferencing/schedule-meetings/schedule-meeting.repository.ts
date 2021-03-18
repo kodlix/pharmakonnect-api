@@ -109,7 +109,7 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
 
     }
 
-    async updateMeeting(id: string, payload: UpdateScheduleMeetingDto) : Promise<string> {
+    async updateMeeting(id: string, payload: UpdateScheduleMeetingDto, user: AccountEntity) : Promise<string> {
         const meeting = await this.findOne(id);
         if (meeting ) {
 
@@ -137,7 +137,7 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
             } 
 
             meeting.updatedAt = new Date();
-            meeting.updatedBy = payload.updatedBy;
+            meeting.updatedBy = user.updatedBy;
 
             const updated = plainToClassFromExist(meeting, payload);
 

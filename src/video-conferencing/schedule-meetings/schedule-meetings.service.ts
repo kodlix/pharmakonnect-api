@@ -24,8 +24,8 @@ export class ScheduleMeetingsService {
     return await this.scheduleMeetingsRepo.findMeetingById(id);
   }
 
-  async update(id: string, updateScheduleMeetingDto: UpdateScheduleMeetingDto) : Promise<string> {
-    return await this.scheduleMeetingsRepo.updateMeeting(id, updateScheduleMeetingDto);
+  async update(id: string, updateScheduleMeetingDto: UpdateScheduleMeetingDto, user: AccountEntity) : Promise<string> {
+    return await this.scheduleMeetingsRepo.updateMeeting(id, updateScheduleMeetingDto, user);
   }
 
   async remove(id: string) : Promise<DeleteResult>{

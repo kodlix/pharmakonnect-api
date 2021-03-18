@@ -40,8 +40,8 @@ export class ScheduleMeetingsController {
   @Put(':id')
   @ApiOperation({ summary: 'Update a meeting' })
   @ApiResponse({ status: 200, description: 'Return meeting successfully updated' })
-  async update(@Param('id') id: string, @Body() updateScheduleMeetingDto: UpdateScheduleMeetingDto): Promise<string> {
-    return await this.scheduleMeetingsService.update(id, updateScheduleMeetingDto);
+  async update(@Param('id') id: string, @Body() updateScheduleMeetingDto: UpdateScheduleMeetingDto, @Req() req: any): Promise<string> {
+    return await this.scheduleMeetingsService.update(id, updateScheduleMeetingDto, req);
   }
 
   @Delete(':id')
