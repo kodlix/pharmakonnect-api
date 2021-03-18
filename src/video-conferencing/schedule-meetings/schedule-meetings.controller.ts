@@ -26,8 +26,8 @@ export class ScheduleMeetingsController {
   @Get()
   @ApiOperation({ summary: 'Get all meetings' })
   @ApiResponse({ status: 200, description: 'Return all meetings' })
-  async findAll(@Query() filterDto: FilterDto) : Promise<ScheduleMeetingsRO[]>{
-    return await this.scheduleMeetingsService.findAll(filterDto);
+  async findAll(@Query() filterDto: FilterDto,  @Req() req: any ) : Promise<ScheduleMeetingsRO[]>{
+    return await this.scheduleMeetingsService.findAll(filterDto, req);
   }
 
   @Get(':id')
