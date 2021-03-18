@@ -72,12 +72,11 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
         if(search) {
 
            const meetings =  await this.createQueryBuilder("meet")
-                    .select("*")
                     .where("meet.accountId = :accountId", { accountId: user.id })
                     .andWhere(new Brackets(qb => {
                         qb.where("meet.topic ILike :topic", { topic: `%${search}%` })
                         .orWhere("meet.meetingID ILike :meetingID", { meetingID: `%${search}%` })
-                    })).getRawMany();
+                    })).getMany();
 
             return meetings;
         }
