@@ -16,8 +16,8 @@ export class ScheduleMeetingsService {
       return await this.scheduleMeetingsRepo.saveMeetingSchedule(request, user);
   }
 
-  async findAll(queryParam: FilterDto, user: AccountEntity): Promise<ScheduleMeetingsRO[]> {
-    return await this.scheduleMeetingsRepo.getAllMeetingsSchedules(queryParam, user);
+  async findAll(queryParam: FilterDto): Promise<ScheduleMeetingsRO[]> {
+    return await this.scheduleMeetingsRepo.getAllMeetingsSchedules(queryParam);
   }
 
   async findOne(id: string) : Promise<ScheduleMeetingsRO>{
