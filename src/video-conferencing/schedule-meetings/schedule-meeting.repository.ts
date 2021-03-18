@@ -63,8 +63,11 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
 
     }
 
-    async getAllMeetingsSchedules({search}: FilterDto): Promise<ScheduleMeetingsRO[]> {
+    async getAllMeetingsSchedules({search}: FilterDto, user: AccountEntity): Promise<ScheduleMeetingsRO[]> {
         
+        if(!user.id) {
+            throw new HttpException( `User Id is required.`, HttpStatus.BAD_REQUEST);
+        }
         
         if(search) {
             const meetings = await this.find({ 
@@ -77,7 +80,7 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
             return meetings;
         }
 
-        return await this.find();
+        return await this.find({where: {accountId: user.id}});
     }
 
     async findMeetingById(id: string): Promise<ScheduleMeetingsRO> {
