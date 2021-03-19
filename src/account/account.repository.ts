@@ -52,6 +52,8 @@ export class AccountRepository extends Repository<AccountEntity> {
         accountPackage: user.accountPackage,
         isRegComplete: user.isRegComplete,
         accountType: user.accountType,
+        accountId: user.id,
+
       };
       return data;
     } else {

@@ -1,4 +1,5 @@
 export interface UserRO {
+    accountId: string;
     email: string;
     token: string;
     expires_in: number;
@@ -12,6 +13,7 @@ export interface UserFromDbRO {
     accountPackage: string;
     isRegComplete: boolean;
     accountType: string;
+    accountId: string;
 }
 
 export interface IndividualRO {
