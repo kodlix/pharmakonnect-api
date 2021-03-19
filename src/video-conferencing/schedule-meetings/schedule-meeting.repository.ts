@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
-import {DeleteResult, EntityRepository, Like, Repository} from "typeorm";
+import {Brackets, DeleteResult, EntityRepository, Like, Repository} from "typeorm";
 import { CreateScheduleMeetingDto } from "./dto/create-schedule-meeting.dto";
 import {ScheduleMeetingEntity} from "./entities/schedule-meeting.entity";
 import { plainToClass, plainToClassFromExist } from 'class-transformer';
@@ -7,7 +7,7 @@ import {validate} from 'class-validator';
 import { FilterDto } from "src/_common/filter.dto";
 import { ScheduleMeetingsRO } from "./interfaces/schedule-meetings.interface";
 import { UpdateScheduleMeetingDto } from "./dto/update-schedule-meeting.dto";
-import {ILike} from "typeorm";
+import {ILike, Equal} from "typeorm";
 import { AccountEntity } from "src/account/entities/account.entity";
 
 
@@ -28,19 +28,24 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
             throw new HttpException( `User ID is required`, HttpStatus.UNAUTHORIZED);
         }
 
-        if(today > payload.startDate) {
+        if(today > new Date(payload.startDate)) {
             throw new HttpException( `Meeting Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
         }
 
-        const todayTime = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+        const todayTime = `${today.getHours()}.${today.getMinutes()}`;
 
-        if(todayTime > payload.startTime.toTimeString()) {
-            throw new HttpException( `Meeting Start Time cannot be in the past`, HttpStatus.BAD_REQUEST);
-        }
+        const splitedStartTime = payload.startTime.toString().split(":");
+        const startTime = `${splitedStartTime[0]}.${splitedStartTime[1]}`;
+         
+        if (todayTime > startTime) {
+            throw new HttpException( `Meeting Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
+        } 
 
         const newMeetings = plainToClass(ScheduleMeetingEntity, payload);
 
         newMeetings.accountId = user.id;
+        newMeetings.schedulerEmail = user.email;
+        newMeetings.schedulerName = `${user.firstName} ${user.lastName}`;
         newMeetings.createdBy = user.createdBy;
 
         const errors = await validate(newMeetings);
@@ -58,19 +63,25 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
 
     }
 
-    async getAllMeetingsSchedules({search}: FilterDto): Promise<ScheduleMeetingsRO[]> {
+    async getAllMeetingsSchedules({search}: FilterDto, user: AccountEntity): Promise<ScheduleMeetingsRO[]> {
+        
+        if(!user.id) {
+            throw new HttpException( `User Id is required.`, HttpStatus.BAD_REQUEST);
+        }
+        
         if(search) {
-            const meetings = await this.find({ 
-                where: [
-                    { topic: ILike(`%${search}%`) },
-                    { meetingID: ILike(`%${search}%`)}
-                ]
-            });
+
+           const meetings =  await this.createQueryBuilder("meet")
+                    .where("meet.accountId = :accountId", { accountId: user.id })
+                    .andWhere(new Brackets(qb => {
+                        qb.where("meet.topic ILike :topic", { topic: `%${search}%` })
+                        .orWhere("meet.meetingID ILike :meetingID", { meetingID: `%${search}%` })
+                    })).getMany();
 
             return meetings;
         }
 
-        return await this.find();
+        return await this.find({where: {accountId: user.id}});
     }
 
     async findMeetingById(id: string): Promise<ScheduleMeetingsRO> {
@@ -104,30 +115,35 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
 
     }
 
-    async updateMeeting(id: string, payload: UpdateScheduleMeetingDto) : Promise<string> {
+    async updateMeeting(id: string, payload: UpdateScheduleMeetingDto, user: AccountEntity) : Promise<string> {
         const meeting = await this.findOne(id);
-        if (meeting && meeting.topic != payload.topic) {
-            
-            const topicExist = await this.findOne({where: {topic: ILike(`%${payload.topic}%`)}});
-            
-            if(topicExist){
-                throw new HttpException( `Meeting with ${payload.topic} is already in use`, HttpStatus.BAD_REQUEST);
-            }
+        if (meeting ) {
 
+            if( meeting.topic != payload.topic) {
+                const topicExist = await this.findOne({where: {topic: ILike(`%${payload.topic}%`)}});
+            
+                if(topicExist){
+                    throw new HttpException( `Meeting with ${payload.topic} is already in use`, HttpStatus.BAD_REQUEST);
+                }
+            }
+        
             const today = new Date();
 
-            if(today > payload.startDate) {
+            if(today > new Date(payload.startDate)) {
                 throw new HttpException( `Meeting Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
             }
     
-            const todayTime = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+            const todayTime = `${today.getHours()}.${today.getMinutes()}`;
 
-            if(todayTime > payload.startTime.toTimeString()) {
-                throw new HttpException( `Meeting Start Time cannot be in the past`, HttpStatus.BAD_REQUEST);
-            }
+            const splitedStartTime = payload.startTime.toString().split(":");
+            const startTime = `${splitedStartTime[0]}.${splitedStartTime[1]}`;
+            
+            if (todayTime > startTime) {
+                throw new HttpException( `Meeting Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
+            } 
 
             meeting.updatedAt = new Date();
-            meeting.updatedBy = payload.updatedBy;
+            meeting.updatedBy = user.updatedBy || user.createdBy;
 
             const updated = plainToClassFromExist(meeting, payload);
 
@@ -141,48 +157,5 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
 
         throw new HttpException(`The meeting with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
     }
-
-
-    async startMeeting(id: string): Promise<string> {
-        const meeting = await this.findOne(id);
-
-        if(meeting) {
-
-            // function hourwithAMPM(dateInput) {
-            //     var d = new Date(dateInput);
-            //     var ampm = (d.getHours() >= 12) ? "PM" : "AM";
-            //     var hours = (d.getHours() >= 12) ? d.getHours()-12 : d.getHours();
-            //     return `$`
-            //     return hours+':'+d.getMinutes()+' '+ampm;
-             
-            //  }
-             //console.log(hourwithAMPM(new Date()))
-
-             //const today = new Date();
-
-             meeting.meetingStarted = true;
-             const updated = plainToClassFromExist(ScheduleMeetingEntity, meeting);
-             await this.save(updated);
-             return "Meeting started successfully";
-        }
-
-        throw new HttpException(`The meeting with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
-
-    }
-
-    async endMeeting(id: string): Promise<string> {
-        const meeting = await this.findOne(id);
-        if(meeting) {
-             meeting.meetingEnded = true;
-             const updated = plainToClassFromExist(ScheduleMeetingEntity, meeting);
-             await this.save(updated);
-
-             return "Meeting ended successfully"
-        }
-
-        throw new HttpException(`The meeting with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
-
-    }
-   
 
 }

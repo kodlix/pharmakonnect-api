@@ -92,12 +92,6 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     const today = new Date();
     console.log('jobvacancy', jobvacancy);
 
-    if (job && job.jobTitle === dto.jobTitle &&  job.nameOfCorporation === dto.nameOfCorporation && job.endDate > today) {
-      throw new HttpException(
-        `Job with title '${dto.jobTitle}' already exisits`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
 
     if (dto.endDate < today) {
       throw new HttpException(
@@ -110,12 +104,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         HttpStatus.BAD_REQUEST,
       );
     } 
-    if ( (jobvacancy.jobTitle === dto.jobTitle) && (jobvacancy.nameOfCorporation === dto.nameOfCorporation) && (jobvacancy.endDate > today)  ){
-      throw new HttpException(
-        `Job with title '${dto.jobTitle}' already exisits`,
-        HttpStatus.BAD_REQUEST,
-    );
-  }
+  
     
     // if (dto.maxSalary < dto.minSalary) {
     //   throw new HttpException(
@@ -185,21 +174,21 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
   async findByAccountId(accountId: string,page = 1): Promise<JobVacancyEntity[]> {
     const jobvacancy = await this.find({
       where: { accountId: accountId },
-      order: { approvedOn: 'DESC' },
+      order: { approvedOn: 'ASC' },
       take: 25,
 
       skip: 25 * (page - 1)});
     return jobvacancy;
   }
 
-  // async findAll(page = 1): Promise<JobVacancyEntity[]> {
-  //   const jobvacancy = await this.find({ order: { approvedOn: 'DESC' },
-  //   take: 25,
+  async findAll(page = 1): Promise<JobVacancyEntity[]> {
+    const jobvacancy = await this.find({ order: { approvedOn: 'ASC' },
+    take: 25,
 
-  //   skip: 25 * (page - 1),});
+    skip: 25 * (page - 1),});
     
-  //   return jobvacancy;
-  //}
+    return jobvacancy;
+  }
 
 
   async findJob(page = 1, searchParam: string): Promise<JobVacancyEntity[]> {
@@ -213,7 +202,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
           { jobLocation: ILike(param) },
           { contactType: ILike(param) },
         ],
-        order: { createdAt: 'DESC' },
+        order: { createdAt: 'ASC' },
         take: 25,
   
         skip: 25 * (page - 1),
@@ -222,7 +211,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
       return searchResult;
     }
     const JobVacancy = await this.find({
-      order: { createdAt: 'DESC' },
+      order: { createdAt: 'ASC' },
       take: 25,
 
       skip: 25 * (page - 1),

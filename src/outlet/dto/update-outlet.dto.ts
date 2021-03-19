@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsNotEmpty } from "class-validator";
 
@@ -45,16 +46,32 @@ export class UpdateOutletDto{
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    country: string;
+    countryId: string;
 
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    state: string;
+    countryName: string;
 
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    lga: string
+    stateId: string;
+
+
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
+    stateName: string;
+
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
+    lgaName: string
+
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
+    lgaId: string;
 
 }

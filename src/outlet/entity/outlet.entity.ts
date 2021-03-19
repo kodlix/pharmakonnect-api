@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { AccountEntity } from 'src/account/entities/account.entity';
 import { AbstractBaseEntity } from 'src/_common/base.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
@@ -40,18 +41,37 @@ export class OutletEntity extends AbstractBaseEntity {
   @Column({ nullable: true })
   organizationName: string;
 
-  @ManyToOne(() => AccountEntity, (x) => x.outlet)
-  account: AccountEntity;
-
   @Column('uuid')
   accountId: string;
 
-  @Column()
-  country: string;
+  // @Column()
+  // country: string;
+
+  // @Column()
+  // state: string;
+
+  @Column({ nullable: true })
+  countryId: string;
 
   @Column()
-  state: string;
+  countryName: string;
+
+  @Column({ nullable: true })
+  stateId: string;
 
   @Column()
-  lga: string;
+  stateName: string;
+
+  @Column({ nullable: true })
+  lgaId: string;
+
+  @Column()
+  lgaName: string;
+
+  // @Column()
+  // lga: string;
+
+  @ManyToOne(() => AccountEntity, (x) => x.outlet)
+  account: AccountEntity;
+
 }

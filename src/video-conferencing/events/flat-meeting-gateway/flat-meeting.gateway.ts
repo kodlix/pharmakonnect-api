@@ -5,6 +5,7 @@ import {
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer,
+    WsException,
     WsResponse,
   } from '@nestjs/websockets';
 
@@ -20,13 +21,14 @@ import {
     roomUsers: Array<any> = [];
 
 
-    @SubscribeMessage('subscribe')
-    public handleSubscribe(client: Socket, data: any) {
+    @SubscribeMessage('createRoom')
+    public handleCreateRoom(client: Socket, data: any) {
 
       //check if room is in use by other conferencers
         const isRoomInUse = this.rooms.find(x => x.room.toLowerCase() === data.room.split("_")[0].toLowerCase());
         if(isRoomInUse) {
-            return client.emit( 'roomExist', {message: `The room "${isRoomInUse.room}" is in use.` } );
+            throw new WsException(`The room "${isRoomInUse.room}" is in use.`)
+            //return client.emit( 'roomExist', {message: `The room "${isRoomInUse.room}" is in use.` } );
         }
 
         //create a room
@@ -62,13 +64,14 @@ import {
 
     }
 
-    @SubscribeMessage('join')
+    @SubscribeMessage('joinRoom')
     public handleJoinRoom(client: Socket, data: any) {
 
         //check if room user wants to join is available
         const isRoomAvailable = this.rooms.find(x => x.room.toLowerCase() === data.room.split("_")[0].toLowerCase());
         if(!isRoomAvailable) {
-            return client.emit( 'roomDoesNotExist', {  message: 'Meeting has ended or the meeting ID is invalid.' } );
+            throw new WsException('Meeting has ended or the meeting ID is invalid.')
+            //return client.emit( 'roomDoesNotExist', {  message: 'Meeting has ended or the meeting ID is invalid.' } );
         }
 
         //join a room
