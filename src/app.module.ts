@@ -20,6 +20,9 @@ import { FlatMeetingModule } from './video-conferencing/events/flat-meeting-gate
 import { OutletModule } from './outlet/outlet.module';
 import { StartMeetingReminderModule } from './video-conferencing/tasks/start-meeting-reminder/start-meeting-reminder.module';
 import { ScheduleMeetingGatewayModule } from './video-conferencing/events/schedule-meeting-gateway/schedule-meeting-gateway.module';
+import { ArticleModule } from './blog/article/article.module';
+import { CommentModule } from './blog/comment/comment.module';
+import { CategoryModule } from './blog/category/category.module';
 
 
 @Module({
@@ -39,7 +42,10 @@ import { ScheduleMeetingGatewayModule } from './video-conferencing/events/schedu
     OutletModule,
     ScheduleMeetingGatewayModule,
     ScheduleModule.forRoot(),
-    StartMeetingReminderModule
+    StartMeetingReminderModule,
+    ArticleModule,
+    CommentModule,
+    CategoryModule
   ],
   controllers: [AppController],
   providers: [AppService],

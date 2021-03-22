@@ -5,6 +5,8 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { AccountRepository } from "./account.repository";
 import { AccountEntity } from "./entities/account.entity";
 import { JwtPayload } from "./interfaces/user.interface";
+import { default as config } from './config';
+
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -14,7 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'ABCDabdc1234',
+      secretOrKey: config.jwt.secretOrKey,
     });
   }
 

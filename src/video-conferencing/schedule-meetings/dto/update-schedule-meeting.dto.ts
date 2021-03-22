@@ -3,9 +3,7 @@ import { IsDate, IsDateString, IsEmpty, IsNotEmpty, IsNumber, IsOptional, IsStri
 import { Exclude, Expose } from "class-transformer";
 
 
-
 export class UpdateScheduleMeetingDto {
-
     @Expose()
     @IsString()
     @ApiProperty()
