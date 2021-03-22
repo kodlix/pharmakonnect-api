@@ -2,8 +2,6 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsDate, IsDateString, IsEmpty, IsNotEmpty, IsNumber, IsOptional, IsString} from "class-validator";
 import { Exclude, Expose } from "class-transformer";
 
-
-
 export class UpdateScheduleMeetingDto {
 
     @Expose()

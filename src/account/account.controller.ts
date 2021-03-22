@@ -6,7 +6,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { AccountService } from './account.service';
 import { CorperateDTO } from './dto/cooperate.dto';
 import { IndividualDTO } from './dto/individual.dto';
-import { RegisterDTO, LoginDTO, LockUserDTO } from './dto/credential.dto';
+import { RegisterDTO, LoginDTO, LockUserDTO, ResetPasswordDto, ChangePasswordDto } from './dto/credential.dto';
 import { CorperateRO, IndividualRO, UserRO } from './interfaces/account.interface';
 import { OrganizationRO, UserDataRO } from './interfaces/user.interface';
 import { FilterDto } from 'src/_common/filter.dto';
@@ -29,7 +29,8 @@ export class AccountController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 201, description: 'The record has been successfully created' })
   async register(@Body() registerDto: RegisterDTO): Promise<string> {
-    return await this.accountService.register(registerDto);
+    let result = await this.accountService.register(registerDto);
+    return result;
   }
 
   @Get()
@@ -93,7 +94,7 @@ export class AccountController {
 
   @Get('/corporate/organizations')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard()) 
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Get all organizations' })
   @ApiResponse({ status: 200, description: 'Return all organizations' })
   async findOrg(): Promise<OrganizationRO[]> {
@@ -143,5 +144,48 @@ export class AccountController {
     };
   }
 
+  @Get('/verify/:token')
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({ status: 200, description: 'Email verified successfully' })
+  public async verifyEmail(@Param() params): Promise<string> {
+    return await this.accountService.verifyEmail(params.token);
+  }
+
+  @Get('/resend-verification/:email')
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({ status: 200, description: 'Email verified successfully' })
+  public async sendEmailVerification(@Param() params): Promise<string> {
+    if (await this.accountService.createEmailToken(params.email)) {
+      if (await this.accountService.sendEmailVerification(params.email)) {
+        return "Verification email has been send kindly check your mail";
+      }
+    }
+  }
+
+  @Get('/forgot-password/:email')
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  public async sendEmailForgotPassword(@Param() params): Promise<string> {
+    return await this.accountService.sendEmailForgotPassword(params.email);
+  }
+
+  @Post('/reset-password')
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({ status: 200, description: 'Email verified successfully' })
+  public async setNewPassord(@Body() resetDto: ResetPasswordDto): Promise<string> {
+    return await this.accountService.setNewPassord(resetDto);
+  }
+
+  @Post('/change-password')
+  @ApiResponse({ status: 404, description: 'Not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({ status: 200, description: 'Email verified successfully' })
+  public async changePassord(@Body() changeDto: ChangePasswordDto): Promise<string> {
+    return await this.accountService.changedPassword(changeDto);
+  }
 
 }

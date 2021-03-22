@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { JobVacancyEntity } from "src/jobvacancy/entities/jobvacancy.entity";
 import { ScheduleMeetingEntity } from "src/video-conferencing/schedule-meetings/entities/schedule-meeting.entity";
 import { OutletEntity } from 'src/outlet/entity/outlet.entity';
+import { ArticleEntity } from "src/blog/article/entities/article.entity";
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
@@ -140,6 +141,14 @@ export class AccountEntity extends AbstractBaseEntity {
   @Column()
   public salt: string;
 
+  @Column({ type: 'bool', default: false })
+  public isEmailVerified: boolean;
+
+  @Column({ nullable: true })
+  public emailToken: string;
+
+  //// RELATIONSHIP ////
+
   @OneToMany(() => JobVacancyEntity, (s) => s.account)
   jobVacancy: JobVacancyEntity[];
 
@@ -149,8 +158,14 @@ export class AccountEntity extends AbstractBaseEntity {
     @OneToMany(() => ScheduleMeetingEntity, s => s.account)
     meeting: ScheduleMeetingEntity[];
 
-    async validatePassword(password: string): Promise<boolean> {
+    @OneToMany(type => ArticleEntity, article => article.author)
+    articles?: ArticleEntity[];
+
+    //// VALIDATE PASSWORD ////
+
+    public async validatePassword(password: string): Promise<boolean> {
         const hash = await bcrypt.hash(password, this.salt);
         return hash === this.password;
     }
+    
 }
