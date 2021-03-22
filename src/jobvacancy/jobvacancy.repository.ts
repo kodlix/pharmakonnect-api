@@ -1,5 +1,6 @@
+/* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { Repository, EntityRepository, DeleteResult } from 'typeorm';
+import { Repository, EntityRepository, DeleteResult, ILike } from 'typeorm';
 import { ApproveJobVacancyDto } from './dto/approve-jobvacancy';
 import { CreateJobVacancyDto } from './dto/create-jobvacancy.dto';
 import { RejectJobVacancyDto } from './dto/reject-jobvacancy';
@@ -13,10 +14,18 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     dto: CreateJobVacancyDto,
     user: AccountEntity,
   ): Promise<JobVacancyEntity> {
-    const job = await this.findOne({ where: { jobTitle: dto.jobTitle } });
+    const job = await this.findOne({ where: { jobTitle: dto.jobTitle, nameOfCorporation: dto.nameOfCorporation } });
     const today = new Date();
 
     const jobvacancy = new JobVacancyEntity();
+
+    if (job && job.jobTitle === dto.jobTitle &&  job.nameOfCorporation === dto.nameOfCorporation && job.endDate > today) {
+      throw new HttpException(
+        `Job with title '${dto.jobTitle}' already exisits`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+   
     if (job && dto.endDate < today) {
       throw new HttpException(
         `End date of Job '${dto.jobTitle}' can not be less than today`,
@@ -32,11 +41,20 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         `Minimum salary of Job '${dto.jobTitle}' can not be greater than Maximum salary`,
         HttpStatus.BAD_REQUEST,
       );
-    } else if (job && dto.yearOfIncorporation < today) {
-      throw new HttpException(
-        `Year of Incorporation can not be less than today`,
-        HttpStatus.BAD_REQUEST,
-      );
+    }
+
+    if(dto.jobUrl) {
+      const isValidUrl = validateUrl(dto.jobUrl);
+      if(!isValidUrl) {
+        throw new HttpException(`The job url ${dto.jobUrl} is not valid`, HttpStatus.BAD_REQUEST)
+      }
+    }
+
+    if(dto.companyUrl) {
+      const isValidUrl = validateUrl(dto.jobUrl);
+      if(!isValidUrl) {
+        throw new HttpException(`The company url ${dto.companyUrl} is not valid`, HttpStatus.BAD_REQUEST)
+      }
     }
     //const jobvacancy = await this.create();
     jobvacancy.createdBy = user.createdBy;
@@ -69,9 +87,11 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
   ): Promise<JobVacancyEntity> {
     const jobvacancy = await this.findOne(id);
     console.log('jobvacancy', jobvacancy);
+    const job = await this.findOne({ where: { jobTitle: dto.jobTitle, nameOfCorporation: dto.nameOfCorporation } });
 
     const today = new Date();
     console.log('jobvacancy', jobvacancy);
+
 
     if (dto.endDate < today) {
       throw new HttpException(
@@ -83,12 +103,15 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         `Start date of Job '${dto.jobTitle}' can not be greater than End date`,
         HttpStatus.BAD_REQUEST,
       );
-    } else if (dto.maxSalary < dto.minSalary) {
-      throw new HttpException(
-        `Minimum salary of Job '${dto.jobTitle}' can not be greater than Maximum salary`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    } 
+  
+    
+    // if (dto.maxSalary < dto.minSalary) {
+    //   throw new HttpException(
+    //     `Minimum salary of Job '${dto.jobTitle}' can not be greater than Maximum salary`,
+    //     HttpStatus.BAD_REQUEST,
+    //   );
+    // }
 
     jobvacancy.updatedAt = new Date();
     jobvacancy.updatedBy = user.createdBy;
@@ -148,22 +171,56 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     return jobvacancy;
   }
 
-  async findByAccountId(accountId: string,page: number = 1): Promise<JobVacancyEntity[]> {
+  async findByAccountId(accountId: string,page = 1): Promise<JobVacancyEntity[]> {
     const jobvacancy = await this.find({
       where: { accountId: accountId },
-      order: { approvedOn: 'DESC' },
+      order: { approvedOn: 'ASC' },
       take: 25,
 
       skip: 25 * (page - 1)});
     return jobvacancy;
   }
 
-  async findAll(page: number = 1): Promise<JobVacancyEntity[]> {
-    const jobvacancy = await this.find({ order: { approvedOn: 'DESC' },
+  async findAll(page = 1): Promise<JobVacancyEntity[]> {
+    const jobvacancy = await this.find({ order: { approvedOn: 'ASC' },
     take: 25,
 
     skip: 25 * (page - 1),});
     
     return jobvacancy;
   }
+
+
+  async findJob(page = 1, searchParam: string): Promise<JobVacancyEntity[]> {
+    if (searchParam) {
+      const param = `%${searchParam}%`
+      const searchResult = await this.find({
+        where: [
+          { nameOfCorporation: ILike(param) },
+          { jobTitle: ILike(param) },
+          { workExperienceInYears: ILike(param) },
+          { jobLocation: ILike(param) },
+          { contactType: ILike(param) },
+        ],
+        order: { createdAt: 'ASC' },
+        take: 25,
+  
+        skip: 25 * (page - 1),
+      })
+
+      return searchResult;
+    }
+    const JobVacancy = await this.find({
+      order: { createdAt: 'ASC' },
+      take: 25,
+
+      skip: 25 * (page - 1),
+    });
+
+    return JobVacancy;
+  }
+}
+
+function validateUrl(value) {
+  return /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(value);
 }

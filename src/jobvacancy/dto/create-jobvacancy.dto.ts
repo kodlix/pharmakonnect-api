@@ -1,5 +1,6 @@
+/* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsUrl, Min, ValidateIf } from 'class-validator';
+import { IsOptional, IsUrl, Max, Min, ValidateIf } from 'class-validator';
 import { IsString, IsNotEmpty, IsInt } from 'class-validator';
 
 export class CreateJobVacancyDto {
@@ -11,18 +12,17 @@ export class CreateJobVacancyDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty({message: 'Year of InCorporation is required'})
-  yearOfIncorporation: Date;
+  yearOfIncorporation: string;
 
   @ApiProperty()
   @IsOptional()
-  @IsInt()
-  companyRegistrationNumber: number;
+  @IsString()
+  companyRegistrationNumber: string;
 
   @ApiProperty()
-  @ValidateIf(o => o.  companyUrl
-    === 'value')
+  @IsOptional()
   @IsString()
-  @IsUrl(undefined, { message: 'Company Url is not valid.' })
+  //@IsUrl(undefined, { message: 'Company Url is not valid.' })
   companyUrl: string;
 
   @ApiProperty()
@@ -77,10 +77,9 @@ export class CreateJobVacancyDto {
   endDate: Date;
 
   @ApiProperty()
-  @ValidateIf(o => o.  jobUrl
-    === 'value')
+  @IsOptional()
   @IsString()
-  @IsUrl(undefined, { message: 'Job Url is not valid' })
+//@IsUrl(undefined, { message: 'Job Url is not valid' })
   jobUrl: string;
 
   @ApiProperty()

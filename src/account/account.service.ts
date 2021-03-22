@@ -21,7 +21,7 @@ export class AccountService {
     if (!user) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.BAD_REQUEST);
     }
-    const { email, accountPackage, isRegComplete, accountType } = user
+    const { email, accountPackage, isRegComplete, accountType, accountId } = user
     if (!email) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.UNAUTHORIZED);
     }
@@ -29,7 +29,7 @@ export class AccountService {
     const accessToken = await this.jwtService.sign(payload);
     let dataToReturn = {
       email, token: accessToken, expires_in: 86400, accountPackage,
-      isRegComplete, accountType
+      isRegComplete, accountType, accountId
     };
     return dataToReturn;
   }
@@ -85,5 +85,11 @@ export class AccountService {
   public async findOrg(): Promise<OrganizationRO[]> {
     return await this.accountRepository.findOrg();
   }
+
+
+  async updateProfileImage(filename: string, userId: string) {
+    return await this.accountRepository.updateProfileImage(filename, userId);
+  }
+
 
 }

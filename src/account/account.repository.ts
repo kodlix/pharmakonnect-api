@@ -52,6 +52,8 @@ export class AccountRepository extends Repository<AccountEntity> {
         accountPackage: user.accountPackage,
         isRegComplete: user.isRegComplete,
         accountType: user.accountType,
+        accountId: user.id,
+
       };
       return data;
     } else {
@@ -133,6 +135,20 @@ export class AccountRepository extends Repository<AccountEntity> {
     const accType = accountTypes.CORPORATE;
     const account = await this.find({ where: { accountType: accType, isRegComplete: true } });
     return this.buildOrgArrRO(account);
+  }
+
+  public async updateProfileImage(filename: string, userId: string) {
+    const user = await this.findOne({ id: userId });
+    if (!user) {
+      throw new HttpException(
+        `User does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }   
+
+    user.profileImage = filename;
+        
+    return await user.save();
   }
 
   private buildUserRO(user: AccountEntity) {
