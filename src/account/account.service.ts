@@ -224,5 +224,4 @@ export class AccountService {
   public async getOneUserById(id: string): Promise<AccountEntity> {
     return await this.accountRepository.findOneOrFail({ where: { id } });
   }
-
 }
