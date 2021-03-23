@@ -23,6 +23,7 @@ import { ScheduleMeetingGatewayModule } from './video-conferencing/events/schedu
 import { ArticleModule } from './blog/article/article.module';
 import { CommentModule } from './blog/comment/comment.module';
 import { CategoryModule } from './blog/category/category.module';
+import { PollModule } from './poll/poll.module';
 
 
 @Module({
@@ -45,7 +46,8 @@ import { CategoryModule } from './blog/category/category.module';
     StartMeetingReminderModule,
     ArticleModule,
     CommentModule,
-    CategoryModule
+    CategoryModule,
+    PollModule
   ],
   controllers: [AppController],
   providers: [AppService],
