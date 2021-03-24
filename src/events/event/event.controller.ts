@@ -44,7 +44,7 @@ export class EventController {
     return await this.eventService.update(id, request, req);
   }
 
-  @Patch(':id')
+  @Patch('publish/:id')
   @ApiOperation({ summary: 'Publish event' })
   @ApiResponse({ status: 200, description: 'Return event successfully published' })
   async publishEvent(@Param('id') id: string) : Promise<string> {
