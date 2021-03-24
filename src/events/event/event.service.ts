@@ -13,8 +13,8 @@ export class EventService {
   
   constructor(private readonly eventRepo: EventRepository) {}
 
-  async create(request: CreateEventDto, user: AccountEntity) : Promise<string> {
-      return await this.eventRepo.saveEvent(request, user);
+  async create(filename, request: CreateEventDto, user: AccountEntity) : Promise<string> {
+      return await this.eventRepo.saveEvent(filename, request, user);
   }
 
   async findAll(queryParam: FilterDto, user: AccountEntity): Promise<EventRO[]> {

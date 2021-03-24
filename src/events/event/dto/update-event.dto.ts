@@ -45,7 +45,13 @@ export class UpdateEventDto {
     @Expose()
     @ApiProperty()
     @IsNotEmpty({message: 'Start Time cannot be empty'})
-    startTime: Date
+    startTime: Date;
+
+
+    @Expose()
+    @ApiProperty()
+    @IsNotEmpty({message: 'End Time cannot be empty'})
+    endTime: Date;
 
     @Expose()
     @IsString()
@@ -118,5 +124,10 @@ export class UpdateEventDto {
     @ApiPropertyOptional()
     @IsOptional()
     accessCode: string;
+
+    @ApiProperty()
+    @ApiPropertyOptional()
+    @IsOptional()
+    coverImage: string;
 
 }

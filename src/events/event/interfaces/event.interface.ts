@@ -8,10 +8,12 @@ export interface EventRO {
     numberOfParticipants: number;
     startDate: Date;
     endDate: Date;
+    startTime: Date;
+    endTime: Date;
     venue: string;
     accessCode: string;
-    organizer: string;
-    organizerPhoneNo: string;
+    organizerName: string;
+    organizerPhoneNumber: string;
     url: string;
     eventType: string;
     online: boolean;

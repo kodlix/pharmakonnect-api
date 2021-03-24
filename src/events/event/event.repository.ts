@@ -14,25 +14,15 @@ import { UpdateEventDto } from "./dto/update-event.dto";
 @EntityRepository(EventEntity)
 export class EventRepository extends Repository<EventEntity> {
 
-    async saveEvent(payload: CreateEventDto, user: AccountEntity) : Promise<string> {
+    async saveEvent(filename: string, payload: CreateEventDto, user: AccountEntity) : Promise<string> {
 
-        const start = new Date();
-        const end = new Date(start);
-        end.setDate(start.getDate() + 1);
-
-        const eventDateTimeExist = await this.createQueryBuilder('ev')
-                .select('id')
-                .where(`ev.startDate BETWEEN '${start.toISOString()}' AND '${end.toISOString()}'`)
-                .andWhere("ev.startTime::time  = localtime ")
-                .getOne();
-        
-        if(eventDateTimeExist) {
-            throw new HttpException( `There is an event scheduled for the date ${payload.startDate} at the time ${payload.startTime}`, HttpStatus.BAD_REQUEST);
-        }
-        
         const today = new Date();
 
-        if(today > new Date(payload.startDate)) {
+        if(payload.endDate < payload.startDate) {
+            throw new HttpException(`Start date of event cannot be greater than End date`, HttpStatus.BAD_REQUEST,);
+        }
+
+        if(today > payload.startDate) {
             throw new HttpException( `Event Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
         }
 
@@ -65,6 +55,11 @@ export class EventRepository extends Repository<EventEntity> {
 
         newEvent.accountId = user.id;
         newEvent.createdBy = user.createdBy;
+        
+        if(filename) {
+            newEvent.coverImage = filename;
+        }
+        
 
         const errors = await validate(newEvent);
 
@@ -136,7 +131,11 @@ export class EventRepository extends Repository<EventEntity> {
 
             const today = new Date();
 
-            if(today > new Date(payload.startDate)) {
+            if(payload.endDate < payload.startDate) {
+                throw new HttpException(`Start date of event cannot be greater than End date`, HttpStatus.BAD_REQUEST,);
+            }
+
+            if(today > payload.startDate) {
                 throw new HttpException( `Event Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
             }
     
@@ -148,6 +147,23 @@ export class EventRepository extends Repository<EventEntity> {
             if (todayTime > startTime) {
                 throw new HttpException( `Event Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
             } 
+
+            if(payload.online) {
+                if(!payload.url) {
+                    throw new HttpException( `Please provide the url to the event.`, HttpStatus.BAD_REQUEST);
+                }
+    
+                if(!validUrl(payload.url)) {
+                    throw new HttpException(`The event url ${payload.url} is not valid`, HttpStatus.BAD_REQUEST)
+                }
+            }
+    
+            if(payload.requireAccessCode || payload.requireUniqueAccessCode) {
+                if(!payload.accessCode) {
+                    throw new HttpException( `Please provide the access code to the event.`, HttpStatus.BAD_REQUEST);
+                }
+            }
+    
 
             event.updatedAt = new Date();
             event.updatedBy = user.updatedBy || user.createdBy;

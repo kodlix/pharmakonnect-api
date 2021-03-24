@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Req, UseInterceptors, ClassSerializerInterceptor, Query, Patch, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Req, UseInterceptors, ClassSerializerInterceptor, Query, Patch, UseGuards, UploadedFile } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -6,6 +6,10 @@ import { EventRO } from './interfaces/event.interface';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilterDto } from 'src/_common/filter.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { editFileName, imageFileFilter } from 'src/_utility/fileupload.util';
+import { diskStorage } from 'multer';
+
 
 @Controller('event')
 @ApiBearerAuth()
@@ -14,12 +18,21 @@ import { AuthGuard } from '@nestjs/passport';
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
+   @UseInterceptors(
+     FileInterceptor('image', {
+       storage: diskStorage({
+         destination: './uploads',
+         filename: editFileName,
+       }),
+       fileFilter: imageFileFilter,
+     }),
+   )
   @Post()
   @ApiOperation({ summary: 'Save Event' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 201, description: 'The record has been successfully created' })
-  create(@Body() createEventDto: CreateEventDto, @Req() req: any): Promise<string> {
-    return this.eventService.create(createEventDto, req.user);
+  create(@UploadedFile() file, @Body() createEventDto: CreateEventDto, @Req() req: any): Promise<string> {
+    return this.eventService.create(file ? file.filename : "" , createEventDto, req.user);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -58,3 +71,5 @@ export class EventController {
     return await this.eventService.remove(id);
   }
 }
+
+

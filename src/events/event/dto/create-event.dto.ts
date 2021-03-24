@@ -45,7 +45,12 @@ export class CreateEventDto {
     @Expose()
     @ApiProperty()
     @IsNotEmpty({message: 'Start Time cannot be empty'})
-    startTime: Date
+    startTime: Date;
+
+    @Expose()
+    @ApiProperty()
+    @IsNotEmpty({message: 'End Time cannot be empty'})
+    endTime: Date;
 
     @Expose()
     @IsString()
@@ -118,5 +123,10 @@ export class CreateEventDto {
     @ApiPropertyOptional()
     @IsOptional()
     published: boolean;
+
+    @ApiProperty()
+    @ApiPropertyOptional()
+    @IsOptional()
+    coverImage: string;
 
 }

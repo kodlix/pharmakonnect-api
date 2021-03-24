@@ -26,20 +26,26 @@ export class EventEntity extends AbstractBaseEntity{
     @Column({ type: 'time', name: 'startTime', default: (): string => 'LOCALTIMESTAMP'})
     startTime: Date;
 
+    @Column({ type: 'time', name: 'endTime', default: (): string => 'LOCALTIMESTAMP'})
+    endTime: Date;
+
     @Column({ type: "varchar", length: 128})
     venue: string;
 
     @Column({ type: "int", nullable: true})
     cost: number;
 
+    @Column({nullable: true})
+    coverImage: string;
+
     @Column({type: "varchar", nullable: true, length: 128})
     accessCode: string;
 
     @Column({type: "varchar", length: 128})
-    organizer: string;
+    organizerName: string;
 
     @Column({type: "varchar", length: 128})
-    organizerPhoneNo: string;
+    organizerPhoneNumber: string;
 
     @Column({type: "varchar", nullable: true, length: 128})
     url: string;
