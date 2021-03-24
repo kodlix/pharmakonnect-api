@@ -29,6 +29,10 @@ export class EventService {
     return await this.eventRepo.updateEvent(id, updateEventDto, user);
   }
 
+  async publishEvent(id: string) : Promise<string> {
+    return await this.eventRepo.publishEvent(id);
+  }
+
   async remove(id: string) : Promise<DeleteResult>{
     return await this.eventRepo.deleteEvent(id);
   }

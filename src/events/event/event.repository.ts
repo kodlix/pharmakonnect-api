@@ -11,7 +11,6 @@ import { EventRO } from "./interfaces/event.interface";
 import { UpdateEventDto } from "./dto/update-event.dto";
 
 
-
 @EntityRepository(EventEntity)
 export class EventRepository extends Repository<EventEntity> {
 
@@ -164,6 +163,24 @@ export class EventRepository extends Repository<EventEntity> {
         }
 
         throw new HttpException(`The event with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
+    }
+
+    async publishEvent(id: string): Promise<string> {
+        const ev = await this.findOne(id);
+        if(!ev) {
+            throw new HttpException(`The event with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
+        }
+
+        ev.published = true;
+        ev.publishedOn = new Date();
+        
+        try {
+            await this.save(ev);
+            return "Event successfully Published";
+        } catch (error) {
+            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
 }

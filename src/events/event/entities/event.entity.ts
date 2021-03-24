@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { Exclude } from "class-transformer";
 import { AccountEntity } from "src/account/entities/account.entity";
 import { EventUserEntity } from "src/events/eventusers/entities/eventuser.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
@@ -19,7 +20,7 @@ export class EventEntity extends AbstractBaseEntity{
     @Column({ name: 'startDate', default: new Date()})
     startDate: Date;
 
-    @Column({ name: 'startDate', default: new Date()})
+    @Column({ name: 'endDate', default: new Date()})
     endDate: Date;
 
     @Column({ type: 'time', name: 'startTime', default: (): string => 'LOCALTIMESTAMP'})
@@ -75,6 +76,10 @@ export class EventEntity extends AbstractBaseEntity{
 
     @OneToMany(() => EventUserEntity, s => s.event)
     eventuser: EventUserEntity[];
+
+    @Exclude()
+    @Column({nullable: true})
+    publishedOn: Date;
 
 
 }

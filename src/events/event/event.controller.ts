@@ -1,12 +1,16 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Req, UseInterceptors, ClassSerializerInterceptor, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Req, UseInterceptors, ClassSerializerInterceptor, Query, Patch, UseGuards } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { EventRO } from './interfaces/event.interface';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilterDto } from 'src/_common/filter.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('event')
+@ApiBearerAuth()
+@UseGuards(AuthGuard())
+@ApiTags('event')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
@@ -38,6 +42,13 @@ export class EventController {
   @ApiResponse({ status: 200, description: 'Return event successfully updated' })
   async update(@Param('id') id: string, @Body() request: UpdateEventDto, @Req() req: any): Promise<string> {
     return await this.eventService.update(id, request, req);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Publish event' })
+  @ApiResponse({ status: 200, description: 'Return event successfully published' })
+  async publishEvent(@Param('id') id: string) : Promise<string> {
+    return await this.eventService.publishEvent(id);
   }
 
   @Delete(':id')
