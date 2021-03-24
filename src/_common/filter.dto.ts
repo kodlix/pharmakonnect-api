@@ -6,4 +6,8 @@ export class FilterDto {
     @ApiProperty()
     @ApiPropertyOptional()
     search: string;
+
+    @ApiProperty()
+    @ApiPropertyOptional()
+    page: number;
 }

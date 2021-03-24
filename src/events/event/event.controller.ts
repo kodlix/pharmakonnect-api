@@ -1,34 +1,49 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Req, UseInterceptors, ClassSerializerInterceptor, Query } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { EventRO } from './interfaces/event.interface';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { FilterDto } from 'src/_common/filter.dto';
 
 @Controller('event')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
   @Post()
-  create(@Body() createEventDto: CreateEventDto) {
-    return this.eventService.create(createEventDto);
+  @ApiOperation({ summary: 'Save Event' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 201, description: 'The record has been successfully created' })
+  create(@Body() createEventDto: CreateEventDto, @Req() req: any): Promise<string> {
+    return this.eventService.create(createEventDto, req.user);
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  findAll() {
-    return this.eventService.findAll();
+  @ApiOperation({ summary: 'Get all events' })
+  @ApiResponse({ status: 200, description: 'Return all events' })
+  async findAll(@Query() filterDto: FilterDto,  @Req() req: any ) : Promise<EventRO[]>{
+    return await this.eventService.findAll(filterDto, req.user);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.eventService.findOne(+id);
+  @ApiOperation({ summary: 'Get event' })
+  @ApiResponse({ status: 200, description: 'Return event' })
+  async findOne(@Param('id') id: string) : Promise<EventRO> {
+    return await this.eventService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
-    return this.eventService.update(+id, updateEventDto);
+  @ApiOperation({ summary: 'Update event' })
+  @ApiResponse({ status: 200, description: 'Return event successfully updated' })
+  async update(@Param('id') id: string, @Body() request: UpdateEventDto, @Req() req: any): Promise<string> {
+    return await this.eventService.update(id, request, req);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.eventService.remove(+id);
+  @ApiOperation({ summary: 'Delete a meeting' })
+  @ApiResponse({ status: 200, description: 'Meeting successfully deleted' })
+  async remove(@Param('id') id: string) {
+    return await this.eventService.remove(id);
   }
 }
