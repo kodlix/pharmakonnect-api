@@ -63,7 +63,7 @@ export class CreateScheduleMeetingDto {
     @IsOptional()
     recordMeeting: boolean;
 
-    @ApiProperty()
+    @ApiProperty({default: true})
     @ApiPropertyOptional()
     @IsOptional()
     allowParticipantJoinAnytime: boolean;
@@ -73,12 +73,12 @@ export class CreateScheduleMeetingDto {
     @IsOptional()
     waitingRoom: boolean
 
-    @ApiProperty()
+    @ApiProperty({default: true})
     @ApiPropertyOptional()
     @IsOptional()
     hostVideo: boolean;
 
-    @ApiProperty()
+    @ApiProperty({default: true})
     @ApiPropertyOptional()
     @IsOptional()
     participantVideo: boolean;
