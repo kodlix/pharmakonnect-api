@@ -3,7 +3,7 @@ import { Column, Entity } from "typeorm";
 
 
 @Entity('Poll')
-export class Poll extends AbstractBaseEntity
+export class PollEntity extends AbstractBaseEntity
  {
     @Column({length: 550})
     title: string;
@@ -21,13 +21,13 @@ export class Poll extends AbstractBaseEntity
     accessCode: string;
 
     @Column({type: 'bool', default: false})
-    requireRegistration: boolean;
+    requiresRegistration: boolean;
 
     @Column({length: 50})
     type: string;
 
-    @Column({type: 'string'})
-    content: string;
+    @Column({type: 'string', length: 500, nullable: true})
+    hint: string;
 
     @Column({type: 'bool', default: false})
     published: boolean;
@@ -40,4 +40,12 @@ export class Poll extends AbstractBaseEntity
 
     @Column({type: 'datetime'})
     endDate: Date;
+
+    @Column({type: 'string'})
+    accountId: string;
+
+    @Column({type: 'bool'})
+    active: boolean;
+
+    
 }

@@ -1,7 +1,8 @@
 export enum pollTypes {
-  POLL = 'poll',
-  ELECTION = 'election',
-  SURVEY= 'survey'
+  EXAMINATION = 'Examination',
+  POLL = 'Poll',
+  SURVEY= 'Survey',
+  ELECTION = 'Election',
 }
 
 

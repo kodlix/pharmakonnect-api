@@ -1,9 +1,9 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator/types/decorator/decorators';
-import { CreatePollDto } from './create-poll.dto';
+import { CreatePollUserDto } from './create-poll-user.dto';
 
-export class UpdatePollDto extends PartialType(CreatePollDto) {
+export class UpdatePollUserDto extends PartialType(CreatePollUserDto) {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

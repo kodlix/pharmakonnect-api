@@ -3,7 +3,7 @@ import { Column, Entity } from "typeorm";
 
 
 @Entity('PollVote')
-export class PollVote extends AbstractBaseEntity
+export class PollVoteEntity extends AbstractBaseEntity
  {
     @Column({length: 125})
     pollId: string;
