@@ -4,8 +4,8 @@ import { EventEntity } from "src/events/event/entities/event.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { Column, Entity, ManyToOne } from "typeorm";
 
-@Entity('eventuser')
-export class EventUserEntity extends AbstractBaseEntity{
+@Entity('eventusers')
+export class EventUsersEntity extends AbstractBaseEntity{
 
     @Column({type: "varchar", length: 128})
     name: string;
@@ -23,7 +23,7 @@ export class EventUserEntity extends AbstractBaseEntity{
     @Column({ type: 'bool', default: false })
     paid: boolean
 
-    @ManyToOne(() => EventEntity, s => s.eventuser)
+    @ManyToOne(() => EventEntity, s => s.eventusers)
     event: EventEntity;
 
     @Column('uuid')

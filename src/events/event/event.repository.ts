@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
-import {Brackets, DeleteResult, EntityRepository, Like, Repository} from "typeorm";
+import {Brackets, DeleteResult, EntityRepository, getCustomRepository, Repository} from "typeorm";
 import { plainToClass, plainToClassFromExist } from 'class-transformer';
 import {validate} from 'class-validator';
 import { FilterDto } from "src/_common/filter.dto";
@@ -9,10 +9,13 @@ import { CreateEventDto } from "./dto/create-event.dto";
 import {validUrl} from '../../_utility/validurl.util';
 import { EventRO } from "./interfaces/event.interface";
 import { UpdateEventDto } from "./dto/update-event.dto";
+import { EventRegistrationDto } from "./dto/event-registration.dto";
+import { EventUsersRepository } from "../eventusers/eventusers.repository";
 
 
 @EntityRepository(EventEntity)
 export class EventRepository extends Repository<EventEntity> {
+
 
     async saveEvent(filename: string, payload: CreateEventDto, user: AccountEntity) : Promise<string> {
 
@@ -85,10 +88,11 @@ export class EventRepository extends Repository<EventEntity> {
         if(search) {
 
            const events =  await this.createQueryBuilder("ev")
-                    .where("meet.accountId = :accountId", { accountId: user.id })
+                     .leftJoinAndSelect("ev.eventusers", "eventUsers")
+                    .where("ev.accountId = :accountId", { accountId: user.id })
                     .andWhere(new Brackets(qb => {
-                        qb.where("meet.name ILike :name", { name: `%${search}%` })
-                        .orWhere("meet.accessCode ILike :accessCode", { accessCode: `%${search}%` })
+                        qb.where("ev.name ILike :name", { name: `%${search}%` })
+                        .orWhere("ev.accessCode ILike :accessCode", { accessCode: `%${search}%` })
                     }))
                     .orderBy("ev.createdAt", "ASC")
                     .take(25)
@@ -98,7 +102,7 @@ export class EventRepository extends Repository<EventEntity> {
             return events;
         }
 
-        return await this.find({where: {accountId: user.id}, order: { createdAt: 'ASC' }, take: 25, skip: 25 * (page - 1)});
+        return await this.find({where: {accountId: user.id}, relations: ['eventusers'], order: { createdAt: 'ASC' }, take: 25, skip: 25 * (page - 1)});
     }
 
     async findEventById(id: string): Promise<EventRO> {
@@ -196,6 +200,25 @@ export class EventRepository extends Repository<EventEntity> {
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+    }
+
+    async addEventRegistration(payload: EventRegistrationDto, user: AccountEntity): Promise<string> {
+        
+        const eventUsersRepository = getCustomRepository(EventUsersRepository);
+
+
+        const eventRegistringFor = await this.find({where: {id: payload.eventId}});
+        if(!eventRegistringFor) {
+            throw new HttpException(`The event you are trying to register for is invalid or does not exist`, HttpStatus.BAD_REQUEST)
+        }
+
+        const userRegisteredForSameEvent = await eventUsersRepository.findByEmailAndEventId(payload.eventId, payload.email);
+        if(userRegisteredForSameEvent) {
+            throw new HttpException(`The email ${payload.email} has already been used to register for this event.`, HttpStatus.BAD_REQUEST)
+        }
+
+        return await eventUsersRepository.createEventUsers(payload, user);
 
     }
 

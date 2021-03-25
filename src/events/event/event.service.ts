@@ -3,6 +3,7 @@ import { AccountEntity } from 'src/account/entities/account.entity';
 import { FilterDto } from 'src/_common/filter.dto';
 import { DeleteResult } from 'typeorm';
 import { CreateEventDto } from './dto/create-event.dto';
+import { EventRegistrationDto } from './dto/event-registration.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { EventRepository } from './event.repository';
 import { EventRO } from './interfaces/event.interface';
@@ -31,6 +32,10 @@ export class EventService {
 
   async publishEvent(id: string) : Promise<string> {
     return await this.eventRepo.publishEvent(id);
+  }
+
+  async addEventRegistration(payload: EventRegistrationDto, user: AccountEntity): Promise<string> {
+    return await this.eventRepo.addEventRegistration(payload, user);
   }
 
   async remove(id: string) : Promise<DeleteResult>{

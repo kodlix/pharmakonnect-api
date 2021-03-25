@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Exclude } from "class-transformer";
 import { AccountEntity } from "src/account/entities/account.entity";
-import { EventUserEntity } from "src/events/eventusers/entities/eventuser.entity";
+import { EventUsersEntity } from "src/events/eventusers/entities/eventusers.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 
@@ -80,8 +80,8 @@ export class EventEntity extends AbstractBaseEntity{
     @Column('uuid')
     accountId: string;
 
-    @OneToMany(() => EventUserEntity, s => s.event)
-    eventuser: EventUserEntity[];
+    @OneToMany(() => EventUsersEntity, s => s.event)
+    eventusers: EventUsersEntity[];
 
     @Exclude()
     @Column({nullable: true})

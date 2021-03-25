@@ -1,26 +1,31 @@
 import { Injectable } from '@nestjs/common';
-import { CreateEventuserDto } from './dto/create-eventuser.dto';
-import { UpdateEventuserDto } from './dto/update-eventuser.dto';
+import { AccountEntity } from 'src/account/entities/account.entity';
+import { FilterDto } from 'src/_common/filter.dto';
+import { DeleteResult } from 'typeorm';
+import { UpdateEventUserRegistrationDto } from './dto/update-eventuser.dto';
+import { EventUsersRepository } from './eventusers.repository';
+import { EventUsersRO } from './interfaces/eventusers.interface';
 
 @Injectable()
 export class EventusersService {
-  create(createEventuserDto: CreateEventuserDto) {
-    return 'This action adds a new eventuser';
+ 
+  constructor(private readonly eventUsersRepo: EventUsersRepository) {
+
   }
 
-  findAll() {
-    return `This action returns all eventusers`;
+  async findAll(queryParam: FilterDto, user: AccountEntity): Promise<EventUsersRO[]> {
+    return await this.eventUsersRepo.getAllEventUsers(queryParam, user);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} eventuser`;
+  async findOne(id: string): Promise<EventUsersRO> {
+    return await this.eventUsersRepo.findEventUsersById(id);
   }
 
-  update(id: number, updateEventuserDto: UpdateEventuserDto) {
-    return `This action updates a #${id} eventuser`;
+  async update(id: string, req: UpdateEventUserRegistrationDto, user: AccountEntity): Promise<string> {
+    return await this.eventUsersRepo.updateEventUser(id, req, user);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} eventuser`;
+  async remove(id: string): Promise<DeleteResult> {
+    return await this.eventUsersRepo.deleteEventUser(id);
   }
 }

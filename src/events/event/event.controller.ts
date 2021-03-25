@@ -9,6 +9,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { editFileName, imageFileFilter } from 'src/_utility/fileupload.util';
 import { diskStorage } from 'multer';
+import { EventRegistrationDto } from './dto/event-registration.dto';
 
 
 @Controller('event')
@@ -63,6 +64,16 @@ export class EventController {
   async publishEvent(@Param('id') id: string) : Promise<string> {
     return await this.eventService.publishEvent(id);
   }
+
+
+  @Post('register')
+  @ApiOperation({ summary: 'Register for an Event' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 201, description: 'Registration successful' })
+  async EventRegistration(@Body() eventRegistrationDtoDto: EventRegistrationDto, @Req() req: any): Promise<string> {
+    return await this.eventService.addEventRegistration(eventRegistrationDtoDto, req.user);
+  }
+
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete event' })
