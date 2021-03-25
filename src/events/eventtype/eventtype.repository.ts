@@ -74,7 +74,7 @@ export class EventTypeRepository extends Repository<EventTypeEntity> {
                 
                 const nameExist = await this.findOne({where: {name: ILike(`%${payload.name}%`)}});
                 if(nameExist){
-                    throw new HttpException( `Meeting with ${payload.name} is already in use`, HttpStatus.BAD_REQUEST);
+                    throw new HttpException( `Event type with ${payload.name} is already in use`, HttpStatus.BAD_REQUEST);
                 }
             }
          
