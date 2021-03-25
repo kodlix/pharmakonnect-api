@@ -34,7 +34,7 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
     }
 
     async findByEmailAndEventId(eventId, email): Promise<boolean> {
-        const exist = await this.find({where: {eventId: eventId, email: email}});
+        const exist = await this.findOne({where: {eventId: eventId, email: email}});
         if(exist) return true;
         return false;
     }
@@ -47,21 +47,21 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
         
         if(search) {
 
-           const events =  await this.createQueryBuilder("evu")
-                    .where("evu.accountId = :accountId", { accountId: user.id })
-                    .andWhere(new Brackets(qb => {
+           const eventsUsers =  await this.createQueryBuilder("evu")
+                    .innerJoinAndSelect("evu.event", "event")
+                    .where(new Brackets(qb => {
                         qb.where("evu.email ILike :email", { email: `%${search}%` })
                         .orWhere("evu.accessCode ILike :accessCode", { accessCode: `%${search}%` })
                     }))
                     .orderBy("evu.createdAt", "ASC")
+                    .skip(25 * (page ? page - 1 : 0))
                     .take(25)
-                    .skip(25)
                     .getMany();
 
-            return events;
+            return eventsUsers;
         }
 
-        return await this.find({where: {accountId: user.id}, order: { createdAt: 'ASC' }, take: 25, skip: 25 * (page - 1)});
+        return await this.find({order: { createdAt: 'ASC' }, relations: ['event'], take: 25, skip: 25 * (page - 1)});
     }
 
     async findEventUsersById(id: string): Promise<EventUsersRO> {
@@ -72,6 +72,10 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
         }
         throw new HttpException(`The event user with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
 
+    }
+
+    async getAllEventUsersByEventId(eventId: string): Promise<EventUsersRO[]> {
+        return await this.find({where: {eventId: eventId}})
     }
     
     async deleteEventUser(id: string): Promise<DeleteResult> {
@@ -96,7 +100,7 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
                     throw new HttpException(`The email ${payload.email} has already been used to register for this event.`, HttpStatus.BAD_REQUEST)
                 }
             }
-            
+
             eventUser.updatedAt = new Date();
             eventUser.updatedBy = user.updatedBy || user.createdBy;
 

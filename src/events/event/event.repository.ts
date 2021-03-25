@@ -38,6 +38,10 @@ export class EventRepository extends Repository<EventEntity> {
             throw new HttpException( `Event Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
         } 
 
+        if(payload.numberOfParticipants <= 0) {
+            throw new HttpException( `Number of participants must be greater than zero.`, HttpStatus.BAD_REQUEST);
+        }
+
         if(payload.online) {
             if(!payload.url) {
                 throw new HttpException( `Please provide the url to the event.`, HttpStatus.BAD_REQUEST);
@@ -87,16 +91,16 @@ export class EventRepository extends Repository<EventEntity> {
         
         if(search) {
 
-           const events =  await this.createQueryBuilder("ev")
-                     .leftJoinAndSelect("ev.eventusers", "eventUsers")
-                    .where("ev.accountId = :accountId", { accountId: user.id })
+           const events =  await this.createQueryBuilder("event")
+                     .innerJoinAndSelect("event.eventusers", "eventusers")
+                    .where("event.accountId = :accountId", { accountId: user.id })
                     .andWhere(new Brackets(qb => {
-                        qb.where("ev.name ILike :name", { name: `%${search}%` })
-                        .orWhere("ev.accessCode ILike :accessCode", { accessCode: `%${search}%` })
+                        qb.where("event.name ILike :name", { name: `%${search}%` })
+                        .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
                     }))
-                    .orderBy("ev.createdAt", "ASC")
+                    .orderBy("event.createdAt", "ASC")
+                    .skip(25 * (page ? page - 1 : 0))
                     .take(25)
-                    .skip(25)
                     .getMany();
 
             return events;
@@ -205,17 +209,48 @@ export class EventRepository extends Repository<EventEntity> {
 
     async addEventRegistration(payload: EventRegistrationDto, user: AccountEntity): Promise<string> {
         
+        const today = new Date();
+
         const eventUsersRepository = getCustomRepository(EventUsersRepository);
 
-
-        const eventRegistringFor = await this.find({where: {id: payload.eventId}});
+        const eventRegistringFor = await this.findOne({where: {id: payload.eventId}});
+        
         if(!eventRegistringFor) {
-            throw new HttpException(`The event you are trying to register for is invalid or does not exist`, HttpStatus.BAD_REQUEST)
+            throw new HttpException(`The event you are trying to register for is invalid or does not exist`, HttpStatus.BAD_REQUEST);
+        }
+
+        if(today.getDate() > new Date(eventRegistringFor.startDate).getDate()) {
+            throw new HttpException(`This event does not accept registration anymore`, HttpStatus.BAD_REQUEST);
+        }
+
+        if(!eventRegistringFor.requireRegistration) {
+            throw new HttpException(`Invalid request`, HttpStatus.BAD_REQUEST);
+        }
+
+        if(!eventRegistringFor.published) {
+            throw new HttpException(`This event has not been published yet`, HttpStatus.BAD_REQUEST);
+        }
+
+        if(eventRegistringFor.cost > 0) {
+            if(!payload.paid) {
+                throw new HttpException(`Sorry, This a paid event, make sure you complete your payment before proceeding`, HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        if(eventRegistringFor.requireUniqueAccessCode || eventRegistringFor.requireAccessCode) {
+            if(!payload.accessCode) {
+                throw new HttpException(`Please provide the access code for this event`, HttpStatus.BAD_REQUEST);
+            }
         }
 
         const userRegisteredForSameEvent = await eventUsersRepository.findByEmailAndEventId(payload.eventId, payload.email);
         if(userRegisteredForSameEvent) {
-            throw new HttpException(`The email ${payload.email} has already been used to register for this event.`, HttpStatus.BAD_REQUEST)
+            throw new HttpException(`The email ${payload.email} has already been used to register for this event.`, HttpStatus.BAD_REQUEST);
+        }
+
+        const allUsersInEvent = await eventUsersRepository.getAllEventUsersByEventId(payload.eventId);
+        if(allUsersInEvent.length >= eventRegistringFor.numberOfParticipants) {
+            throw new HttpException(`Sorry, The maximum number of participants has been reached for this event`, HttpStatus.BAD_REQUEST);
         }
 
         return await eventUsersRepository.createEventUsers(payload, user);
