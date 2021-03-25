@@ -35,6 +35,9 @@ export class PollEntity extends AbstractBaseEntity
     @Column({type: 'datetime'})
     publishedAt: Date;
 
+    @Column({type: 'string', length: 128})
+    publishedBy: string;
+
     @Column({type: 'datetime'})
     startDate: Date;
 
