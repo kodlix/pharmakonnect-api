@@ -1,26 +1,33 @@
 import { Injectable } from '@nestjs/common';
+import { AccountEntity } from 'src/account/entities/account.entity';
 import { CreateEventtypeDto } from './dto/create-eventtype.dto';
 import { UpdateEventtypeDto } from './dto/update-eventtype.dto';
+import { EventTypeRepository } from './eventtype.repository';
 
 @Injectable()
 export class EventtypeService {
-  create(createEventtypeDto: CreateEventtypeDto) {
-    return 'This action adds a new eventtype';
+
+  constructor(private readonly eventTypeRepo: EventTypeRepository) {
+
   }
 
-  findAll() {
-    return `This action returns all eventtype`;
+  async create(createEventtypeDto: CreateEventtypeDto, user: AccountEntity): Promise<string> {
+    return await this.eventTypeRepo.saveEventType(createEventtypeDto, user);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} eventtype`;
+  async findAll() {
+    return await this.eventTypeRepo.getAllEventTypes();
   }
 
-  update(id: number, updateEventtypeDto: UpdateEventtypeDto) {
-    return `This action updates a #${id} eventtype`;
+  async findOne(id: string) {
+    return await this.eventTypeRepo.findEventTypeById(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} eventtype`;
+  async update(id: string, updateEventtypeDto: UpdateEventtypeDto, user: AccountEntity) {
+    return await this.eventTypeRepo.updateEventType(id, updateEventtypeDto, user);
+  }
+
+  async remove(id: string) {
+    return await this.eventTypeRepo.deleteEventType(id);
   }
 }
