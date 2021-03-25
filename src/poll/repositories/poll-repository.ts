@@ -22,7 +22,7 @@ export class PollRepository extends Repository<PollEntity> {
     }
    
     if (dto.endDate < today) {
-      throw new HttpException(``
+      throw new HttpException(
         `Poll end-date cannot be less than today`,
         HttpStatus.BAD_REQUEST,
       );
