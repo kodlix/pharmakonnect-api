@@ -7,7 +7,7 @@ import {
     WebSocketServer,
     WsException
 } from '@nestjs/websockets';
-import { plainToClass, plainToClassFromExist } from 'class-transformer';
+import { plainToClass } from 'class-transformer';
 import { Server, Socket } from 'socket.io';
 import { ScheduleMeetingEntity } from 'src/video-conferencing/schedule-meetings/entities/schedule-meeting.entity';
 import { ScheduleMeetingRepository } from 'src/video-conferencing/schedule-meetings/schedule-meeting.repository';
@@ -42,6 +42,11 @@ import { Connection } from 'typeorm';
               throw new WsException(`The meeting with ID ${data.id} cannot be found`);
           }
 
+          // if(meeting.meetingStarted) {
+          //   throw new WsException(`Meeting already started`);
+          // } else if (meeting.meetingEnded) {
+          //     throw new WsException(`Meeting already ended`);
+          // }
           
           meeting.meetingStarted = true;
           const updated = plainToClass(ScheduleMeetingEntity, meeting);
