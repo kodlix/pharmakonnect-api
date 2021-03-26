@@ -40,8 +40,15 @@ export class EventController {
   @Get()
   @ApiOperation({ summary: 'Get all events' })
   @ApiResponse({ status: 200, description: 'Return all events' })
-  async findAll(@Query() filterDto: FilterDto,  @Req() req: any ) : Promise<EventRO[]>{
-    return await this.eventService.findAll(filterDto, req.user);
+  async findAll(@Query() filterDto: FilterDto) : Promise<EventRO[]>{
+    return await this.eventService.findAll(filterDto);
+  }
+
+  @Get('myevent')
+  @ApiOperation({ summary: 'Get all my events' })
+  @ApiResponse({ status: 200, description: 'Return all my events' })
+  async findMyEvents(@Query() filterDto: FilterDto,  @Req() req: any ) : Promise<EventRO[]>{
+    return await this.eventService.findMyEvents(filterDto, req.user);
   }
 
   @Get(':id')
@@ -61,8 +68,8 @@ export class EventController {
   @Patch('publish/:id')
   @ApiOperation({ summary: 'Publish event' })
   @ApiResponse({ status: 200, description: 'Return event successfully published' })
-  async publishEvent(@Param('id') id: string) : Promise<string> {
-    return await this.eventService.publishEvent(id);
+  async publishEvent(@Param('id') id: string, @Req() req: any) : Promise<string> {
+    return await this.eventService.publishEvent(id, req.user);
   }
 
 

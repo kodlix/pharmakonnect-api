@@ -83,7 +83,29 @@ export class EventRepository extends Repository<EventEntity> {
 
     }
 
-    async getAllEvents({search, page}: FilterDto, user: AccountEntity): Promise<EventRO[]> {
+    async getAllEvents({search, page}: FilterDto): Promise<EventRO[]> {
+    
+        if(search) {
+
+           const events =  await this.createQueryBuilder("event")
+                     .innerJoinAndSelect("event.eventusers", "eventusers")
+                    .where(new Brackets(qb => {
+                        qb.where("event.name ILike :name", { name: `%${search}%` })
+                        .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
+                    }))
+                    .orderBy("event.createdAt", "ASC")
+                    .skip(25 * (page ? page - 1 : 0))
+                    .take(25)
+                    .getMany();
+
+            return events;
+        }
+
+        return await this.find({relations: ['eventusers'], order: { createdAt: 'ASC' }, take: 25, skip: 25 * (page - 1)});
+    }
+
+    
+    async findMyEvents({search, page}: FilterDto, user: AccountEntity): Promise<EventRO[]> {
         
         if(!user.id) {
             throw new HttpException( `User Id is required.`, HttpStatus.BAD_REQUEST);
@@ -189,10 +211,14 @@ export class EventRepository extends Repository<EventEntity> {
         throw new HttpException(`The event with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
     }
 
-    async publishEvent(id: string): Promise<string> {
+    async publishEvent(id: string, user: AccountEntity): Promise<string> {
         const ev = await this.findOne(id);
         if(!ev) {
             throw new HttpException(`The event with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
+        }
+
+        if(ev.accountId != user.id) {
+            throw new HttpException(`You can only publish an event created by you`, HttpStatus.NOT_FOUND);
         }
 
         ev.published = true;

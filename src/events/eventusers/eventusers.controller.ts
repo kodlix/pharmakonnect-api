@@ -16,8 +16,15 @@ export class EventusersController {
   @Get()
   @ApiOperation({ summary: 'Get all event users' })
   @ApiResponse({ status: 200, description: 'Return all event users' })
-  async findAll(@Query() filterDto: FilterDto,  @Req() req: any) {
-    return await this.eventusersService.findAll(filterDto, req.user);
+  async findAll(@Query() filterDto: FilterDto) {
+    return await this.eventusersService.findAll(filterDto);
+  }
+
+  @Get('me')
+  @ApiOperation({ summary: 'Get all me event users' })
+  @ApiResponse({ status: 200, description: 'Return me from event users' })
+  async findMeFromEventUsers(@Query() filterDto: FilterDto,  @Req() req: any) {
+    return await this.eventusersService.findMeFromEventUsers(filterDto, req.user);
   }
 
   @Get(':id')

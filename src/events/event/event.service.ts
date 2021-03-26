@@ -18,8 +18,12 @@ export class EventService {
       return await this.eventRepo.saveEvent(filename, request, user);
   }
 
-  async findAll(queryParam: FilterDto, user: AccountEntity): Promise<EventRO[]> {
-    return await this.eventRepo.getAllEvents(queryParam, user);
+  async findAll(queryParam: FilterDto): Promise<EventRO[]> {
+    return await this.eventRepo.getAllEvents(queryParam);
+  }
+
+  async findMyEvents(queryParam: FilterDto, user: AccountEntity): Promise<EventRO[]> {
+    return await this.eventRepo.findMyEvents(queryParam, user);
   }
 
   async findOne(id: string) : Promise<EventRO>{
@@ -30,8 +34,8 @@ export class EventService {
     return await this.eventRepo.updateEvent(id, updateEventDto, user);
   }
 
-  async publishEvent(id: string) : Promise<string> {
-    return await this.eventRepo.publishEvent(id);
+  async publishEvent(id: string, user: AccountEntity) : Promise<string> {
+    return await this.eventRepo.publishEvent(id, user);
   }
 
   async addEventRegistration(payload: EventRegistrationDto, user: AccountEntity): Promise<string> {

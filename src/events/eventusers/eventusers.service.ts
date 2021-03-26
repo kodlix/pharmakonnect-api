@@ -13,8 +13,12 @@ export class EventusersService {
 
   }
 
-  async findAll(queryParam: FilterDto, user: AccountEntity): Promise<EventUsersRO[]> {
-    return await this.eventUsersRepo.getAllEventUsers(queryParam, user);
+  async findAll(queryParam: FilterDto): Promise<EventUsersRO[]> {
+    return await this.eventUsersRepo.getAllEventUsers(queryParam);
+  }
+
+  async findMeFromEventUsers(queryParam: FilterDto, user: AccountEntity): Promise<EventUsersRO[]> {
+    return await this.eventUsersRepo.findMeFromEventUsers(queryParam, user);
   }
 
   async findOne(id: string): Promise<EventUsersRO> {

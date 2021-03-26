@@ -39,11 +39,7 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
         return false;
     }
 
-    async getAllEventUsers({search, page}: FilterDto, user: AccountEntity): Promise<EventUsersRO[]> {
-        
-        if(!user.id) {
-            throw new HttpException( `User Id is required.`, HttpStatus.BAD_REQUEST);
-        }
+    async getAllEventUsers({search, page}: FilterDto): Promise<EventUsersRO[]> {
         
         if(search) {
 
@@ -63,6 +59,34 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
 
         return await this.find({order: { createdAt: 'ASC' }, relations: ['event'], take: 25, skip: 25 * (page - 1)});
     }
+
+    async findMeFromEventUsers({search, page}: FilterDto, user: AccountEntity): Promise<EventUsersRO[]> {
+        
+        if(!user.id) {
+            throw new HttpException( `User Id is required.`, HttpStatus.BAD_REQUEST);
+        }
+        
+
+        if(search) {
+
+           const eventsUsers =  await this.createQueryBuilder("evu")
+                    .innerJoinAndSelect("evu.event", "event")
+                    .where("event.accountId = :accountId", { accountId: user.id })
+                    .andWhere(new Brackets(qb => {
+                        qb.where("evu.email ILike :email", { email: `%${search}%` })
+                        .orWhere("evu.accessCode ILike :accessCode", { accessCode: `%${search}%` })
+                    }))
+                    .orderBy("evu.createdAt", "ASC")
+                    .skip(25 * (page ? page - 1 : 0))
+                    .take(25)
+                    .getMany();
+
+            return eventsUsers;
+        }
+
+        return await this.find({where: {accountId: user.id}, order: { createdAt: 'ASC' }, relations: ['event'], take: 25, skip: 25 * (page - 1)});
+    }
+
 
     async findEventUsersById(id: string): Promise<EventUsersRO> {
 

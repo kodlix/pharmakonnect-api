@@ -21,6 +21,7 @@ import { OutletModule } from './outlet/outlet.module';
 import { StartMeetingReminderModule } from './video-conferencing/tasks/start-meeting-reminder/start-meeting-reminder.module';
 import { ScheduleMeetingGatewayModule } from './video-conferencing/events/schedule-meeting-gateway/schedule-meeting-gateway.module';
 import { EventsModule } from './events/events.module';
+import { EventReminderModule } from './events/tasks/event-reminder.module';
 
 
 @Module({
@@ -42,6 +43,7 @@ import { EventsModule } from './events/events.module';
     ScheduleModule.forRoot(),
     StartMeetingReminderModule,
     EventsModule,
+    EventReminderModule
   ],
   controllers: [AppController],
   providers: [AppService],
