@@ -42,8 +42,7 @@ import { EventReminderModule } from './events/tasks/event-reminder.module';
     ScheduleMeetingGatewayModule,
     ScheduleModule.forRoot(),
     StartMeetingReminderModule,
-    EventsModule,
-    EventReminderModule
+    EventsModule
   ],
   controllers: [AppController],
   providers: [AppService],
