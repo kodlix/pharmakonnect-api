@@ -42,33 +42,28 @@ import { Connection } from 'typeorm';
               throw new WsException(`The meeting with ID ${data.id} cannot be found`);
           }
 
-          if(meeting.meetingStarted) {
-              throw new WsException(`Meeting already started`);
-          } else if (meeting.meetingEnded) {
-              throw new WsException(`Meeting already ended`);
-          }
           
           meeting.meetingStarted = true;
           const updated = plainToClass(ScheduleMeetingEntity, meeting);
 
       
-          await this.scheduleMeetingRepo.save(updated);
-           //create a room
-          client.join( data.meetingId );
-          client.join( data.socketId );
+          const saved = await this.scheduleMeetingRepo.save(updated);
+          if(saved) {
+               //create a room
+            client.join( data.meetingId );
+            client.join( data.socketId );
+            //create a data store for the current room and its users
+            let meetingObj = {
+                meetingId: data.meetingID,
+                socketId: data.socketId,
+                name: data.name
+            }
 
-          //create a data store for the current room and its users
-          let meetingObj = {
-              meetingId: data.meetingID,
-              socketId: data.socketId,
-              name: data.name
+            this.meetings.push(meetingObj);
+
+            //this.server.to(data.socketId).emit('socketResponse', { socketResponse: {participantCount: this.meetings.length, name: this.meetings[this.meetings.length - 1].name}});
+            this.server.to(data.socketId).emit('count', { count: this.meetings.length, users: this.meetings, isNew: data.isNewMeeting });
           }
-
-          this.meetings.push(meetingObj);
-
-          //this.server.to(data.socketId).emit('socketResponse', { socketResponse: {participantCount: this.meetings.length, name: this.meetings[this.meetings.length - 1].name}});
-          this.server.to(data.socketId).emit('count', { count: this.meetings.length, users: this.meetings, isNew: data.isNewMeeting });
-
 
       } catch (error) {
         throw new WsException(`Unable to start meeting - Error: ${error.message}`);
@@ -96,16 +91,16 @@ import { Connection } from 'typeorm';
             throw new WsException(`You cannot join a meeting scheduled for a previous day`);
           }
   
-          const obj = {
-            durationInHours: meeting.durationInHours,
-            durationInMinutes: meeting.durationInMinutes,
-            startTime: meeting.startTime,
-            today
-          }
+          // const obj = {
+          //   durationInHours: meeting.durationInHours,
+          //   durationInMinutes: meeting.durationInMinutes,
+          //   startTime: meeting.startTime,
+          //   today
+          // }
   
-          if(!this.MeetingValid(obj)) {
-            throw new WsException('This meeting has ended or is no longer valid');
-          }
+          // if(!this.MeetingValid(obj)) {
+          //   throw new WsException('This meeting has ended or is no longer valid');
+          // }
   
           //if user wants to join with the passcode, make sure he/she has the correct passcode
           if(data.passcode) {
@@ -128,7 +123,7 @@ import { Connection } from 'typeorm';
   
   
           const meetings = this.meetings.filter(x => x.meetingId === data.meetingId);
-          const userThatJoinedInfo = this.meetings.find(x => x.socketId === data.socketId);
+          //const userThatJoinedInfo = this.meetings.find(x => x.socketId === data.socketId);
   
           //Inform other members in the room of new user's arrival
           if ( client.adapter.rooms[data.meetingId].length > 1 ) {
@@ -180,9 +175,11 @@ import { Connection } from 'typeorm';
         const updated = plainToClass(ScheduleMeetingEntity, meeting);
         
         try {
-          await this.scheduleMeetingRepo.save(updated);
-          await this.scheduleMeetingRepo.delete({ id: meeting.id });
-          client.to( data.meetingId ).emit( 'meetingEnded', { message: "The meeting has ended" } );
+          const saved = await this.scheduleMeetingRepo.save(updated);
+          if(saved) {
+            await this.scheduleMeetingRepo.delete({ id: meeting.id });
+            client.to( data.meetingId ).emit( 'meetingEnded', { message: "The meeting has ended" } );
+          }
         
         } catch (error) {
           throw new WsException(`Unable to end meeting - Error: ${error.message}`);
