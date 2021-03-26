@@ -124,15 +124,16 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
             }
         
             const today = new Date();
-
-            if(today > payload.startDate) {
-                throw new HttpException( `Meeting Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
+            if(payload.startDate.getDate() != meeting.startDate.getDate()) {
+                if(today > payload.startDate) {
+                    throw new HttpException( `Meeting Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
+                }
+    
+                if (isNotValidTime(payload.startTime)) {
+                    throw new HttpException( `Meeting Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
+                } 
             }
-
-            if (isNotValidTime(payload.startTime)) {
-                throw new HttpException( `Meeting Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
-            } 
-
+           
             meeting.updatedAt = new Date();
             meeting.updatedBy = user.updatedBy || user.createdBy;
 
