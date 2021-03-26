@@ -66,7 +66,9 @@ import { Connection } from 'typeorm';
 
           this.meetings.push(meetingObj);
 
-          this.server.to(data.socketId).emit('socketResponse', { socketResponse: {participantCount: this.meetings.length, name: this.meetings[this.meetings.length - 1].name}});
+          //this.server.to(data.socketId).emit('socketResponse', { socketResponse: {participantCount: this.meetings.length, name: this.meetings[this.meetings.length - 1].name}});
+          this.server.to(data.socketId).emit('count', { count: this.meetings.length, users: this.meetings, isNew: data.isNewMeeting });
+
 
       } catch (error) {
         throw new WsException(`Unable to start meeting - Error: ${error.message}`);
@@ -130,8 +132,8 @@ import { Connection } from 'typeorm';
   
           //Inform other members in the room of new user's arrival
           if ( client.adapter.rooms[data.meetingId].length > 1 ) {
-              client.to( data.meetingId ).emit( 'new user', { socketId: data.socketId, name: data.name, participantCount: meetings.length, users: meetings} );
-              this.server.to( data.socketId ).emit( 'socketResponse', {socketResponse: { participantCount: meetings.length, name: userThatJoinedInfo.name } });
+              client.to( data.meetingId ).emit( 'new user', { socketId: data.socketId, user: data.name, count: meetings.length, users: meetings} );
+              this.server.to( data.socketId ).emit( 'count', { count: meetings.length, users: meetings, isNew: data.isNewMeeting } );
           }
         } catch (error) {
           throw new WsException(`Unable to join meeting - Error: ${error.message}`);
@@ -203,7 +205,7 @@ import { Connection } from 'typeorm';
 
         const usersRemaining = this.meetings.filter(x => x.meetingId === userThatLeft.meetingId);   
   
-        client.to(userThatLeft.meetingId).emit( 'userLeft', { name: userThatLeft.name, participantCount:usersRemaining.length, users: usersRemaining  })
+        client.to(userThatLeft.meetingId).emit( 'userLeft', { name: userThatLeft.name, count:usersRemaining.length, users: usersRemaining  })
       }
     }
   
