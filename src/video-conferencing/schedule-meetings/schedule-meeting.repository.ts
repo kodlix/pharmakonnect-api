@@ -9,6 +9,7 @@ import { ScheduleMeetingsRO } from "./interfaces/schedule-meetings.interface";
 import { UpdateScheduleMeetingDto } from "./dto/update-schedule-meeting.dto";
 import {ILike, Equal} from "typeorm";
 import { AccountEntity } from "src/account/entities/account.entity";
+import {isNotValidTime} from "../../_utility/time-validator.util";
 
 
 
@@ -28,16 +29,11 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
             throw new HttpException( `User ID is required`, HttpStatus.UNAUTHORIZED);
         }
 
-        if(today > new Date(payload.startDate)) {
+        if(today > payload.startDate) {
             throw new HttpException( `Meeting Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
         }
-
-        const todayTime = `${today.getHours()}.${today.getMinutes()}`;
-
-        const splitedStartTime = payload.startTime.toString().split(":");
-        const startTime = `${splitedStartTime[0]}.${splitedStartTime[1]}`;
-         
-        if (todayTime > startTime) {
+    
+        if (isNotValidTime(payload.startTime)) {
             throw new HttpException( `Meeting Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
         } 
 
@@ -129,16 +125,11 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
         
             const today = new Date();
 
-            if(today > new Date(payload.startDate)) {
+            if(today > payload.startDate) {
                 throw new HttpException( `Meeting Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
             }
-    
-            const todayTime = `${today.getHours()}.${today.getMinutes()}`;
 
-            const splitedStartTime = payload.startTime.toString().split(":");
-            const startTime = `${splitedStartTime[0]}.${splitedStartTime[1]}`;
-            
-            if (todayTime > startTime) {
+            if (isNotValidTime(payload.startTime)) {
                 throw new HttpException( `Meeting Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
             } 
 
