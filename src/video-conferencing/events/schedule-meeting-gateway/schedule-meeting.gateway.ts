@@ -95,6 +95,12 @@ import { Connection } from 'typeorm';
           if(today > new Date(meeting.startDate)) {
             throw new WsException(`You cannot join a meeting scheduled for a previous day`);
           }
+
+          if(!meeting.meetingStarted) {
+            throw new WsException(`The meeting has not started.`);
+          } else if (meeting.meetingEnded) {
+            throw new WsException(`The meeting has ended.`);
+          }
   
           // const obj = {
           //   durationInHours: meeting.durationInHours,
