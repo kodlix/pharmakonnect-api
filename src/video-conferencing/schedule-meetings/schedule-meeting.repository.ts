@@ -10,6 +10,7 @@ import { UpdateScheduleMeetingDto } from "./dto/update-schedule-meeting.dto";
 import {ILike, Equal} from "typeorm";
 import { AccountEntity } from "src/account/entities/account.entity";
 import {isNotValidTime} from "../../_utility/time-validator.util";
+import { isNotValidDate } from "src/_utility/date-validator.util";
 
 
 
@@ -17,23 +18,22 @@ import {isNotValidTime} from "../../_utility/time-validator.util";
 export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity> {
 
     async saveMeetingSchedule(payload: CreateScheduleMeetingDto, user: AccountEntity) : Promise<string> {
-        
+
         const isMeetingTopicExist = await this.findOne({where: {topic: ILike(`%${payload.topic}%`)}});
         if(isMeetingTopicExist) {
             throw new HttpException( `Meeting with ${payload.topic} already exist`, HttpStatus.BAD_REQUEST);
         }
         
-        const today = new Date();
 
         if(!user.id) {
             throw new HttpException( `User ID is required`, HttpStatus.UNAUTHORIZED);
         }
 
-        if(today > payload.startDate) {
-            throw new HttpException( `Meeting Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
+        if(isNotValidDate(payload.startDate)) {
+            throw new HttpException( `Meeting Start Date cannot be less than current date`, HttpStatus.BAD_REQUEST);
         }
     
-        if (isNotValidTime(payload.startTime)) {
+        if (isNotValidTime(payload.startTime, payload.startDate)) {
             throw new HttpException( `Meeting Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
         } 
 
@@ -123,17 +123,14 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
                 }
             }
         
-            const today = new Date();
-            if(payload.startDate.getDate() != meeting.startDate.getDate()) {
-                if(today > payload.startDate) {
-                    throw new HttpException( `Meeting Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
-                }
-    
-                if (isNotValidTime(payload.startTime)) {
-                    throw new HttpException( `Meeting Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
-                } 
+            if(isNotValidDate(payload.startDate)) {
+                throw new HttpException( `Meeting Start Date cannot be less than current date`, HttpStatus.BAD_REQUEST);
             }
-           
+
+            if (isNotValidTime(payload.startTime, payload.startDate)) {
+                throw new HttpException( `Meeting Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
+            } 
+                       
             meeting.updatedAt = new Date();
             meeting.updatedBy = user.updatedBy || user.createdBy;
 

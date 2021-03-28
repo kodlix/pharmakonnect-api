@@ -11,6 +11,7 @@ import { plainToClass } from 'class-transformer';
 import { Server, Socket } from 'socket.io';
 import { ScheduleMeetingEntity } from 'src/video-conferencing/schedule-meetings/entities/schedule-meeting.entity';
 import { ScheduleMeetingRepository } from 'src/video-conferencing/schedule-meetings/schedule-meeting.repository';
+import { isNotValidDate } from 'src/_utility/date-validator.util';
 import { Connection } from 'typeorm';
   
   //Websocket gateway for scheduled video conferencing
@@ -40,6 +41,12 @@ import { Connection } from 'typeorm';
 
           if(!meeting) {
               throw new WsException(`The meeting with ID ${data.id} cannot be found`);
+          }
+
+          if(isNotValidDate(meeting.startDate) ) {
+            throw new WsException(`Please edit the start date of this meeting to the current date before starting`);
+          } else if (new Date(meeting.startDate).setHours(0,0,0,0) > new Date().setHours(0,0,0,0))  {
+            throw new WsException(`The scheduled date for this meeting has not yet reached`);
           }
 
           // if(meeting.meetingStarted) {
@@ -89,11 +96,12 @@ import { Connection } from 'typeorm';
           if(!meeting) {
               throw new WsException(`The meeting with ID ${data.id} cannot be found`);
           }
-  
-          const today = new Date();
-  
-          if(today > new Date(meeting.startDate)) {
+    
+          if(isNotValidDate(meeting.startDate) ) {
             throw new WsException(`You cannot join a meeting scheduled for a previous day`);
+          }
+          else if (new Date(meeting.startDate).setHours(0,0,0,0) > new Date().setHours(0,0,0,0))  {
+            throw new WsException(`You cannot join a meeting scheduled for a future date`);
           }
 
           if(!meeting.meetingStarted) {
