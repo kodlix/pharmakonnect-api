@@ -23,7 +23,7 @@ export class StartMeetingReminderService {
 
           const meetingStartTimeReached = [];
           const messages = [];
-          const msg: any = {};
+          let msg: any = {};
 
           const start = new Date();
             start.setHours(0, 0, 0, 0);
@@ -55,7 +55,7 @@ export class StartMeetingReminderService {
               if(meetingStartTimeReached.length > 0)  {
                     for (const msr of meetingStartTimeReached) {
 
-                      msr.startTime = msr.startTime >= 12 ? `${msr.startTime} PM` : `${msr.startTime} AM`;
+                      msr.startTime = msr.startTime.split(':')[0] >= 12 ? `${msr.startTime} PM` : `${msr.startTime} AM`;
 
                       msg.to = msr.schedulerEmail;
                       msg.from = 'zack.aminu@netopconsult.com';
@@ -66,9 +66,10 @@ export class StartMeetingReminderService {
                           <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`
 
                       messages.push(msg);
+                      msg = {};
 
-                  }
-              }
+                    }
+                }
 
                 try {
                   if(messages.length > 0) {
