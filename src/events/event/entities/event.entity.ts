@@ -81,11 +81,15 @@ export class EventEntity extends AbstractBaseEntity{
     accountId: string;
 
     @OneToMany(() => EventUsersEntity, s => s.event)
-    eventusers: EventUsersEntity[];
+    eventUsers: EventUsersEntity[];
 
     @Exclude()
     @Column({nullable: true})
     publishedOn: Date;
+
+    @Exclude()
+    @Column({ type: 'bool', default: false})
+    eventReminderSent: boolean;
 
 
 }

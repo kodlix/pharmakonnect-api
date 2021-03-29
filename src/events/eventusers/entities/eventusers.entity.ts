@@ -23,7 +23,7 @@ export class EventUsersEntity extends AbstractBaseEntity{
     @Column({ type: 'bool', default: false })
     paid: boolean
 
-    @ManyToOne(() => EventEntity, s => s.eventusers)
+    @ManyToOne(() => EventEntity, s => s.eventUsers)
     event: EventEntity;
 
     @Column('uuid')

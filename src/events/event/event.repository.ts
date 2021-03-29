@@ -21,7 +21,7 @@ export class EventRepository extends Repository<EventEntity> {
 
         const today = new Date();
 
-        if(payload.endDate < payload.startDate) {
+        if(new Date(payload.endDate).setHours(0,0,0,0) < new Date(payload.startDate).setHours(0,0,0,0)) {
             throw new HttpException(`Start date of event cannot be greater than End date`, HttpStatus.BAD_REQUEST,);
         }
 
@@ -88,7 +88,7 @@ export class EventRepository extends Repository<EventEntity> {
         if(search) {
 
            const events =  await this.createQueryBuilder("event")
-                     .innerJoinAndSelect("event.eventusers", "eventusers")
+                     .innerJoinAndSelect("event.eventUsers", "eventUsers")
                     .where(new Brackets(qb => {
                         qb.where("event.name ILike :name", { name: `%${search}%` })
                         .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
@@ -101,7 +101,7 @@ export class EventRepository extends Repository<EventEntity> {
             return events;
         }
 
-        return await this.find({relations: ['eventusers'], order: { createdAt: 'ASC' }, take: 25, skip: 25 * (page - 1)});
+        return await this.find({relations: ['eventUsers'], order: { createdAt: 'ASC' }, take: 25, skip: 25 * (page - 1)});
     }
 
     
@@ -114,7 +114,7 @@ export class EventRepository extends Repository<EventEntity> {
         if(search) {
 
            const events =  await this.createQueryBuilder("event")
-                     .innerJoinAndSelect("event.eventusers", "eventusers")
+                     .innerJoinAndSelect("event.eventUsers", "eventUsers")
                     .where("event.accountId = :accountId", { accountId: user.id })
                     .andWhere(new Brackets(qb => {
                         qb.where("event.name ILike :name", { name: `%${search}%` })
@@ -128,7 +128,7 @@ export class EventRepository extends Repository<EventEntity> {
             return events;
         }
 
-        return await this.find({where: {accountId: user.id}, relations: ['eventusers'], order: { createdAt: 'ASC' }, take: 25, skip: 25 * (page - 1)});
+        return await this.find({where: {accountId: user.id}, relations: ['eventUsers'], order: { createdAt: 'ASC' }, take: 25, skip: 25 * (page - 1)});
     }
 
     async findEventById(id: string): Promise<EventRO> {

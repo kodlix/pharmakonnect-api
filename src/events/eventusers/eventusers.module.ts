@@ -12,4 +12,4 @@ import { AccountModule } from 'src/account/account.module';
   controllers: [EventusersController],
   providers: [EventusersService]
 })
-export class EventusersModule {}
+export class EventUsersModule {}
