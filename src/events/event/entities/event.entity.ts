@@ -5,7 +5,7 @@ import { EventUsersEntity } from "src/events/eventusers/entities/eventusers.enti
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 
-@Entity('event')
+@Entity('Event')
 export class EventEntity extends AbstractBaseEntity{
 
     @Column({unique: true, type: "varchar", length: 128})

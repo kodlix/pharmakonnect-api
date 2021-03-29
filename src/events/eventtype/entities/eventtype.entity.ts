@@ -2,7 +2,7 @@
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { Column, Entity } from "typeorm";
 
-@Entity('eventtype')
+@Entity('EventType')
 export class EventTypeEntity extends AbstractBaseEntity{
 
     @Column({type: "varchar", length: 128})
