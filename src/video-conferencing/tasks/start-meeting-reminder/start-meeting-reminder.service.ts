@@ -4,6 +4,7 @@ import { Cron, CronExpression  } from '@nestjs/schedule';
 import { ScheduleMeetingRepository } from 'src/video-conferencing/schedule-meetings/schedule-meeting.repository';
 import { Connection } from 'typeorm';
 import * as SendGrid from "@sendgrid/mail";
+import { isNotValidTime } from 'src/_utility/time-validator.util';
 SendGrid.setApiKey("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")
 
 
@@ -22,11 +23,12 @@ export class StartMeetingReminderService {
 
           const meetingStartTimeReached = [];
           const messages = [];
-          const msg: any = {};
+          let msg: any = {};
 
           const start = new Date();
-          const end = new Date(start);
-          end.setDate(start.getDate() + 1);
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(start);
+            end.setDate(start.getDate() + 1);
 
           const todayMeetings = await this.scheduleMeetingRepo.createQueryBuilder('meet')
                               .select('id')
@@ -41,13 +43,10 @@ export class StartMeetingReminderService {
                               .getRawMany();
 
           if(todayMeetings.length > 0) {
+
               for (const tm of todayMeetings) {
-                const todayTime = `${start.getHours()}.${start.getMinutes()}`;
 
-                const splitedStartTime = tm.startTime.toString().split(":");
-                const startTime = `${splitedStartTime[0]}.${splitedStartTime[1]}`;
-
-                if(todayTime >= startTime) {
+                if (isNotValidTime(tm.startTime, tm.startDate)) {
                     meetingStartTimeReached.push(tm);
                 }
 
@@ -56,18 +55,21 @@ export class StartMeetingReminderService {
               if(meetingStartTimeReached.length > 0)  {
                     for (const msr of meetingStartTimeReached) {
 
+                      msr.startTime = msr.startTime.split(':')[0] >= 12 ? `${msr.startTime} PM` : `${msr.startTime} AM`;
+
                       msg.to = msr.schedulerEmail;
                       msg.from = 'zack.aminu@netopconsult.com';
                       msg.subject = `Reminder to Start your scheduled meeting`,
                       msg.html = `<p> Dear ${msr.schedulerName}, </p>
-                          <p> Due to your busy schedule, this is a reminder email for you to Start the meeting you scheduled at <strong>${msr.startTime}</strong> today.</p>
-                          <p> Please login to your account and proceed to your meetings to start.</p>
+                          <p> Due to your busy schedule, this is a reminder email for you to Start the meeting you scheduled for <strong>${msr.startDate}</strong> at <strong>${msr.startTime}</strong>.</p>
+                          <p> Please login to your account and proceed to start meeting.</p>
                           <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`
 
                       messages.push(msg);
+                      msg = {};
 
-                  }
-              }
+                    }
+                }
 
                 try {
                   if(messages.length > 0) {
