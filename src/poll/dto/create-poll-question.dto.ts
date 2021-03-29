@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsPositive, IsString } from 'class-validator';
 import { pollQuestionType, pollTypes } from '../poll.constant';
 
 export class CreatePollQuestionDto {
@@ -7,6 +7,12 @@ export class CreatePollQuestionDto {
   @IsString()
   @IsNotEmpty({ message: 'Poll is required' })
   pollId: string;
+
+  @ApiProperty()
+  @IsPositive({message: "Question number must be positive"})
+  @IsNotEmpty({ message: 'Question number is required' })
+  @IsNumber()
+  SN: Number;
 
   @ApiProperty()
   @IsString()

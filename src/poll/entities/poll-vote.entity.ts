@@ -17,8 +17,17 @@ export class PollVoteEntity extends AbstractBaseEntity
     @Column({length: 125})
     questionType: string;
 
+    @Column({length: 125, nullable: true})
+    email: string;
+
+    @Column({length: 125, nullable: true})
+    phonenumber: string;
+
     @Column({length: 125})
     optionId: string;
+
+    @Column({length: 125, nullable: true})
+    accountId: string;
 
     @Column({length: 550})
     content: string;

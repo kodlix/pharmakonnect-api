@@ -16,7 +16,7 @@ export class PollRepository extends Repository<PollEntity> {
     const today = new Date();    
     if (existingPoll) {
         throw new HttpException(
-            `You have an active poll with same title '${dto.title}' already exisits`,
+            `You have an active poll with same title '${dto.title}' already exist`,
             HttpStatus.BAD_REQUEST,
           );
     }
@@ -63,7 +63,7 @@ export class PollRepository extends Repository<PollEntity> {
     const today = new Date();    
     if (existingPoll) {
         throw new HttpException(
-            `You have an active poll with same title '${dto.title}' already exisits`,
+            `You have an active poll with same title '${dto.title}' already exist`,
             HttpStatus.BAD_REQUEST,
           );
     }
@@ -101,13 +101,30 @@ export class PollRepository extends Repository<PollEntity> {
 
     const existingPoll = await this.findOne(id);
     if (!existingPoll) {
-        throw new HttpException(`Poll does not exisits`, HttpStatus.NOT_FOUND );
+        throw new HttpException(`Poll does not exist`, HttpStatus.NOT_FOUND );
     }
 
     existingPoll.published = true;
     existingPoll.publishedAt = new Date();
     existingPoll.publishedBy = user.id;
 
+    return await existingPoll.save();
+  }
+
+
+  
+  async deactivate(id: string, user: AccountEntity): Promise<PollEntity> {
+
+    if (!id) {
+        throw new HttpException(`Invalid poll`, HttpStatus.BAD_REQUEST);
+    }
+
+    const existingPoll = await this.findOne(id);
+    if (!existingPoll) {
+        throw new HttpException(`Poll does not exist`, HttpStatus.NOT_FOUND );
+    }
+
+    existingPoll.active = false;
     return await existingPoll.save();
   }
 
@@ -119,7 +136,7 @@ export class PollRepository extends Repository<PollEntity> {
 
     const existingPoll = await this.findOne(id);
     if (!existingPoll) {
-      throw new HttpException(`Poll does not exisits`, HttpStatus.NOT_FOUND);
+      throw new HttpException(`Poll does not exist`, HttpStatus.NOT_FOUND);
     }
   
     return await this.delete({ id: existingPoll.id });
@@ -132,13 +149,13 @@ export class PollRepository extends Repository<PollEntity> {
 
     const existingPoll = await this.findOne(id);
     if (!existingPoll) {
-      throw new HttpException(`Poll does not exisits`, HttpStatus.NOT_FOUND);
+      throw new HttpException(`Poll does not exist`, HttpStatus.NOT_FOUND);
     }
     return existingPoll;
   }
 
 
-  async findJob(page = 1, searchParam: string): Promise<PollEntity[]> {
+  async findAllPolls(page = 1, searchParam: string): Promise<PollEntity[]> {  // @TODO convert to full-text search
     if (searchParam) {
       const param = `%${searchParam}%`
       const searchResult = await this.find({

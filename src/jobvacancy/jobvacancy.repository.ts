@@ -21,7 +21,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
 
     if (job && job.jobTitle === dto.jobTitle &&  job.nameOfCorporation === dto.nameOfCorporation && job.endDate > today) {
       throw new HttpException(
-        `Job with title '${dto.jobTitle}' already exisits`,
+        `Job with title '${dto.jobTitle}' already exist`,
         HttpStatus.BAD_REQUEST,
       );
     }

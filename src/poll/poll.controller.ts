@@ -9,26 +9,26 @@ export class PollController {
 
   @Post()
   create(@Body() createPollDto: CreatePollDto) {
-    return this.pollService.create(createPollDto);
+    //return this.pollService.create(createPollDto);
   }
 
   @Get()
   findAll() {
-    return this.pollService.findAll();
+    //return this.pollService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.pollService.findOne(+id);
+    //return this.pollService.findOne(+id);
   }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() updatePollDto: UpdatePollDto) {
-    return this.pollService.update(+id, updatePollDto);
+    //return this.pollService.update(+id, updatePollDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.pollService.remove(+id);
+    //return this.pollService.remove(+id);
   }
 }

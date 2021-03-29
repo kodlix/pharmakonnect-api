@@ -1,5 +1,6 @@
+import { AccountEntity } from "src/account/entities/account.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 
 
 @Entity('Poll')
@@ -49,6 +50,10 @@ export class PollEntity extends AbstractBaseEntity
 
     @Column({type: 'bool'})
     active: boolean;
+    
+    @OneToOne(() => AccountEntity)
+    @JoinColumn()
+    public account: AccountEntity;
 
     
 }
