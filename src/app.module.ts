@@ -25,6 +25,7 @@ import { CommentModule } from './blog/comment/comment.module';
 import { CategoryModule } from './blog/category/category.module';
 import { EventsModule } from './events/events.module';
 import { EventReminderModule } from './events/tasks/event-reminder.module';
+import { PollModule } from './poll/poll.module';
 
 
 @Module({
@@ -48,7 +49,8 @@ import { EventReminderModule } from './events/tasks/event-reminder.module';
     ArticleModule,
     CommentModule,
     CategoryModule,
-    EventsModule
+    EventsModule,
+    PollModule
   ],
   controllers: [AppController],
   providers: [AppService],
