@@ -13,6 +13,16 @@ export interface ConversationRO{
     createdBy: string
 
     updatedBy: string
+    
+    id: string
+
+    channelName: string
+
+    creatorName: string
+
+    initiatorId: string
+
+
 }
 
 

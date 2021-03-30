@@ -10,10 +10,12 @@ import { ConversationRepository} from './repository/chat.conversation.repository
 //import { GroupChatRepository } from './repository/chat.groupChatRepository';
 import { MessageRepository } from './repository/chat.message.repository';
 import { ParticipantEntity } from './entities/participant.entity';
+import { AccountModule } from 'src/account/account.module';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([ConversationRepository, MessageRepository, ParticipantEntity])
+    TypeOrmModule.forFeature([ConversationRepository, MessageRepository, ParticipantEntity]),
+    AccountModule
   ],
   controllers: [ChatController],
   providers: [ChatConverationService, AlertGateway, ChatGateway, ChatMessageService]

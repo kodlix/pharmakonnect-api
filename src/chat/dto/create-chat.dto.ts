@@ -32,6 +32,17 @@ export class CreateConversationDto {
     @ApiProperty()
     readonly updatedBy: string
 
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    readonly creatorName : string
+
+    
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    readonly channelName : string
+
 }
 
 export class CreateMessageDto{

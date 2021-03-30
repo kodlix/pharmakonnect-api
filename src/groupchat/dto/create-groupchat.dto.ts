@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { CreateParticipantDto } from "src/chat/dto/create-chat.dto";
 
 
-export class CreateGroupChatDto{
+export class CreateGroupchatDto{
     @IsString()
     @IsNotEmpty()
     @ApiProperty()

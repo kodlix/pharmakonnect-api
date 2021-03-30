@@ -4,8 +4,9 @@ import { GetgroupchatRO } from 'src/chat/chat.interface'
 import { ParticipantEntity } from 'src/chat/entities/participant.entity'
 import { GroupChatEntity } from '../entities/groupchat.entity';
 import { ConversationRepository } from 'src/chat/repository/chat.conversation.repository';
-import { CreateGroupChatDto } from '../dto/create-groupchat.dto';
+import { CreateGroupchatDto } from '../dto/create-groupchat.dto';
 import { UpdateGroupchatDto } from '../dto/update-groupchat.dto';
+import { ConversationEntity } from 'src/chat/entities/conversation.entity';
 
 
 @EntityRepository(GroupChatEntity)
@@ -21,8 +22,9 @@ export class GroupChatRepository extends Repository<GroupChatEntity>{
     //get single groupchat and details(participant)
     async getGroupChatById(id: string) {
 
-        const groupchat = await this.find({where:{id: id}, relations:["participants"]});
+        const groupchat = await this.find({relations:["participants"], where:{id: id}});
         return groupchat
+       
     }
 
 
@@ -37,7 +39,7 @@ export class GroupChatRepository extends Repository<GroupChatEntity>{
 
 
     //create groupchat
-    async createGroup(groupchat: CreateGroupChatDto): Promise<CreateGroupChatDto> {
+    async createGroup(groupchat: CreateGroupchatDto): Promise<CreateGroupchatDto> {
 
         const newgroupchat = await this.create();
         let groupchatParticipant = []       
@@ -100,9 +102,11 @@ export class GroupChatRepository extends Repository<GroupChatEntity>{
     //Delete a groupchat
     async deleteGroupChat(id: string) {
         const repository = await getRepository(ParticipantEntity);
-        await getConnection().createQueryBuilder().delete().from(GroupChatEntity).where("id = :id", {id}).execute();
-        this.conversationRepo.deleteConversation(id)
-        var test = await repository.delete({groupChatID: id})
+        const conversrepository = await getRepository(ConversationEntity);
+        const deletegroup = await getConnection().createQueryBuilder().delete().from(GroupChatEntity).where("id = :id", {id}).execute();
+        await conversrepository.delete({creatorId: id})
+        //const conver = this.conversationRepo.deleteConversation(id)
+        await repository.delete({groupChatID: id})
 
 
     }

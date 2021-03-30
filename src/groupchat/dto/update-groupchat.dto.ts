@@ -1,9 +1,11 @@
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateGroupchatDto } from './create-groupchat.dto';
 import { IsNotEmpty, IsString, IsBoolean, isBoolean, IsDate, IsArray } from "class-validator"
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateParticipantDto } from "src/chat/dto/create-chat.dto";
 
 
-export class UpdateGroupchatDto{
+export class UpdateGroupchatDto {
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
@@ -55,4 +57,3 @@ export class UpdateGroupchatDto{
     @ApiProperty()
     readonly participant : CreateParticipantDto[]
 }
-

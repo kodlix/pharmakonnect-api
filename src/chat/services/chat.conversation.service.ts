@@ -10,9 +10,13 @@ export class ChatConverationService {
     private readonly conversationrepo: ConversationRepository
     ){}
 
-  async create(dto: CreateConversationDto): Promise<CreateConversationDto> {
+  async create(dto: CreateConversationDto, user: any): Promise<CreateConversationDto> {
    
-    return await this.conversationrepo.createOrUpdateConversation(dto)
+    return await this.conversationrepo.createOrUpdateConversation(dto, user)
+  }
+
+  async findConversation(creatorid: string, channelid: string){
+    return await this.conversationrepo.getConversationPaticipantMessage(creatorid, channelid);
   }
 
   // findAll() {
@@ -20,9 +24,9 @@ export class ChatConverationService {
   //   return `This action returns all chat`;
   // }
 
-  async findOne(id: string) {
+  async findOne(user: any) {
     //pick single and all related chat
-    return await this.conversationrepo.getConversationById(id)
+    return await this.conversationrepo.getConversationById(user)
   }
 
   // update(id: number, updateChatDto: UpdateChatDto) {

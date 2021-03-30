@@ -8,25 +8,25 @@ import { ContactEnitiy } from './entities/contact.entity';
 export class ContactService extends Repository<ContactEnitiy> {
 
 
-  async createContact(dto: CreateContactDto[]): Promise<any[]> {
+  async createContact(dto: CreateContactDto[], user: any): Promise<any[]> {
     try {
       const contactrepository = await getRepository(ContactEnitiy);
       let contactArr = [] 
       let contactExist = [];
       for(let value of dto) {
-        let isExist = await getRepository(ContactEnitiy).findOne({where:{creatorId: value.creatorId, accountId: value.accountId }})
+        let isExist = await getRepository(ContactEnitiy).findOne({where:{creatorId: user.id, accountId: value.accountId }})
                 
         if (isExist) {
           contactExist.push(value.firstName+ ' ' +value.lastName+ ' Already exist in your contact')
         }else{
           let contact = new ContactEnitiy()
         contact.accountId = value.accountId;
-        contact.creatorId = value.creatorId;
+        contact.creatorId = user.id;
         contact.email = value.email;
         contact.firstName = value.firstName;
         contact.lastName = value.lastName;
         contact.phoneNo = value.phoneNo;
-        contact.createdBy = value.creatorId //use created by
+        contact.createdBy = user.createdBy //use created by
 
          contactArr.push(contact)
         }        
@@ -46,9 +46,10 @@ export class ContactService extends Repository<ContactEnitiy> {
 
   }
 
-  async findAll(): Promise<ContactEnitiy[]> {
+  async findAll(id: string): Promise<ContactEnitiy[]> {
     const conversations = await getRepository(ContactEnitiy)
       .createQueryBuilder('conversation')
+      .where('conversation.creatorId = :id', {id})
       .getMany();
     return conversations
   }
