@@ -18,7 +18,7 @@ export class PollUserEntity extends AbstractBaseEntity {
   @Column({ length: 128 })
   pollId: string;
 
-  @Column({ type: 'datetime', default: new Date() })
+  @Column({ default: new Date() })
   registeredAt: Date;
 
   @Column({ type: 'bool', default: true })

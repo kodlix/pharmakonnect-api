@@ -12,12 +12,12 @@ import { PollOptionEntity } from '../entities/poll-option.entity';
 export class PollOptionRepository extends Repository<PollOptionEntity> {
   async createEntity(dto: CreatePollOptionDto, user: AccountEntity): Promise<PollOptionEntity> {
 
-    if (dto && !dto.pollId) {
-      throw new HttpException(
-        `Option does not belong to any poll`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    // if (dto && !dto.pollId) {
+    //   throw new HttpException(
+    //     `Option does not belong to any poll`,
+    //     HttpStatus.BAD_REQUEST,
+    //   );
+    // }
 
     const option = plainToClass(PollOptionEntity, dto);
 
@@ -39,7 +39,8 @@ export class PollOptionRepository extends Repository<PollOptionEntity> {
     if (!id) {
         throw new HttpException(`Invalid option`, HttpStatus.BAD_REQUEST);
     }
-    const existingPollOption = await this.findOne(id, {where: {pollId: dto.pollId, questionId: dto.questionId,content: dto.content, id: NotEquals(dto.id)}});
+    const existingPollOption = await this.findOne(id, {where: {content: dto.content, id: NotEquals(dto.id)}});
+    // const existingPollOption = await this.findOne(id, {where: {pollId: dto.pollId, questionId: dto.questionId,content: dto.content, id: NotEquals(dto.id)}});
 
     if (existingPollOption) {
         throw new HttpException(
@@ -48,8 +49,8 @@ export class PollOptionRepository extends Repository<PollOptionEntity> {
           );
     }
 
-    existingPollOption.updatedAt = new Date();
-    existingPollOption.updatedBy = user.email;
+    // existingPollOption.updatedAt = new Date();
+    // existingPollOption.updatedBy = user.email;
     const updatePollOption = plainToClassFromExist(existingPollOption, dto);
 
     try {

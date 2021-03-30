@@ -49,7 +49,6 @@ export class CreateGroupChatDto{
     @ApiProperty()
     readonly createdBy : string
 
-
     @IsArray()
     @IsNotEmpty()
     @ApiProperty()

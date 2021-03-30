@@ -12,12 +12,12 @@ import { PollQuestionEntity } from '../entities/poll-question.entity';
 export class PollQuestionRepository extends Repository<PollQuestionEntity> {
   async createEntity(dto: CreatePollQuestionDto, user: AccountEntity): Promise<PollQuestionEntity> {
 
-    if (dto && !dto.pollId) {
-      throw new HttpException(
-        `Question does not belong to any poll`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    // if (dto && !dto.pollId) {
+    //   throw new HttpException(
+    //     `Question does not belong to any poll`,
+    //     HttpStatus.BAD_REQUEST,
+    //   );
+    // }
 
     const question = plainToClass(PollQuestionEntity, dto);
 
@@ -39,7 +39,7 @@ export class PollQuestionRepository extends Repository<PollQuestionEntity> {
     if (!id) {
         throw new HttpException(`Invalid question`, HttpStatus.BAD_REQUEST);
     }
-    const existingPollQuestion = await this.findOne(id, {where: {pollId: dto.pollId, content: dto.content, id: NotEquals(dto.id)}});
+    const existingPollQuestion = await this.findOne(id, {where: { content: dto.content, id: NotEquals(dto.id) }});
 
     if (existingPollQuestion) {
         throw new HttpException(
@@ -48,8 +48,8 @@ export class PollQuestionRepository extends Repository<PollQuestionEntity> {
           );
     }
 
-    existingPollQuestion.updatedAt = new Date();
-    existingPollQuestion.updatedBy = user.email;
+    // existingPollQuestion.updatedAt = new Date();
+    // existingPollQuestion.updatedBy = user.email;
     const updatePollQuestion = plainToClassFromExist(existingPollQuestion, dto);
 
     try {

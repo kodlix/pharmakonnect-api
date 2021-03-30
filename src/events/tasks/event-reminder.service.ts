@@ -80,7 +80,7 @@ export class EventReminderService {
         }
       }
 
-      console.log("f", futureEvents);
+      // console.log("f", futureEvents);
       //this.logger.debug('Called when the current second is 45');
     }
 }

@@ -1,20 +1,25 @@
 import { AbstractBaseEntity } from "src/_common/base.entity";
-import { Column, Entity } from "typeorm";
+import { BaseEntity, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import { PollQuestionEntity } from "./poll-question.entity";
+import { PollEntity } from "./poll.entity";
 
 
 @Entity('PollOption')
-export class PollOptionEntity extends AbstractBaseEntity
+export class PollOptionEntity extends BaseEntity
  {
-    @Column({length: 255})
+    @PrimaryColumn()
+    id: string;
+
+    @Column()
     pollId: string;
 
-    @Column({length: 255})
+    @Column()
     questionId: string;
 
-    @Column({length: 50})
+    @Column()
     questionType: string;
 
-    @Column({length: 550})
+    @Column()
     content: string;
 
     @Column({type: 'bool', default: true})
@@ -22,4 +27,18 @@ export class PollOptionEntity extends AbstractBaseEntity
 
     @Column({type: 'bool', default: false})
     isCorrect: boolean;
+
+    @Column()
+    createdBy: string;
+
+    @Column({default: new Date()})
+    createdAt: Date;
+
+    @ManyToOne(() => PollQuestionEntity, (q) => q.options)
+    question: PollQuestionEntity;
+
+    @ManyToOne(() => PollEntity, (q) => q.options)
+    poll: PollEntity;
+
+    
 }

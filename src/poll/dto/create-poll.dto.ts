@@ -7,6 +7,7 @@ import {
   IsString,
 } from 'class-validator';
 import { pollTypes } from '../poll.constant';
+import { CreatePollQuestionDto } from './create-poll-question.dto';
 
 export class CreatePollDto {
   @ApiProperty()
@@ -54,5 +55,9 @@ export class CreatePollDto {
   @IsString()
   @IsNotEmpty({ message: 'Start date is required' })
   endDate: Date;
+
+  @ApiProperty({type: [CreatePollQuestionDto]})
+  @IsNotEmpty()
+  questions: CreatePollQuestionDto[];
 
 }

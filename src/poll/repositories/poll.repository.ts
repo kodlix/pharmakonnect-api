@@ -6,6 +6,7 @@ import { Repository, EntityRepository, DeleteResult, ILike, MoreThan } from 'typ
 import { CreatePollDto } from '../dto/create-poll.dto';
 import { UpdatePollDto } from '../dto/update-poll.dto';
 import { PollEntity } from '../entities/poll.entity';
+import { v4 as uuidv4  } from 'uuid';
 
 
 @EntityRepository(PollEntity)
@@ -13,6 +14,7 @@ export class PollRepository extends Repository<PollEntity> {
   async createEntity(dto: CreatePollDto, user: AccountEntity): Promise<PollEntity> {
     const existingPoll = await this.findOne({ where: { title : dto.title, accountId: user.id, endDate:  MoreThan(new Date()), } });
 
+    const pollId = uuidv4().toString()
     const today = new Date();    
     if (existingPoll) {
         throw new HttpException(
@@ -36,9 +38,28 @@ export class PollRepository extends Repository<PollEntity> {
     } 
 
     const poll = plainToClass(PollEntity, dto);
-
+    poll.id = pollId;
     poll.accountId = user.id;
     poll.createdBy = user.email;
+
+    if (poll.questions?.length > 0) {
+      for (const question of poll.questions) {
+        question.id = uuidv4();
+        question.createdBy = user.email;
+        question.createdAt = new Date()
+        question.pollId = pollId;
+
+        if (question.options?.length > 0) {
+          for (const option of question.options) {
+            option.id = uuidv4();
+            option.questionId = question.id;
+            option.createdBy = user.email;
+            option.createdAt = new Date()
+            option.pollId = pollId;
+          }
+        }
+      }
+    }
 
     const errors = await validate(poll);
 
@@ -49,6 +70,8 @@ export class PollRepository extends Repository<PollEntity> {
     try {        
         return await this.save(poll);
     } catch(error)  {
+      console.log(error);
+      
         throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -177,6 +200,41 @@ export class PollRepository extends Repository<PollEntity> {
     }
     
     const Poll = await this.find({
+      order: { createdAt: 'ASC' },
+      take: 25,
+
+      skip: 25 * (page - 1),
+    });
+
+    return Poll;
+  }
+
+
+  async findAllPollsByAccount(page = 1, searchParam: string, user: AccountEntity): Promise<PollEntity[]> {  // @TODO convert to full-text search
+    if (searchParam) {
+      const param = `%${searchParam}%`
+      const searchResult = await this.find({
+        where: 
+        [
+          { accountId: user.id },
+          { title: ILike(param) },
+          { slug: ILike(param) },
+          { hint: ILike(param) },
+          { type: ILike(param) },
+          { createdBy: ILike(param) },
+          { description: ILike(param) },
+        ],
+        order: { createdAt: 'ASC', published : 'ASC'},
+        take: 25,
+  
+        skip: 25 * (page - 1),
+      })
+
+      return searchResult;
+    }
+    
+    const Poll = await this.find({
+      where: { accountId: user.id },
       order: { createdAt: 'ASC' },
       take: 25,
 

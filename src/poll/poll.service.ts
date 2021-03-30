@@ -14,8 +14,12 @@ export class PollService {
     return await  this.pollRepository.createEntity(createPollDto, user);
   }
 
-  async findAll(pageNo : number, searchParam: string ) {
+  async findAll(pageNo : number, searchParam: string) {
     return await  this.pollRepository.findAllPolls(pageNo, searchParam);
+  }
+
+  async findAllByOwner(pageNo : number, searchParam: string, user: AccountEntity) {
+    return await  this.pollRepository.findAllPollsByAccount(pageNo, searchParam, user);
   }
 
   async findOne(id: string) {

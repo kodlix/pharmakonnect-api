@@ -88,7 +88,7 @@ export class StartMeetingReminderService {
               }
           }
 
-          console.log("m", todayMeetings);
+          // console.log("m", todayMeetings);
           //this.logger.debug('Called when the current second is 45');
     }
 }
