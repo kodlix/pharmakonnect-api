@@ -28,6 +28,7 @@ import { gatewayData } from './gateway-data.interface';
 
     @WebSocketServer() server: Server;
     meetings: Array<any> = [];
+    waiters : Array<any> = [];
 
     @SubscribeMessage('startMeeting')
     public async handleStartMeeting(client: Socket, data: gatewayData) {
@@ -69,7 +70,8 @@ import { gatewayData } from './gateway-data.interface';
             let meetingObj = {
                 meetingId: data.meetingId,
                 socketId: data.socketId,
-                name: data.name
+                name: data.name,
+                host: true
             }
 
             this.meetings.push(meetingObj);
@@ -136,7 +138,8 @@ import { gatewayData } from './gateway-data.interface';
           let meetingObj = {
             meetingId: data.meetingId,
             socketId: data.socketId,
-            name: data.name
+            name: data.name,
+            host: false
           }
   
           this.meetings.push(meetingObj);
@@ -154,6 +157,34 @@ import { gatewayData } from './gateway-data.interface';
           throw new WsException(`Unable to join meeting - Error: ${error.message}`);
         }
         
+    }
+
+    @SubscribeMessage('waiter')
+    public handleWaiter(client: Socket, data: any): void {
+      if(!data.meetingId ||!data.name || !data.socketId) {
+        throw new WsException("Please make sure meetingId, name and socketid is provided");
+      }
+
+      const meetingInfo = this.meetings.filter(x => x.meetingId === data.meetingId);
+      const hostInfo = meetingInfo.find(x => x.host === true);
+
+      // let waiting = {
+      //   socketId: data.socketId,
+      //   admitted: false,
+      //   meetingId: data.meetingId
+      // }
+
+      // this.waiters.push(waiting);
+      client.to( hostInfo.socketId ).emit( 'waiter', {message: `${data.name} entered the waiting room`, meetingId: data.meetingId, socketId: data.socketId } );
+
+    }
+
+    @SubscribeMessage("admit")
+    public handleAdmit(client: Socket, data: any) {
+      if(!data.meetingId || !data.socketId) {
+        throw new WsException("Please make sure meetingId and socketid is provided");
+      }
+      client.to(data.socketId).emit('admitted', {});
     }
 
     @SubscribeMessage('newUserStart')
