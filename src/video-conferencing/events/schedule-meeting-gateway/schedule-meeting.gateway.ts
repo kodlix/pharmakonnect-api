@@ -206,7 +206,7 @@ import { gatewayData } from './gateway-data.interface';
 
     @SubscribeMessage('chat')
     public handleOnChat(client: Socket, data: any): void {
-      client.to( data.meetingId ).emit( 'chat', { sender: data.sender, msg: data.msg } );
+      client.to( data.room ).emit( 'chat', { sender: data.sender, msg: data.msg } );
     }
 
     @SubscribeMessage('endMeeting')
@@ -249,10 +249,11 @@ import { gatewayData } from './gateway-data.interface';
       const userThatLeft = this.meetings.find(x => x.socketId === client.id);
       
       if(userThatLeft) {
-        this.meetings = this.meetings.filter(x => x.meetingId != userThatLeft.meetingId);
+        const meetings = this.meetings.filter(x => x.meetingId === userThatLeft.meetingId);
+        const usersRemaining = meetings.filter(x => x.socketId != userThatLeft.socketId);   
 
-        const usersRemaining = this.meetings.filter(x => x.meetingId === userThatLeft.meetingId);   
-  
+        this.meetings = this.meetings.filter(x => x.socketId != userThatLeft.socketId);
+
         client.to(userThatLeft.meetingId).emit( 'userLeft', { name: userThatLeft.name, count:usersRemaining.length, users: usersRemaining  })
       }
     }
