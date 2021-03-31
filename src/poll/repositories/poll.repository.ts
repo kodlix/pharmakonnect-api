@@ -12,15 +12,17 @@ import { v4 as uuidv4  } from 'uuid';
 @EntityRepository(PollEntity)
 export class PollRepository extends Repository<PollEntity> {
   async createEntity(dto: CreatePollDto, user: AccountEntity): Promise<PollEntity> {
-    const existingPoll = await this.findOne({ where: { title : dto.title, accountId: user.id, endDate:  MoreThan(new Date()), } });
+    const existingPoll = await this.findOne({
+      where: { title: dto.title, accountId: user.id }
+    });
 
-    const pollId = uuidv4().toString()
     const today = new Date();    
-    if (existingPoll) {
-        throw new HttpException(
-            `You have an active poll with same title '${dto.title}' already exist`,
-            HttpStatus.BAD_REQUEST,
-          );
+
+    if (existingPoll && existingPoll.endDate >= today) {
+      throw new HttpException(
+          `You have an active poll with same title '${dto.title}'.`,
+          HttpStatus.BAD_REQUEST,
+        );
     }
    
     if (dto.endDate < today) {
@@ -36,6 +38,15 @@ export class PollRepository extends Repository<PollEntity> {
         HttpStatus.BAD_REQUEST,
       );
     } 
+
+    if (existingPoll) {
+      throw new HttpException(
+          `You have an active poll with same title '${dto.title}' already exist`,
+          HttpStatus.BAD_REQUEST,
+        );
+  }
+
+    const pollId = uuidv4().toString();
 
     const poll = plainToClass(PollEntity, dto);
     poll.id = pollId;
