@@ -13,6 +13,7 @@ import { ScheduleMeetingEntity } from 'src/video-conferencing/schedule-meetings/
 import { ScheduleMeetingRepository } from 'src/video-conferencing/schedule-meetings/schedule-meeting.repository';
 import { isNotValidDate } from 'src/_utility/date-validator.util';
 import { Connection } from 'typeorm';
+import { gatewayData } from './gateway-data.interface';
   
   //Websocket gateway for scheduled video conferencing
   @WebSocketGateway({namespace: '/schedulemeetinggateway'})
@@ -29,7 +30,7 @@ import { Connection } from 'typeorm';
     meetings: Array<any> = [];
 
     @SubscribeMessage('startMeeting')
-    public async handleStartMeeting(client: Socket, data: any) {
+    public async handleStartMeeting(client: Socket, data: gatewayData) {
 
       if(!data.id || !data.meetingId || !data.name || !data.socketId) {
         throw new WsException("Please make sure id, meetingId, name and socketId is provided");
@@ -66,7 +67,7 @@ import { Connection } from 'typeorm';
             client.join( data.socketId );
             //create a data store for the current room and its users
             let meetingObj = {
-                meetingId: data.meetingID,
+                meetingId: data.meetingId,
                 socketId: data.socketId,
                 name: data.name
             }
@@ -84,7 +85,7 @@ import { Connection } from 'typeorm';
     }
 
     @SubscribeMessage('joinMeeting')
-    public async handleJoinMeeting(client: Socket, data: any) {
+    public async handleJoinMeeting(client: Socket, data: gatewayData) {
         
         if(!data.id || !data.meetingId || !data.name || !data.socketId) {
             throw new WsException("Please make sure id, meetingId, name and socketId is provided");
@@ -133,7 +134,7 @@ import { Connection } from 'typeorm';
           client.join( data.socketId );
   
           let meetingObj = {
-            meetingId: data.meetingID,
+            meetingId: data.meetingId,
             socketId: data.socketId,
             name: data.name
           }
