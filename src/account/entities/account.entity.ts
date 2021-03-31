@@ -6,6 +6,8 @@ import * as bcrypt from 'bcrypt';
 import { JobVacancyEntity } from "src/jobvacancy/entities/jobvacancy.entity";
 import { ScheduleMeetingEntity } from "src/video-conferencing/schedule-meetings/entities/schedule-meeting.entity";
 import { OutletEntity } from 'src/outlet/entity/outlet.entity';
+import { FeatureEntity } from 'src/features/entity/feature.entity';
+import { PackageFeatureEntity } from 'src/package/entities/packagefeature.entity';
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
@@ -142,6 +144,12 @@ export class AccountEntity extends AbstractBaseEntity {
 
   @OneToMany(() => JobVacancyEntity, (s) => s.account)
   jobVacancy: JobVacancyEntity[];
+
+  @OneToMany(() => FeatureEntity, (s) => s.account)
+  feature: FeatureEntity[];
+
+  @OneToMany(() => FeatureEntity, (s) => s.account)
+  package: PackageFeatureEntity[];
 
   @OneToMany(() => OutletEntity, (x) => x.account)
   outlet: OutletEntity[];
