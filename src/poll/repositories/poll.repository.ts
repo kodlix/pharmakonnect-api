@@ -52,7 +52,7 @@ export class PollRepository extends Repository<PollEntity> {
     poll.id = pollId;
     poll.accountId = user.id;
     poll.createdBy = user.email;
-
+    poll.createdAt = new Date()
     if (poll.questions?.length > 0) {
       for (const question of poll.questions) {
         question.id = uuidv4();
@@ -67,6 +67,7 @@ export class PollRepository extends Repository<PollEntity> {
             option.createdBy = user.email;
             option.createdAt = new Date()
             option.pollId = pollId;
+            option.questionType = question.questionType
           }
         }
       }
@@ -181,7 +182,7 @@ export class PollRepository extends Repository<PollEntity> {
       throw new HttpException(`Invalid poll`, HttpStatus.BAD_REQUEST);
     }
 
-    const existingPoll = await this.findOne(id);
+    const existingPoll = await this.findOne(id, {relations: ['questions', 'questions.options']});
     if (!existingPoll) {
       throw new HttpException(`Poll does not exist`, HttpStatus.NOT_FOUND);
     }

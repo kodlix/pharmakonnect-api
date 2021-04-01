@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AccountEntity } from 'src/account/entities/account.entity';
 import { CreatePollDto } from './dto/create-poll.dto';
 import { UpdatePollDto } from './dto/update-poll.dto';
+import { pollQuestionType, pollTypes } from './poll.constant';
 import { PollRepository } from './repositories/poll.repository';
 
 @Injectable()
@@ -24,6 +25,13 @@ export class PollService {
 
   async findOne(id: string) {
     return await  this.pollRepository.findById(id);
+  }
+
+  async getPollSettings() {
+    return await  {
+      pollTypes:  Object.values(pollTypes),
+      questionTypes: Object.values(pollQuestionType)
+    }
   }
 
   async update(id: string, updatePollDto: UpdatePollDto, user :AccountEntity) {

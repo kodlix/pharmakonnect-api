@@ -37,6 +37,14 @@ export class PollController {
     return this.pollService.findAllByOwner(page, searchParam, req?.user)
   }
 
+  @Get('setting')
+  @ApiOperation({ summary: 'Get all poll setting' })
+  @ApiResponse({ status: 201, description: 'Success' })
+  @ApiResponse({ status: 404, description: 'Not Found.' })
+  getPollSetting(): Promise<any> {
+    return this.pollService.getPollSettings();
+  }
+
   @Get(':id')
   @ApiResponse({ status: 201, description: 'Success.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })

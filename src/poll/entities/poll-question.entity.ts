@@ -1,6 +1,6 @@
 import { AccountEntity } from 'src/account/entities/account.entity';
 import { AbstractBaseEntity } from 'src/_common/base.entity';
-import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { PollOptionEntity } from './poll-option.entity';
 import { PollEntity } from './poll.entity';
 
@@ -15,6 +15,7 @@ export class PollQuestionEntity extends BaseEntity {
   @Column()
   pollType: string;
 
+  @Column()
   questionType: string;
 
   @Column({ type: 'int' })
@@ -29,10 +30,10 @@ export class PollQuestionEntity extends BaseEntity {
   @Column()
   createdBy: string;
 
-  @Column({default: new Date()})
+  @CreateDateColumn({ name: 'createdAt', default: new Date() })
   createdAt: Date;
 
-  @OneToMany(() => PollOptionEntity, (x) => x.questionId, { cascade: ['insert', 'update'] })
+  @OneToMany(() => PollOptionEntity, (x) => x.question, { cascade: ['insert', 'update'] })
   options: PollOptionEntity[];
 
   @ManyToOne(() => PollEntity, (p) => p.questions)

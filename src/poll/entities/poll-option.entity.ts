@@ -1,5 +1,5 @@
 import { AbstractBaseEntity } from "src/_common/base.entity";
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { PollQuestionEntity } from "./poll-question.entity";
 import { PollEntity } from "./poll.entity";
 
@@ -31,7 +31,7 @@ export class PollOptionEntity extends BaseEntity
     @Column()
     createdBy: string;
 
-    @Column({default: new Date()})
+    @CreateDateColumn({ name: 'createdAt', default: new Date() })
     createdAt: Date;
 
     @ManyToOne(() => PollQuestionEntity, (q) => q.options)
