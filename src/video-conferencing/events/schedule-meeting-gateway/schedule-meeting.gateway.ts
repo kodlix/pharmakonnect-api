@@ -181,10 +181,11 @@ import { gatewayData } from './gateway-data.interface';
 
     @SubscribeMessage("admit")
     public handleAdmit(client: Socket, data: any) {
-      if(!data.meetingId || !data.socketId) {
+      if(!data.meetingId || !data.waiterId) {
         throw new WsException("Please make sure meetingId and socketid is provided");
       }
-      client.to(data.socketId).emit('admitted', {});
+      
+      client.to(data.waiterId).emit('admitted', {message: "sth"});
     }
 
     @SubscribeMessage('newUserStart')
@@ -229,7 +230,7 @@ import { gatewayData } from './gateway-data.interface';
           const saved = await this.scheduleMeetingRepo.save(updated);
           if(saved) {
             await this.scheduleMeetingRepo.delete({ id: meeting.id });
-            client.to( data.meetingId ).emit( 'meetingEnded', { message: "The meeting has ended" } );
+            this.server.in(data.meetingId).emit( 'meetingEnded', { message: "The meeting has ended" } );
           }
         
         } catch (error) {
@@ -244,6 +245,7 @@ import { gatewayData } from './gateway-data.interface';
     }
   
     public handleDisconnect(client: Socket): void {
+      console.log("client disconected", client.id.split('#'))
       client.id = client.id.split('#')[1];
       
       const userThatLeft = this.meetings.find(x => x.socketId === client.id);
