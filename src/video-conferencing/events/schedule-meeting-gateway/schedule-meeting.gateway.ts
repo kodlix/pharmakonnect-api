@@ -230,6 +230,7 @@ import { gatewayData } from './gateway-data.interface';
           const saved = await this.scheduleMeetingRepo.save(updated);
           if(saved) {
             await this.scheduleMeetingRepo.delete({ id: meeting.id });
+            this.meetings = this.meetings.filter(x => x.meetingId != data.meetingId);
             this.server.in(data.meetingId).emit( 'meetingEnded', { message: "The meeting has ended" } );
           }
         
