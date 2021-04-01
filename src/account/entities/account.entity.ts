@@ -8,6 +8,8 @@ import { ScheduleMeetingEntity } from "src/video-conferencing/schedule-meetings/
 import { OutletEntity } from 'src/outlet/entity/outlet.entity';
 import { ArticleEntity } from "src/blog/article/entities/article.entity";
 import { PollEntity } from 'src/poll/entities/poll.entity';
+import { FeatureEntity } from 'src/features/entity/feature.entity';
+import { PackageFeatureEntity } from 'src/package/entities/packagefeature.entity';
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
@@ -150,6 +152,12 @@ export class AccountEntity extends AbstractBaseEntity {
 
   @OneToMany(() => JobVacancyEntity, (s) => s.account)
   jobVacancy: JobVacancyEntity[];
+
+  @OneToMany(() => FeatureEntity, (s) => s.account)
+  feature: FeatureEntity[];
+
+  @OneToMany(() => FeatureEntity, (s) => s.account)
+  package: PackageFeatureEntity[];
 
   @OneToMany(() => OutletEntity, (x) => x.account)
   outlet: OutletEntity[];

@@ -1,10 +1,15 @@
 /* eslint-disable prettier/prettier */
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { BeforeInsert, Column, Entity, ManyToOne } from 'typeorm';
 import { AbstractBaseEntity } from 'src/_common/base.entity';
 import { AccountEntity } from 'src/account/entities/account.entity';
 
 @Entity('JobVacancy')
 export class JobVacancyEntity extends AbstractBaseEntity {
+  // @BeforeInsert()
+  // nameToUpperCase() {
+  //     this.jobTitle = this.jobTitle.toLowerCase()
+  // }
+
   @Column({ unique: false, nullable: true })
   sectorId: string;
 
@@ -26,6 +31,7 @@ export class JobVacancyEntity extends AbstractBaseEntity {
   @Column({ nullable: true })
   minimumQualification: string;
 
+ 
   @Column({ nullable: true })
   jobTitle: string;
 
