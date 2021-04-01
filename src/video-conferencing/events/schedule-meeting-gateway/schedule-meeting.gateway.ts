@@ -13,6 +13,7 @@ import { ScheduleMeetingEntity } from 'src/video-conferencing/schedule-meetings/
 import { ScheduleMeetingRepository } from 'src/video-conferencing/schedule-meetings/schedule-meeting.repository';
 import { isNotValidDate } from 'src/_utility/date-validator.util';
 import { Connection } from 'typeorm';
+import { gatewayData } from './gateway-data.interface';
   
   //Websocket gateway for scheduled video conferencing
   @WebSocketGateway({namespace: '/schedulemeetinggateway'})
@@ -27,9 +28,10 @@ import { Connection } from 'typeorm';
 
     @WebSocketServer() server: Server;
     meetings: Array<any> = [];
+    waiters : Array<any> = [];
 
     @SubscribeMessage('startMeeting')
-    public async handleStartMeeting(client: Socket, data: any) {
+    public async handleStartMeeting(client: Socket, data: gatewayData) {
 
       if(!data.id || !data.meetingId || !data.name || !data.socketId) {
         throw new WsException("Please make sure id, meetingId, name and socketId is provided");
@@ -66,9 +68,10 @@ import { Connection } from 'typeorm';
             client.join( data.socketId );
             //create a data store for the current room and its users
             let meetingObj = {
-                meetingId: data.meetingID,
+                meetingId: data.meetingId,
                 socketId: data.socketId,
-                name: data.name
+                name: data.name,
+                host: true
             }
 
             this.meetings.push(meetingObj);
@@ -84,7 +87,7 @@ import { Connection } from 'typeorm';
     }
 
     @SubscribeMessage('joinMeeting')
-    public async handleJoinMeeting(client: Socket, data: any) {
+    public async handleJoinMeeting(client: Socket, data: gatewayData) {
         
         if(!data.id || !data.meetingId || !data.name || !data.socketId) {
             throw new WsException("Please make sure id, meetingId, name and socketId is provided");
@@ -133,9 +136,10 @@ import { Connection } from 'typeorm';
           client.join( data.socketId );
   
           let meetingObj = {
-            meetingId: data.meetingID,
+            meetingId: data.meetingId,
             socketId: data.socketId,
-            name: data.name
+            name: data.name,
+            host: false
           }
   
           this.meetings.push(meetingObj);
@@ -153,6 +157,35 @@ import { Connection } from 'typeorm';
           throw new WsException(`Unable to join meeting - Error: ${error.message}`);
         }
         
+    }
+
+    @SubscribeMessage('waiter')
+    public handleWaiter(client: Socket, data: any): void {
+      if(!data.meetingId ||!data.name || !data.socketId) {
+        throw new WsException("Please make sure meetingId, name and socketid is provided");
+      }
+
+      const meetingInfo = this.meetings.filter(x => x.meetingId === data.meetingId);
+      const hostInfo = meetingInfo.find(x => x.host === true);
+
+      // let waiting = {
+      //   socketId: data.socketId,
+      //   admitted: false,
+      //   meetingId: data.meetingId
+      // }
+
+      // this.waiters.push(waiting);
+      client.to( hostInfo.socketId ).emit( 'waiter', {message: `${data.name} entered the waiting room`, meetingId: data.meetingId, socketId: data.socketId } );
+
+    }
+
+    @SubscribeMessage("admit")
+    public handleAdmit(client: Socket, data: any) {
+      if(!data.meetingId || !data.waiterId) {
+        throw new WsException("Please make sure meetingId and socketid is provided");
+      }
+      
+      client.to(data.waiterId).emit('admitted', {message: "sth"});
     }
 
     @SubscribeMessage('newUserStart')
@@ -174,7 +207,7 @@ import { Connection } from 'typeorm';
 
     @SubscribeMessage('chat')
     public handleOnChat(client: Socket, data: any): void {
-      client.to( data.meetingId ).emit( 'chat', { sender: data.sender, msg: data.msg } );
+      client.to( data.room ).emit( 'chat', { sender: data.sender, msg: data.msg } );
     }
 
     @SubscribeMessage('endMeeting')
@@ -197,7 +230,8 @@ import { Connection } from 'typeorm';
           const saved = await this.scheduleMeetingRepo.save(updated);
           if(saved) {
             await this.scheduleMeetingRepo.delete({ id: meeting.id });
-            client.to( data.meetingId ).emit( 'meetingEnded', { message: "The meeting has ended" } );
+            this.meetings = this.meetings.filter(x => x.meetingId != data.meetingId);
+            this.server.in(data.meetingId).emit( 'meetingEnded', { message: "The meeting has ended" } );
           }
         
         } catch (error) {
@@ -212,15 +246,17 @@ import { Connection } from 'typeorm';
     }
   
     public handleDisconnect(client: Socket): void {
+      console.log("client disconected", client.id.split('#'))
       client.id = client.id.split('#')[1];
       
       const userThatLeft = this.meetings.find(x => x.socketId === client.id);
       
       if(userThatLeft) {
-        this.meetings = this.meetings.filter(x => x.meetingId != userThatLeft.meetingId);
+        const meetings = this.meetings.filter(x => x.meetingId === userThatLeft.meetingId);
+        const usersRemaining = meetings.filter(x => x.socketId != userThatLeft.socketId);   
 
-        const usersRemaining = this.meetings.filter(x => x.meetingId === userThatLeft.meetingId);   
-  
+        this.meetings = this.meetings.filter(x => x.socketId != userThatLeft.socketId);
+
         client.to(userThatLeft.meetingId).emit( 'userLeft', { name: userThatLeft.name, count:usersRemaining.length, users: usersRemaining  })
       }
     }
