@@ -1,7 +1,7 @@
 import { EntityRepository, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { AccountEntity } from './entities/account.entity';
-import { RegisterDTO, LoginDTO, LockUserDTO } from './dto/credential.dto';
+import { RegisterDTO, LoginDTO, LockUserDTO, ChangePasswordDto, ResetPasswordDto } from './dto/credential.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { UserFromDbRO } from './interfaces/account.interface';
 import { OrganizationRO, UserDataRO } from './interfaces/user.interface';
@@ -14,7 +14,7 @@ export class AccountRepository extends Repository<AccountEntity> {
     password,
     accountType,
     isRegComplete,
-  }: RegisterDTO): Promise<string> {
+  }: RegisterDTO): Promise<boolean> {
     const isExists = await await this.findOne({ email });
     if (isExists) {
       throw new HttpException(
@@ -32,7 +32,7 @@ export class AccountRepository extends Repository<AccountEntity> {
     user.password = await this.hashPassword(password, user.salt);
     try {
       await user.save();
-      return 'Registration successful';
+      return true;
     } catch (error) {
       throw new HttpException(
         { error: `An error occured`, status: HttpStatus.INTERNAL_SERVER_ERROR },
@@ -52,6 +52,8 @@ export class AccountRepository extends Repository<AccountEntity> {
         accountPackage: user.accountPackage,
         isRegComplete: user.isRegComplete,
         accountType: user.accountType,
+        accountId: user.id,
+
       };
       return data;
     } else {
@@ -133,6 +135,51 @@ export class AccountRepository extends Repository<AccountEntity> {
     const accType = accountTypes.CORPORATE;
     const account = await this.find({ where: { accountType: accType, isRegComplete: true } });
     return this.buildOrgArrRO(account);
+  }
+
+  public async updateProfileImage(filename: string, userId: string) {
+    const user = await this.findOne({ id: userId });
+    if (!user) {
+      throw new HttpException(
+        `User does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }   
+
+    user.profileImage = filename;        
+    return await user.save();
+  }
+
+  public async setNewPassord({ email, newPassword }: ResetPasswordDto): Promise<string> {
+    try {
+      var user = await this.findOne({ where: { email: email } });
+      if (!user) throw new HttpException(`User with email: ${email}, does not exists`, HttpStatus.NOT_FOUND);
+      user.password = await this.hashPassword(newPassword, user.salt);
+      await user.save();
+      return "Password was changed successfully";
+    } catch (error) {
+      throw new HttpException(
+        { error: `An error while try to change password`, status: HttpStatus.INTERNAL_SERVER_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  public async changedPassword({ email, newPassword, currentPassword }: ChangePasswordDto): Promise<string> {
+    try {
+      var user = await this.findOne({ where: { email: email } });
+      if (!user) throw new HttpException(`User with email: ${email}, does not exists`, HttpStatus.NOT_FOUND);
+      if (await user.validatePassword(currentPassword)) {
+        user.password = await this.hashPassword(newPassword, user.salt);
+        await user.save();
+        return "Password was changed successfully";
+      }
+    } catch (error) {
+      throw new HttpException(
+        { error: `An error while try to change password`, status: HttpStatus.INTERNAL_SERVER_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   private buildUserRO(user: AccountEntity) {

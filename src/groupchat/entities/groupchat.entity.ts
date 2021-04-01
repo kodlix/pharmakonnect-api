@@ -7,7 +7,7 @@ import { MessageEntity } from "src/chat/entities/message.entity";
 @Entity("GroupChat")
 export class GroupChatEntity extends AbstractBaseEntity{
 
-    @ManyToOne(()=> AccountEntity, account => account.id)
+    // @ManyToOne(()=> AccountEntity, account => account.id)
     @Column()
     creatorId : string
 

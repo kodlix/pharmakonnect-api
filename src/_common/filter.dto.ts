@@ -1,10 +1,13 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsNotEmpty, IsOptional } from "class-validator";
 
 export class FilterDto {
 
-    @IsOptional()
-    @IsNotEmpty()
     @ApiProperty()
+    @ApiPropertyOptional()
     search: string;
+
+    @ApiProperty()
+    @ApiPropertyOptional()
+    page: number;
 }
