@@ -48,7 +48,6 @@ export class JobVacancyController {
   @ApiResponse({ status: 201, description: 'Success.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   async findAll(@Query('page') page: number, @Req() req: any): Promise<JobVacancyRO[]> {
-    console.log(req.user);
     return await this.jobvacancyService.findAll(page);
   }
 
