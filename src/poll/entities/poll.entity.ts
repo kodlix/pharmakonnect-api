@@ -27,7 +27,7 @@ export class PollEntity extends AbstractBaseEntity
     accessCode: string;
 
     @Column({type: 'bool', default: false})
-    requiresRegistration: boolean;
+    requiresLogin: boolean;
 
     @Column({length: 50})
     type: string;

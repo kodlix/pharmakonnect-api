@@ -33,7 +33,7 @@ export class CreatePollDto {
   @ApiProperty()
   @IsOptional()
   @IsBoolean()
-  requiresRegistration: boolean;
+  requiresLogin: boolean;
 
   @ApiProperty()
   @IsString()
