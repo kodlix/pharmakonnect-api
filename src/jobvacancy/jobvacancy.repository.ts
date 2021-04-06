@@ -183,6 +183,10 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     jobvacancy.endDate = dto.endDate;
     jobvacancy.yearOfIncorporation = dto.yearOfIncorporation;
     jobvacancy.workExperienceInYears = dto.workExperienceInYears;
+    if (jobvacancy.rejected = true){
+      jobvacancy.rejected = false;
+    }
+    
     return await this.save(jobvacancy);
   }
   async updateApprove(
@@ -233,9 +237,10 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
   }
 
   async findAll(page = 1): Promise<JobVacancyEntity[]> {
-    const jobvacancy = await this.find({ order: { approvedOn: 'ASC' },
+    const jobvacancy = await this.find({ where: 
+      { approved: true },
+     order: { approvedOn: 'ASC' },
     take: 25,
-
     skip: 25 * (page - 1),});
     
     return jobvacancy;
@@ -252,8 +257,10 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
           { workExperienceInYears: ILike(param) },
           { jobLocation: ILike(param) },
           { contactType: ILike(param) },
+          { approved: true },
+          { rejected: false}
         ],
-        order: { createdAt: 'ASC' },
+        order: {approvedOn: 'ASC' },
         take: 25,
   
         skip: 25 * (page - 1),
@@ -262,7 +269,11 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
       return searchResult;
     }
     const JobVacancy = await this.find({
-      order: { createdAt: 'ASC' },
+      where: [
+        { approved: true },
+        { rejected: false || null}
+      ],
+      order: {approvedOn: 'ASC' },
       take: 25,
 
       skip: 25 * (page - 1),
