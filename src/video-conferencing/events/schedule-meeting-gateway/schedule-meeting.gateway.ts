@@ -226,8 +226,7 @@ import { gatewayData } from './gateway-data.interface';
       const meetingInfo = this.meetings.filter(x => x.meetingId === data.meetingId);
       const hostInfo = meetingInfo.find(x => x.host === true);
 
-
-      client.to( hostInfo.socketId ).emit( 'waiter', {message: `${data.name} entered the waiting room`, meetingId: data.meetingId, socketId: data.socketId } );
+      client.to( hostInfo.socketId ).emit( 'waiter', {message: `${data.name} entered the waiting room.`, meetingId: data.meetingId, socketId: data.socketId } );
 
     }
 
@@ -237,7 +236,18 @@ import { gatewayData } from './gateway-data.interface';
         throw new WsException("Please make sure meetingId and socketid is provided");
       }
       
-      client.to(data.waiterId).emit('admitted', {message: "sth"});
+      client.to(data.waiterId).emit('admitted', {message: "admitted"});
+    }
+
+    @SubscribeMessage("removeUser")
+    public handleRemove(client: Socket, data: any) {
+      if(!data.meetingId || !data.waiterId) {
+        throw new WsException("Please make sure meetingId and socketid is provided");
+      }
+      
+      this.meetings = this.meetings.filter(x => x.scoketId != data.waiterId);
+
+      client.to(data.waiterId).emit('removed', {message: "removed"});
     }
 
     @SubscribeMessage('newUserStart')
