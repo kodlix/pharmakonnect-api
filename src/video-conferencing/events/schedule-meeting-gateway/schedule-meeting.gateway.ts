@@ -159,6 +159,64 @@ import { gatewayData } from './gateway-data.interface';
         
     }
 
+    @SubscribeMessage('joinWaitingRoom')
+    public async handleJoinWaitingRoom(client: Socket, data: gatewayData) {
+        
+        if(!data.id || !data.meetingId || !data.name || !data.socketId) {
+            throw new WsException("Please make sure id, meetingId, name and socketId is provided");
+        }
+        
+        try {
+          const meeting = await this.scheduleMeetingRepo.findOne(data.id);
+
+          if(!meeting) {
+              throw new WsException(`The meeting with ID ${data.id} cannot be found`);
+          }
+    
+          if(isNotValidDate(meeting.startDate) ) {
+            throw new WsException(`You cannot join a meeting scheduled for a previous day`);
+          }
+          else if (new Date(meeting.startDate).setHours(0,0,0,0) > new Date().setHours(0,0,0,0))  {
+            throw new WsException(`You cannot join a meeting scheduled for a future date`);
+          }
+
+          if(!meeting.meetingStarted) {
+            throw new WsException(`The meeting has not started.`);
+          } else if (meeting.meetingEnded) {
+            throw new WsException(`The meeting has ended.`);
+          }
+  
+  
+          //if user wants to join with the passcode, make sure he/she has the correct passcode
+          if(data.passcode) {
+            if (data.passcode != meeting.passcode) {
+              throw new WsException(`The passcode for the meeting is incorrect`);
+            } 
+          }
+  
+          //join a room
+          client.join( data.meetingId );
+          client.join( data.socketId );
+  
+          let meetingObj = {
+            meetingId: data.meetingId,
+            socketId: data.socketId,
+            name: data.name,
+            host: false
+          }
+  
+          this.meetings.push(meetingObj);
+  
+  
+          const meetings = this.meetings.filter(x => x.meetingId === data.meetingId);
+          this.server.in( data.meetingId ).emit( 'count', { count: meetings.length, users: meetings, isNew: data.isNewMeeting } );
+          
+        } catch (error) {
+          throw new WsException(`Unable to join meeting - Error: ${error.message}`);
+        }
+        
+    }
+
     @SubscribeMessage('waiter')
     public handleWaiter(client: Socket, data: any): void {
       if(!data.meetingId ||!data.name || !data.socketId) {
@@ -168,13 +226,7 @@ import { gatewayData } from './gateway-data.interface';
       const meetingInfo = this.meetings.filter(x => x.meetingId === data.meetingId);
       const hostInfo = meetingInfo.find(x => x.host === true);
 
-      // let waiting = {
-      //   socketId: data.socketId,
-      //   admitted: false,
-      //   meetingId: data.meetingId
-      // }
 
-      // this.waiters.push(waiting);
       client.to( hostInfo.socketId ).emit( 'waiter', {message: `${data.name} entered the waiting room`, meetingId: data.meetingId, socketId: data.socketId } );
 
     }
