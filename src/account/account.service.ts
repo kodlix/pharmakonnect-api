@@ -39,9 +39,9 @@ export class AccountService {
 
   public async register(registerDto: RegisterDTO): Promise<string> {
     if (await this.accountRepository.register(registerDto)) {
-      if (await this.createEmailToken(registerDto.email)) {
-        await this.sendEmailVerification(registerDto.email);
-      }
+      // if (await this.createEmailToken(registerDto.email)) {
+      //   await this.sendEmailVerification(registerDto.email);
+      // }
       return "Registration successfully";
     }
   }
