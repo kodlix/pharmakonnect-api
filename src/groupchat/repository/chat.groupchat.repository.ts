@@ -4,7 +4,7 @@ import { GetgroupchatRO } from 'src/chat/chat.interface'
 import { ParticipantEntity } from 'src/chat/entities/participant.entity'
 import { GroupChatEntity } from '../entities/groupchat.entity';
 import { ConversationRepository } from 'src/chat/repository/chat.conversationRepository';
-// import { CreateGroupChatDto } from '../dto/create-groupchat.dto';
+import { CreateGroupchatDto } from '../dto/create-groupchat.dto';
 import { UpdateGroupchatDto } from '../dto/update-groupchat.dto';
 
 
@@ -37,7 +37,7 @@ export class GroupChatRepository extends Repository<GroupChatEntity>{
 
 
     //create groupchat
-    async createGroup(groupchat: CreateGroupChatDto): Promise<CreateGroupChatDto> {
+    async createGroup(groupchat: CreateGroupchatDto): Promise<CreateGroupchatDto> {
 
         const newgroupchat = await this.create();
         let groupchatParticipant = []       
