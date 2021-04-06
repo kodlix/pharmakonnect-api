@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsNotEmpty, IsInt } from "class-validator";
+import { IsString, IsNotEmpty, IsInt, IsNumber, isNumber } from "class-validator";
 
 export class CreateOutletDto{
     @ApiProperty()
@@ -42,6 +42,20 @@ export class CreateOutletDto{
     @IsString()
     @IsNotEmpty() 
     closingTime: string;
+    
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty() 
+    city: string;
+
+    
+    @ApiProperty()
+    @IsNumber()
+    longitude: Number;
+    
+    @ApiProperty()
+    @IsNumber()
+    latitude: Number;
 
     @ApiProperty()
     @IsString()

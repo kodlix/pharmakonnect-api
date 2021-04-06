@@ -9,6 +9,8 @@ import { ScheduleMeetingsRO } from "./interfaces/schedule-meetings.interface";
 import { UpdateScheduleMeetingDto } from "./dto/update-schedule-meeting.dto";
 import {ILike, Equal} from "typeorm";
 import { AccountEntity } from "src/account/entities/account.entity";
+import {isNotValidTime} from "../../_utility/time-validator.util";
+import { isNotValidDate } from "src/_utility/date-validator.util";
 
 
 
@@ -16,30 +18,28 @@ import { AccountEntity } from "src/account/entities/account.entity";
 export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity> {
 
     async saveMeetingSchedule(payload: CreateScheduleMeetingDto, user: AccountEntity) : Promise<string> {
-        
+
         const isMeetingTopicExist = await this.findOne({where: {topic: ILike(`%${payload.topic}%`)}});
         if(isMeetingTopicExist) {
             throw new HttpException( `Meeting with ${payload.topic} already exist`, HttpStatus.BAD_REQUEST);
         }
         
-        const today = new Date();
 
         if(!user.id) {
             throw new HttpException( `User ID is required`, HttpStatus.UNAUTHORIZED);
         }
 
-        if(today > new Date(payload.startDate)) {
-            throw new HttpException( `Meeting Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
+        if(isNotValidDate(payload.startDate)) {
+            throw new HttpException( `Meeting Start Date cannot be less than current date`, HttpStatus.BAD_REQUEST);
         }
-
-        const todayTime = `${today.getHours()}.${today.getMinutes()}`;
-
-        const splitedStartTime = payload.startTime.toString().split(":");
-        const startTime = `${splitedStartTime[0]}.${splitedStartTime[1]}`;
-         
-        if (todayTime > startTime) {
+    
+        if (isNotValidTime(payload.startTime, payload.startDate)) {
             throw new HttpException( `Meeting Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
         } 
+
+        if(payload.durationInHours === 0 && payload.durationInMinutes === 0) {
+            throw new HttpException( `Duration should be greater than 0 min`, HttpStatus.BAD_REQUEST);
+        }
 
         const newMeetings = plainToClass(ScheduleMeetingEntity, payload);
 
@@ -127,21 +127,18 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
                 }
             }
         
-            const today = new Date();
-
-            if(today > new Date(payload.startDate)) {
-                throw new HttpException( `Meeting Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
+            if(isNotValidDate(payload.startDate)) {
+                throw new HttpException( `Meeting Start Date cannot be less than current date`, HttpStatus.BAD_REQUEST);
             }
-    
-            const todayTime = `${today.getHours()}.${today.getMinutes()}`;
 
-            const splitedStartTime = payload.startTime.toString().split(":");
-            const startTime = `${splitedStartTime[0]}.${splitedStartTime[1]}`;
-            
-            if (todayTime > startTime) {
+            if (isNotValidTime(payload.startTime, payload.startDate)) {
                 throw new HttpException( `Meeting Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
             } 
 
+            if(payload.durationInHours === 0 && payload.durationInMinutes === 0) {
+                throw new HttpException( `Duration should be greater than 0 min`, HttpStatus.BAD_REQUEST);
+            }
+                       
             meeting.updatedAt = new Date();
             meeting.updatedBy = user.updatedBy || user.createdBy;
 

@@ -16,12 +16,13 @@ export class ChatGateway implements OnGatewayInit {
 
     @SubscribeMessage('chatToServer')
     handleMessage(client: Socket, message: { sender: string, room: string, message: string }) {
-        this.wss.emit('chatToClient', message);
+        this.wss.to(message.room).emit('chatToClient', message);
         this.logger.log(`${message.message} ${message.sender} ${message.room}`)
 
     }
 
-    @SubscribeMessage('joinRoom') handleRoomJoin(client: Socket, room: string) {
+    @SubscribeMessage('joinRoom') 
+    handleRoomJoin(client: Socket, room: string) {
         client.join(room);
         client.emit('joinedRoom', room)
     }

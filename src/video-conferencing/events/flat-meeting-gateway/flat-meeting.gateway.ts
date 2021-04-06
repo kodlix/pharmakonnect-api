@@ -59,7 +59,7 @@ import {
 
         // callback function called in the client to show participants count
         if ( client.adapter.rooms[data.room].length === 1 ) {
-          this.server.to(data.socketId).emit('count', { count: this.rooms[this.rooms.length - 1].users.length, name: this.rooms[this.rooms.length - 1].users, isNew: data.isNew });
+          this.server.to(data.socketId).emit('count', { count: this.rooms[this.rooms.length - 1].users.length, users: this.rooms[this.rooms.length - 1].users, isNew: data.isNew });
         }
 
     }
@@ -88,8 +88,8 @@ import {
 
         //Inform other members in the room of new user's arrival
         if ( client.adapter.rooms[data.room].length > 1 ) {
-            client.to( data.room ).emit( 'new user', { socketId: data.socketId, user: data.user, userCount: isRoomAvailable.users.length, users: isRoomAvailable.users } );
-            this.server.to( data.socketId ).emit( 'count', { count: isRoomAvailable.users.length, name: isRoomAvailable.users, isNew: data.isNew } );
+            client.to( data.room ).emit( 'new user', { socketId: data.socketId, user: data.user, count: isRoomAvailable.users.length, users: isRoomAvailable.users } );
+            this.server.to( data.socketId ).emit( 'count', { count: isRoomAvailable.users.length, users: isRoomAvailable.users, isNew: data.isNew } );
         }
 
     }
@@ -150,7 +150,7 @@ import {
         }
         
         if(userName) {
-            client.to(userName.split('*')[1]).emit( 'userLeft', { name: userName.split('*')[0], userCount: userRoomDetails.users.length, users: userRoomDetails.users  })
+            client.to(userName.split('*')[1]).emit( 'userLeft', { name: userName.split('*')[0], count: userRoomDetails.users.length, users: userRoomDetails.users  })
         }
     }
   

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { GroupchatService } from './groupchat.service';
-import { CreateGroupChatDto } from './dto/create-groupchat.dto';
+import { CreateGroupchatDto } from './dto/create-groupchat.dto';
 import { UpdateGroupchatDto } from './dto/update-groupchat.dto';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -10,7 +10,7 @@ export class GroupchatController {
   constructor(private readonly groupchatService: GroupchatService) {}
 
   @Post()
-  create(@Body() createGroupchatDto: CreateGroupChatDto) {
+  create(@Body() createGroupchatDto: CreateGroupchatDto) {
     return this.groupchatService.create(createGroupchatDto);
     //sample payload
     // {

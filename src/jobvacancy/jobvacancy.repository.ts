@@ -14,14 +14,29 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     dto: CreateJobVacancyDto,
     user: AccountEntity,
   ): Promise<JobVacancyEntity> {
-    const job = await this.findOne({ where: { jobTitle: dto.jobTitle, nameOfCorporation: dto.nameOfCorporation } });
+    const job = await this.findOne({ where: { jobTitle: dto.jobTitle.toLowerCase(), nameOfCorporation: dto.nameOfCorporation } });
     const today = new Date();
 
     const jobvacancy = new JobVacancyEntity();
 
-    if (job && job.jobTitle === dto.jobTitle &&  job.nameOfCorporation === dto.nameOfCorporation && job.endDate > today) {
+    if (job && job.jobTitle === dto.jobTitle.toLowerCase() &&  job.nameOfCorporation === dto.nameOfCorporation && job.endDate > today) {
       throw new HttpException(
-        `Job with title '${dto.jobTitle}' already exisits`,
+        `Job with title '${dto.jobTitle}' already exist`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    console.log(new Date(dto.yearOfIncorporation).getFullYear())
+    if ( new Date(dto.yearOfIncorporation).getFullYear() > new Date().getFullYear()){
+      throw new HttpException(
+        `Year of Incorporation can not be a future year`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if ( dto.yearOfIncorporation < '1900'){
+      throw new HttpException(
+        `Year of Incorporation can not be a less than 1900 year`,
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -51,7 +66,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     }
 
     if(dto.companyUrl) {
-      const isValidUrl = validateUrl(dto.jobUrl);
+      const isValidUrl = validateUrl(dto.companyUrl);
       if(!isValidUrl) {
         throw new HttpException(`The company url ${dto.companyUrl} is not valid`, HttpStatus.BAD_REQUEST)
       }
@@ -70,14 +85,22 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
     jobvacancy.jobDescription = dto.jobDescription;
     jobvacancy.minimumQualification = dto.minimumQualification;
     jobvacancy.otherSkills = dto.otherSkills;
-    jobvacancy.jobTitle = dto.jobTitle;
+    jobvacancy.jobTitle = dto.jobTitle.toLowerCase();
     jobvacancy.startDate = dto.startDate;
     jobvacancy.endDate = dto.endDate;
     jobvacancy.yearOfIncorporation = dto.yearOfIncorporation;
     jobvacancy.workExperienceInYears = dto.workExperienceInYears;
     console.log('jobvacancy', jobvacancy);
 
-    return await this.save(jobvacancy);
+    try{
+      const test = await this.save(jobvacancy);
+      return test;
+    }
+    catch (error){
+      console.log(error);
+      
+    }
+    
   }
 
   async updateEntity(
@@ -104,6 +127,34 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
         HttpStatus.BAD_REQUEST,
       );
     } 
+
+    if ( new Date(dto.yearOfIncorporation).getFullYear() > new Date().getFullYear()){
+      throw new HttpException(
+        `Year of Incorporation can not be a future year`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if ( dto.yearOfIncorporation < '1900'){
+      throw new HttpException(
+        `Year of Incorporation can not be a less than 1900 year`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if(dto.jobUrl) {
+      const isValidUrl = validateUrl(dto.jobUrl);
+      if(!isValidUrl) {
+        throw new HttpException(`The job url ${dto.jobUrl} is not valid`, HttpStatus.BAD_REQUEST)
+      }
+    }
+
+    if(dto.companyUrl) {
+      const isValidUrl = validateUrl(dto.jobUrl);
+      if(!isValidUrl) {
+        throw new HttpException(`The company url ${dto.companyUrl} is not valid`, HttpStatus.BAD_REQUEST)
+      }
+    }
   
     
     // if (dto.maxSalary < dto.minSalary) {
@@ -224,3 +275,13 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
 function validateUrl(value) {
   return /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(value);
 }
+
+// function validateUrl(value) {
+//   var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+//     '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+//     '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+//     '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+//     '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+//     '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+//   return !!pattern.test(value);
+// }

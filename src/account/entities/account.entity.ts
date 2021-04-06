@@ -6,6 +6,10 @@ import * as bcrypt from 'bcrypt';
 import { JobVacancyEntity } from "src/jobvacancy/entities/jobvacancy.entity";
 import { ScheduleMeetingEntity } from "src/video-conferencing/schedule-meetings/entities/schedule-meeting.entity";
 import { OutletEntity } from 'src/outlet/entity/outlet.entity';
+import { ArticleEntity } from "src/blog/article/entities/article.entity";
+import { PollEntity } from 'src/poll/entities/poll.entity';
+import { FeatureEntity } from 'src/features/entity/feature.entity';
+import { PackageFeatureEntity } from 'src/package/entities/packagefeature.entity';
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
@@ -140,17 +144,36 @@ export class AccountEntity extends AbstractBaseEntity {
   @Column()
   public salt: string;
 
+  @Column({ type: 'bool', default: false })
+  public emailVerified: boolean;
+
+  @Column({ nullable: true })
+  public emailToken: string;
+
   @OneToMany(() => JobVacancyEntity, (s) => s.account)
   jobVacancy: JobVacancyEntity[];
+
+  @OneToMany(() => FeatureEntity, (s) => s.account)
+  feature: FeatureEntity[];
+
+  @OneToMany(() => FeatureEntity, (s) => s.account)
+  package: PackageFeatureEntity[];
 
   @OneToMany(() => OutletEntity, (x) => x.account)
   outlet: OutletEntity[];
 
-    @OneToMany(() => ScheduleMeetingEntity, s => s.account)
-    meeting: ScheduleMeetingEntity[];
+  @OneToMany(() => ScheduleMeetingEntity, s => s.account)
+  meeting: ScheduleMeetingEntity[];
 
-    async validatePassword(password: string): Promise<boolean> {
-        const hash = await bcrypt.hash(password, this.salt);
-        return hash === this.password;
-    }
+  @OneToMany(type => ArticleEntity, article => article.author)
+  articles?: ArticleEntity[];
+
+  @OneToMany(() => PollEntity, p => p.account)
+  polls: PollEntity[];
+
+  public async validatePassword(password: string): Promise<boolean> {
+      const hash = await bcrypt.hash(password, this.salt);
+      return hash === this.password;
+  }
+    
 }

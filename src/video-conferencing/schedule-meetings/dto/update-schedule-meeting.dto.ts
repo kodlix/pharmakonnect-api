@@ -3,9 +3,7 @@ import { IsDate, IsDateString, IsEmpty, IsNotEmpty, IsNumber, IsOptional, IsStri
 import { Exclude, Expose } from "class-transformer";
 
 
-
 export class UpdateScheduleMeetingDto {
-
     @Expose()
     @IsString()
     @ApiProperty()
@@ -63,7 +61,7 @@ export class UpdateScheduleMeetingDto {
     @IsOptional()
     recordMeeting: boolean;
 
-    @ApiProperty()
+    @ApiProperty({default: true})
     @ApiPropertyOptional()
     @IsOptional()
     allowParticipantJoinAnytime: boolean;
@@ -73,12 +71,12 @@ export class UpdateScheduleMeetingDto {
     @IsOptional()
     waitingRoom: boolean
 
-    @ApiProperty()
+    @ApiProperty({default: true})
     @ApiPropertyOptional()
     @IsOptional()
     hostVideo: boolean;
 
-    @ApiProperty()
+    @ApiProperty({default: true})
     @ApiPropertyOptional()
     @IsOptional()
     participantVideo: boolean;

@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, ManyToOne } from "typeorm";
+import { Column, Entity, OneToMany, ManyToOne, JoinColumn } from "typeorm";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { AccountEntity } from "src/account/entities/account.entity"
 import { ParticipantEntity } from "src/chat/entities/participant.entity";
@@ -32,13 +32,10 @@ export class GroupChatEntity extends AbstractBaseEntity{
     @Column()
     expiresOn : Date
 
-
-    // @OneToMany(() => ParticipantEntity, participant => participant.groupChatID, {eager: true,  cascade: true})
+    @OneToMany(() => ParticipantEntity, participant => participant.groupChatID, {eager: true,  cascade: true})
     participants : ParticipantEntity[]
 
     @OneToMany(() => MessageEntity, message => message.groupChatID, {eager: true, cascade: true})
     messages : MessageEntity[]
-
-
 
 }

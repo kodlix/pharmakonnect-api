@@ -8,14 +8,39 @@ import { CreateConversationDto } from 'src/chat/dto/create-chat.dto';
 @EntityRepository(ConversationEntity)
 export class ConversationRepository extends Repository<ConversationEntity>{
 
-    async getConversationById(id: string): Promise<ConversationRO[]> {
-        return await ConversationEntity.find({
-            where: [{ creatorId: id },
-            { channelId: id }]
+    async getConversationById(user: any): Promise<ConversationRO[]> {
+        const getConversationList = await ConversationEntity.find({
+            where: [{ creatorId: user },
+            { channelId: user }]
         })
+        let conversationList = []
+        for (const item of getConversationList) {
+            item.initiatorId = user
+
+            conversationList.push(item);            
+        }
+
+        return conversationList.sort(function(a, b){return a.updatedOn - b.updatedOn});
     }
 
-    async createOrUpdateConversation(dto: CreateConversationDto): Promise<CreateConversationDto> {
+    async getConversationPaticipantMessage(creatorid: string, channelid: string){
+        try {
+            const conversation = await this.findOne({
+                where: [{ creatorId: creatorid, channelId: channelid }, { creatorId: channelid, channelId: creatorid }],
+                relations: ["participants", "messages"]
+            })
+            return conversation;            
+        } catch (error) {
+            throw new HttpException(
+              { error: `An error occured`, status: HttpStatus.INTERNAL_SERVER_ERROR },
+              HttpStatus.INTERNAL_SERVER_ERROR,
+            );
+          }
+        
+
+    }
+
+    async createOrUpdateConversation(dto: CreateConversationDto, user: any): Promise<CreateConversationDto> {
 
         const exist = await this.findOne({
             where: [{ creatorId: dto.creatorId, channelId: dto.channelId }, { creatorId: dto.channelId, channelId: dto.creatorId }]
@@ -28,10 +53,12 @@ export class ConversationRepository extends Repository<ConversationEntity>{
                 convers.isGroupChat = dto.isGroupChat;
                 convers.title = dto.title;
                 convers.channelId = dto.channelId;
-                convers.createdBy = dto.createdBy;
+                convers.createdBy = dto.creatorName;
                 convers.creatorId = dto.creatorId;
                 convers.updatedOn = new Date();
                 convers.updatedBy = dto.updatedBy;
+                convers.channelName = dto.channelName;
+                convers.creatorName = dto.creatorName;
 
                 const result = await ConversationEntity.save(convers);
                 //Call create MESSAGE end point
@@ -48,6 +75,8 @@ export class ConversationRepository extends Repository<ConversationEntity>{
                 conversadmin.creatorId = dto.creatorId;
                 conversadmin.updatedOn = new Date();
                 conversadmin.updatedBy = dto.updatedBy;
+                conversadmin.creatorName = dto.creatorName;
+                conversadmin.channelName = dto.channelName;
 
                 groupchatConversation.push(conversadmin);
 
@@ -60,6 +89,8 @@ export class ConversationRepository extends Repository<ConversationEntity>{
                     convers.creatorId = value.groupChatID;
                     convers.updatedOn = new Date();
                     convers.updatedBy = dto.updatedBy;
+                    convers.creatorName = dto.creatorName;
+                    convers.channelName = dto.channelName;
 
                     groupchatConversation.push(convers);
                 }
