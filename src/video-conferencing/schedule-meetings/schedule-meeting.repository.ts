@@ -24,7 +24,6 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
             throw new HttpException( `Meeting with ${payload.topic} already exist`, HttpStatus.BAD_REQUEST);
         }
         
-
         if(!user.id) {
             throw new HttpException( `User ID is required`, HttpStatus.UNAUTHORIZED);
         }
@@ -63,7 +62,7 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
 
     }
 
-    async getAllMeetingsSchedules({search}: FilterDto, user: AccountEntity): Promise<ScheduleMeetingsRO[]> {
+    async getAllMeetingsSchedules({search, page}: FilterDto, user: AccountEntity): Promise<ScheduleMeetingsRO[]> {
         
         if(!user.id) {
             throw new HttpException( `User Id is required.`, HttpStatus.BAD_REQUEST);
@@ -76,12 +75,16 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
                     .andWhere(new Brackets(qb => {
                         qb.where("meet.topic ILike :topic", { topic: `%${search}%` })
                         .orWhere("meet.meetingID ILike :meetingID", { meetingID: `%${search}%` })
-                    })).getMany();
+                    }))
+                    .orderBy("meet.createdAt", "DESC")
+                    .take(15)
+                    .skip(page ? 15 * (page - 1) : 0)
+                    .getMany();
 
             return meetings;
         }
 
-        return await this.find({where: {accountId: user.id}});
+        return await this.find({where: {accountId: user.id}, order: {createdAt: 'DESC'}, take: 15, skip: page ? 15 * (page - 1) : 0});
     }
 
     async findMeetingById(id: string): Promise<ScheduleMeetingsRO> {
