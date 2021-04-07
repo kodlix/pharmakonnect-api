@@ -36,6 +36,7 @@ export class CommentService {
     const comment = new CommentEntity();
     comment.article = article;
     comment.message = commentDto.message;
+    comment.createdBy = commentDto.createdBy;
     comment.author = (await this.accountService.getOneUserByEmail(userEmail)).email;
     const createdComment = await this.commentRepo.save(comment);
     return this.findOne(createdComment.id);

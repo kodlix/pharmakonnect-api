@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Query, UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
 import { CategoryDto } from './dto/category.dto';
 
@@ -37,6 +37,7 @@ export class CategoryController {
   }
 
   @Post()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async create(@Body() catDto: CategoryDto, @Req() req: any) {
     try {
@@ -48,6 +49,7 @@ export class CategoryController {
   }
 
   @Put(':categoryId')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async update(@Param('categoryId') categoryId: string, @Body() categoryDto: CategoryDto) {
     try {
@@ -58,6 +60,7 @@ export class CategoryController {
   }
 
   @Delete(':categoryId')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async remove(@Param('categoryId') categoryId: string) {
     try {

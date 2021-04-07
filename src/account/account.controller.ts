@@ -103,6 +103,7 @@ export class AccountController {
 
   // upload single file
   @Put('/uploads')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   @UseInterceptors(
     FileInterceptor('image', {

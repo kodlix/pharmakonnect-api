@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AccountService } from 'src/account/account.service';
 import { CategoryService } from '../category/category.service';
 import { ArticleService } from './article.service';
@@ -43,6 +43,7 @@ export class ArticleController {
   }
 
   @Post()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async create(@Body() articleDto: ArticleDto, @Req() req: any) {
     try {
@@ -54,6 +55,7 @@ export class ArticleController {
   }
 
   @Put(':articleId')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async update(@Param('articleId') articleId: string, @Body() articleDto: ArticleDto) {
     try {
@@ -64,6 +66,7 @@ export class ArticleController {
   }
 
   @Delete(':articleId')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async remove(@Param('articleId') articleId: string) {
     try {
