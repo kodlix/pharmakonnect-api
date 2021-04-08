@@ -14,11 +14,20 @@ export class CommentService {
     @Inject(forwardRef(() => AccountService)) private readonly accountService: AccountService
   ) { }
 
+  // public async findAll(articleId: string, page: number, take: number): Promise<CommentEntity[]> {
+  //   const article = await this.articleService.findOne(articleId);
+  //   if (article) {
+  //     return article.comments;
+  //   }
+  // }
+
   public async findAll(articleId: string, page: number, take: number): Promise<CommentEntity[]> {
-    const article = await this.articleService.findOne(articleId);
-    if (article) {
-      return article.comments;
-    }
+    return await this.commentRepo.find({
+      where: { articleId: articleId },
+      skip: (take * (page - 1)), 
+      take: take, 
+      order: { createdAt: 'DESC' }
+    });
   }
 
   public async findOne(commentId: string) {
