@@ -28,6 +28,7 @@ import { ApproveJobVacancyDto } from './dto/approve-jobvacancy';
 import { RejectJobVacancyDto } from './dto/reject-jobvacancy';
 import { JobVacancyRO } from './jobvacancy.interface';
 import { AuthGuard } from '@nestjs/passport';
+import { FilterDto } from 'src/_common/filter.dto';
 
 @Controller('jobvacancy')
 @ApiBearerAuth()
@@ -59,8 +60,8 @@ export class JobVacancyController {
     @ApiResponse({ status: 404, description: 'Not Found.' })
     @ApiQuery({ name: 'page', required: false})
     @ApiQuery({ name: 'search', required: false})
-    async findJob(@Req() req: any, @Query('page') page?: number, @Query('search') searchParam?: string): Promise<JobVacancyRO[]> {
-        return await this.jobvacancyService.findJob(page, searchParam);
+    async findJob(@Req() req: any, @Query('search') search: string, @Query('page') page: number): Promise<JobVacancyRO[]> {
+        return await this.jobvacancyService.findJob(search, page);
   }
 
   @Get(':id')
