@@ -23,9 +23,9 @@ export class CommentService {
 
   public async findAll(articleId: string, page: number, take: number): Promise<CommentEntity[]> {
     return await this.commentRepo.find({
-      where: { articleId: articleId },
+      where: { articleId : articleId },
       skip: (take * (page - 1)), 
-      take: take, 
+      take: take || 20, 
       order: { createdAt: 'DESC' }
     });
   }

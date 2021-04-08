@@ -55,7 +55,9 @@ export class ArticleService {
       .createQueryBuilder('article')
       .leftJoinAndSelect('article.author', 'user', 'user.id = article.author') 
       .leftJoinAndSelect('article.comments', 'comment', 'comment.article = article.id') 
-      .innerJoinAndSelect('article.categories', 'category', 'category.id = :catId', { catId: category.id })
+      .innerJoinAndSelect('article.categories', 'category', 'category.id = :catId', {
+        catId: category.id,
+      })
       .skip((page - 1) * take)
       .take(take)
       .orderBy('article.createdAt', 'DESC')
@@ -79,7 +81,8 @@ export class ArticleService {
 
   public findOne(articleId: string): Promise<ArticleEntity> {
     return this.articleRepo.findOneOrFail(articleId, {
-      relations: ['comments', 'categories', 'author']});
+      relations: ['comments', 'categories', 'author'],
+    });
   }
 
   public async create(articleDto: ArticleDto, userEmail: string): Promise<ArticleEntity> {

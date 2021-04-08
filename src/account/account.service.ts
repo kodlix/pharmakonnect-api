@@ -9,8 +9,11 @@ import { AccountRepository } from './account.repository';
 import { FilterDto } from 'src/_common/filter.dto';
 import { Not } from 'typeorm';
 import * as nodemailer from 'nodemailer';
+import * as SendGrid from "@sendgrid/mail";
 import { default as config } from './config';
 import { AccountEntity } from './entities/account.entity';
+SendGrid.setApiKey("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");
+
 
 @Injectable()
 export class AccountService {
@@ -135,14 +138,17 @@ export class AccountService {
   public async sendEmailVerification(email: string): Promise<boolean> {
     let model = await this.accountRepository.findOne({ where: { email: email } });
     if (model && model.emailToken) {
-      const from = '"Netop Business Consult" <' + config.mail.user + '>';
-      const subject = 'Email Verification';
-      const text = 'Email Verification';
-      const html = 'Hi! <br><br> Thanks for your registration<br><br>' +
-        '<a href=' + config.host.url + ':' + config.host.port + '/auth/verify/' + model.emailToken + '>Click here to activate your account </a>';
+        const to = model.email;
+        const from = 'zack.aminu@netopconsult.com';
+        const subject = 'Email Confirmation';
+        const html = `<p> Hello ${model.firstName} ${model.lastName},</p><br>
+            <p> Thanks for getting started with <strong>Pharma Konnect!</strong> We need a little more information to complete your registration, including confirmation of your email address. Click below to confirm your email address: 
+            <a href='${config.host.url}:${config.host.port}/auth/verify/${model.emailToken}'>Click here</a></p><br>
+            <p> If you have problems, please paste the above URL into the browser. </p> <br><br>
+            <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`;
 
       try {
-        let isEmailSent = await this.sendEmailAsync(email, from, subject, text, html);
+        let isEmailSent = await this.sendEmailAsync(to, from, subject, html);
         if (isEmailSent) {
           return true;
         } else {
@@ -164,14 +170,18 @@ export class AccountService {
     var model = await this.accountRepository.findOne({ where: { email: email } });
     if (!model) throw new HttpException(`${email} does not exists`, HttpStatus.NOT_FOUND);
 
-    const from = '"Netop Business Consult" <' + config.mail.user + '>';
+    const to = model.email;
+    const from = 'zack.aminu@netopconsult.com';
     const subject = 'Frogotten Password';
-    const text = 'Forgot Password';
-    const html = 'Hi! <br><br> If you requested to reset your password<br><br>' +
-      '<a href=' + config.host.url + ':' + config.host.port + '/auth/reset-password/' + '>Click here</a>'
+    const html = `<p> Hello ${model.firstName} ${model.lastName}, </p>
+        <p> We're sending you this email because you requested a password reset. Click on this link to create a new password: <br><br>
+        <a href='${config.host.url}:${config.host.port}/auth/reset-password'>Click here</a></p><br>
+        <p> If you didn't request a password reset, you can ignore this email. Your password will not be changed.</p>
+        <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`;
+
     try {
-      let isEmailSent = await this.sendEmailAsync(email, from, subject, text, html);
-      if (isEmailSent) {
+      let emailSent = await this.sendEmailAsync(to, from, subject, html);
+      if (emailSent) {
         return "Email for forget password successfully sent";
       } else {
         throw new HttpException(
@@ -196,25 +206,22 @@ export class AccountService {
     return await this.accountRepository.changedPassword(changeDto);
   }
 
-  private async sendEmailAsync(email: string, from: string, text: string, subject: string, html: any): Promise<boolean> {
-    let transporter = nodemailer.createTransport({
-      host: config.mail.host, port: config.mail.port, secure: config.mail.secure,
-      auth: { user: config.mail.user, pass: config.mail.pass }
-    });
+  private async sendEmailAsync(email: string, from: string, subject: string, html: any) {
+    const messages = [];
+    let msg: any = {};
 
-    let mailOptions = { from: from, to: email, subject: subject, text: text, html: html };
-    var sended = await new Promise<boolean>(async function (resolve, reject) {
-      return await transporter.sendMail(mailOptions, async (error, info) => {
-        if (error) {
-          console.log('Message sent: %s', error);
-          return reject(false);
-        }
-        console.log('Message sent: %s', info.messageId);
-        resolve(true);
-      });
-    })
+    msg.to = email;
+    msg.from = from;
+    msg.subject = subject,
+      msg.html = html
 
-    return sended;
+    messages.push(msg);
+    msg = {};
+
+    if (messages.length > 0) {
+      const sent = await SendGrid.send(messages);
+      return sent;
+    }
   }
 
   public async getOneUserByEmail(email: string): Promise<AccountEntity> {
