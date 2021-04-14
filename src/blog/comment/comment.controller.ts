@@ -53,7 +53,7 @@ export class CommentController {
   @Put(':commentId/like')
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  async likeComment(@Param('commentId') commentId: string, @Body() commentDto: CommentDto) {
+  async likeComment(@Param('commentId') commentId: string) {
     try {
       return await this.commentService.likeComment(commentId);
     } catch (err) {
@@ -64,7 +64,7 @@ export class CommentController {
   @Put(':commentId/dislike')
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  async dislikeComment(@Param('commentId') commentId: string, @Body() commentDto: CommentDto) {
+  async dislikeComment(@Param('commentId') commentId: string) {
     try {
       return await this.commentService.dislikeComment(commentId);
     } catch (err) {
