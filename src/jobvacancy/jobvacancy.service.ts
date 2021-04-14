@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { AccountEntity } from 'src/account/entities/account.entity';
+import { FilterDto } from 'src/_common/filter.dto';
 import { DeleteResult } from 'typeorm';
 import { ApproveJobVacancyDto } from './dto/approve-jobvacancy';
 import { CreateJobVacancyDto } from './dto/create-jobvacancy.dto';
@@ -24,8 +25,8 @@ export class JobVacancyService {
   //   return await this.jobvacancyRepository.findAll(page);
   // }
 
-  async findJob(page, searchParam): Promise<JobVacancyRO[]> {
-    return await this.jobvacancyRepository.findJob(page, searchParam);
+  async findJob(search: string, page: number): Promise<JobVacancyRO[]> {
+    return await this.jobvacancyRepository.findJob(search, page);
 }
 
   async findOne(id: string): Promise<JobVacancyRO> {
