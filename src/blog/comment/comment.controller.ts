@@ -50,6 +50,28 @@ export class CommentController {
     }
   }
 
+  @Put(':commentId/like')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async likeComment(@Param('commentId') commentId: string, @Body() commentDto: CommentDto) {
+    try {
+      return await this.commentService.likeComment(commentId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Put(':commentId/dislike')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async dislikeComment(@Param('commentId') commentId: string, @Body() commentDto: CommentDto) {
+    try {
+      return await this.commentService.dislikeComment(commentId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   @Delete(':commentId')
   @ApiBearerAuth()
   @UseGuards(AuthGuard())

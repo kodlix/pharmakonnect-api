@@ -67,4 +67,16 @@ export class CommentService {
     return this.commentRepo.remove(comment);
   }
 
+  public async likeComment(commentId): Promise<Number> {
+    const comment = await this.findOne(commentId);
+    const likes = await comment.likeComment();
+    return likes
+  }
+
+  public async dislikeComment(commentId): Promise<Number> {
+    const comment = await this.findOne(commentId);
+    const dislikes = await comment.dislikeComment();
+    return dislikes
+  }
+
 }

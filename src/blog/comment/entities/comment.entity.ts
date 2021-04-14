@@ -32,7 +32,21 @@ export class CommentEntity {
   @Column({ default: 0 })
   dislikes?: number;
 
+
+  likeComment?(): Number {
+    this.likes += 1;
+    return this.likes;
+  }
+
+  dislikeComment?(): Number {
+    if(this.dislikes == 0) return;
+    this.dislikes += 1;
+    return this.dislikes;
+  }
+
   @ManyToOne(type => ArticleEntity, article => article.comments)
   article?: ArticleEntity;
+
+
 
 }
