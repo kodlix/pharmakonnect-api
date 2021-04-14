@@ -53,8 +53,8 @@ export class ArticleService {
   public async getArticlesByCategory(category: CategoryEntity, page = 1, take = 25): Promise<ArticleEntity[]> {
     const articles = await this.articleRepo
       .createQueryBuilder('article')
-      .leftJoinAndSelect('article.author', 'user', 'user.id = article.author') // n->1
-      .leftJoinAndSelect('article.comments', 'comment', 'comment.article = article.id') // 1->n
+      .leftJoinAndSelect('article.author', 'user', 'user.id = article.author') 
+      .leftJoinAndSelect('article.comments', 'comment', 'comment.article = article.id') 
       .innerJoinAndSelect('article.categories', 'category', 'category.id = :catId', {
         catId: category.id,
       })
