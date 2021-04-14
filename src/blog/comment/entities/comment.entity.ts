@@ -33,15 +33,14 @@ export class CommentEntity {
   dislikes?: number;
 
 
-  likeComment?(): Number {
-    this.likes += 1;
-    return this.likes;
+  likeComment?(): CommentEntity {
+    this.likes  = this.likes + 1;
+    return this;
   }
 
-  dislikeComment?(): Number {
-    if(this.dislikes == 0) return;
-    this.dislikes += 1;
-    return this.dislikes;
+  dislikeComment?(): CommentEntity {
+    this.dislikes  = this.dislikes + 1;
+    return this;
   }
 
   @ManyToOne(type => ArticleEntity, article => article.comments)

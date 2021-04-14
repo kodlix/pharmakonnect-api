@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { ArticleService } from '../article/article.service';
 import { CommentDto } from './dto/comment.dto';
 import { CommentEntity } from './entities/comment.entity';
@@ -59,16 +59,22 @@ export class CommentService {
     return this.commentRepo.remove(comment);
   }
 
-  public async likeComment(commentId): Promise<Number> {
-    const comment = await this.findOne(commentId);
-    const likes = await comment.likeComment();
-    return likes
+  public async likeComment(commentId): Promise<CommentEntity> {
+    const comment = await this.commentRepo.findOne(commentId);
+    const liked = await comment.likeComment();
+    await this.commentRepo.update(commentId, liked);
+    
+    const result = await this.commentRepo.findOne(commentId);
+    return result;
   }
 
-  public async dislikeComment(commentId): Promise<Number> {
+  public async dislikeComment(commentId): Promise<CommentEntity> {
     const comment = await this.findOne(commentId);
-    const dislikes = await comment.dislikeComment();
-    return dislikes
+    const disliked = await comment.dislikeComment();
+    await this.commentRepo.update(commentId, disliked);
+
+    const result = await this.commentRepo.findOne(commentId);
+    return result;
   }
 
 }
