@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { IsEmail, IsFQDN, Length } from 'class-validator';
 import { AbstractBaseEntity } from 'src/_common/base.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
