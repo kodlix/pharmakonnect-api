@@ -73,6 +73,10 @@ export class AccountEntity extends AbstractBaseEntity {
   @Column({ nullable: true, length: 50 })
   public pcn: string;
 
+  @Length(50)
+  @Column({ nullable: true, length: 50 })
+  public typesOfPractice: string;
+
   @Length(128)
   @Column({ nullable: true, length: 128 })
   public sectorId: string;

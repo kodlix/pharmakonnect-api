@@ -200,6 +200,7 @@ export class AccountRepository extends Repository<AccountEntity> {
       accountPackage: user.accountPackage,
       organizationName: user.organizationName,
       organizationType: user.organizationType,
+      typesOfPractice: user.typesOfPractice,
       isRegComplete: user.isRegComplete,
       accountType: user.accountType,
       address: user.address,
