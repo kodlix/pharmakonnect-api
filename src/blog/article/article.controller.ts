@@ -76,7 +76,7 @@ export class ArticleController {
     }
   }
 
-  @Put(':articleId/publish')
+  @Put(':articleId/reject')
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async reject(@Param('articleId') articleId: string, @Body() rejectDto: RejectArticleDto) {
