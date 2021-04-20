@@ -140,6 +140,9 @@ export class ArticleService {
     if (!article) {
       throw new BadRequestException("article does not exist");
     }
+    if (article.published) {
+      throw new BadRequestException("article has been published already.");
+    }
     const published = await article.publishArticle();
     await this.articleRepo.update(articleId, published);
     
@@ -151,6 +154,9 @@ export class ArticleService {
     const article = await this.articleRepo.findOne(articleId);
     if (!article) {
       throw new BadRequestException("article does not exist");
+    }
+    if (article.rejected) {
+      throw new BadRequestException("article has been rejected already.");
     }
     const rejectedArticle = await article.rejectArticle(message);
     await this.articleRepo.update(articleId, rejectedArticle);

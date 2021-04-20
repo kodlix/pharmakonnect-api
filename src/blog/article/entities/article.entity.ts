@@ -56,12 +56,14 @@ import {
 
     publishArticle?(): ArticleEntity{
       this.published = true;
+      this.rejected = false;
       this.editedAt = new Date();
       return this;
     }
 
     rejectArticle?(message: string): ArticleEntity{
       this.rejected = true;
+      this.published = false;
       this.rejectMessage = message;
       this.editedAt = new Date();
       return this;
