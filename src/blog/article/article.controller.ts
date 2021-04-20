@@ -4,7 +4,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AccountService } from 'src/account/account.service';
 import { CategoryService } from '../category/category.service';
 import { ArticleService } from './article.service';
-import { ArticleDto } from './dto/article.dto';
+import { ArticleDto, RejectArticleDto } from './dto/article.dto';
 
 @ApiTags('article')
 @Controller('article')
@@ -71,6 +71,17 @@ export class ArticleController {
   async publish(@Param('articleId') articleId: string) {
     try {
       return await this.articleService.publish(articleId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Put(':articleId/publish')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async reject(@Param('articleId') articleId: string, @Body() rejectDto: RejectArticleDto) {
+    try {
+      return await this.articleService.reject(articleId, rejectDto.message);
     } catch (err) {
       throw new HttpException(err, HttpStatus.BAD_REQUEST);
     }

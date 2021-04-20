@@ -33,8 +33,14 @@ import {
     @Column({ nullable: true })
     editedAt?: Date;
   
-    @Column({ default: true })
+    @Column({ default: false })
     published?: boolean;
+
+    @Column({ default: false })
+    rejected?: boolean;
+
+    @Column({ length: 512,  nullable: true })
+    rejectMessage?: string;
   
     @Column({ default: 0 })
     claps?: number;
@@ -50,6 +56,13 @@ import {
 
     publishArticle?(): ArticleEntity{
       this.published = true;
+      this.editedAt = new Date();
+      return this;
+    }
+
+    rejectArticle?(message: string): ArticleEntity{
+      this.rejected = true;
+      this.rejectMessage = message;
       this.editedAt = new Date();
       return this;
     }

@@ -125,31 +125,40 @@ export class ArticleService {
     return entities;
   }
 
-  public async publish(ArticleId): Promise<ArticleEntity> {
-    const Article = await this.articleRepo.findOne(ArticleId);
-    const published = await Article.publishArticle();
-    await this.articleRepo.update(ArticleId, published);
+  public async publish(articleId): Promise<ArticleEntity> {
+    const article = await this.articleRepo.findOne(articleId);
+    const published = await article.publishArticle();
+    await this.articleRepo.update(articleId, published);
     
-    const result = await this.articleRepo.findOne(ArticleId);
+    const result = await this.articleRepo.findOne(articleId);
+    return result;
+  }
+
+  public async reject(articleId, message): Promise<ArticleEntity> {
+    const article = await this.articleRepo.findOne(articleId);
+    const rejectedArticle = await article.rejectArticle(message);
+    await this.articleRepo.update(articleId, rejectedArticle);
+    
+    const result = await this.articleRepo.findOne(articleId);
     return result;
   }
 
 
-  public async likeArticle(ArticleId): Promise<ArticleEntity> {
-    const Article = await this.articleRepo.findOne(ArticleId);
-    const liked = await Article.likeArticle();
-    await this.articleRepo.update(ArticleId, liked);
+  public async likeArticle(articleId): Promise<ArticleEntity> {
+    const article = await this.articleRepo.findOne(articleId);
+    const liked = await article.likeArticle();
+    await this.articleRepo.update(articleId, liked);
     
-    const result = await this.articleRepo.findOne(ArticleId);
+    const result = await this.articleRepo.findOne(articleId);
     return result;
   }
 
-  public async dislikeArticle(ArticleId): Promise<ArticleEntity> {
-    const Article = await this.findOne(ArticleId);
-    const disliked = await Article.dislikeArticle();
-    await this.articleRepo.update(ArticleId, disliked);
+  public async dislikeArticle(articleId): Promise<ArticleEntity> {
+    const article = await this.findOne(articleId);
+    const disliked = await article.dislikeArticle();
+    await this.articleRepo.update(articleId, disliked);
 
-    const result = await this.articleRepo.findOne(ArticleId);
+    const result = await this.articleRepo.findOne(articleId);
     return result;
   }
 
