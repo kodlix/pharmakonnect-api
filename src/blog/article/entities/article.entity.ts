@@ -41,6 +41,28 @@ import {
   
     @Column({ default: 0 })
     views?: number;
+
+    @Column({ default: 0 })
+    likes?: number;
+
+    @Column({ default: 0 })
+    dislikes?: number;
+
+    publishArticle?(): ArticleEntity{
+      this.published = true;
+      this.editedAt = new Date();
+      return this;
+    }
+
+    likeArticle?(): ArticleEntity {
+      this.likes  = this.likes + 1;
+      return this;
+    }
+  
+    dislikeArticle?(): ArticleEntity {
+      this.dislikes  = this.dislikes + 1;
+      return this;
+    }
   
     @OneToMany(type => CommentEntity, comment => comment.article)
     comments?: CommentEntity[];

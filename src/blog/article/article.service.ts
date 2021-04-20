@@ -125,5 +125,33 @@ export class ArticleService {
     return entities;
   }
 
+  public async publish(ArticleId): Promise<ArticleEntity> {
+    const Article = await this.articleRepo.findOne(ArticleId);
+    const published = await Article.publishArticle();
+    await this.articleRepo.update(ArticleId, published);
+    
+    const result = await this.articleRepo.findOne(ArticleId);
+    return result;
+  }
+
+
+  public async likeArticle(ArticleId): Promise<ArticleEntity> {
+    const Article = await this.articleRepo.findOne(ArticleId);
+    const liked = await Article.likeArticle();
+    await this.articleRepo.update(ArticleId, liked);
+    
+    const result = await this.articleRepo.findOne(ArticleId);
+    return result;
+  }
+
+  public async dislikeArticle(ArticleId): Promise<ArticleEntity> {
+    const Article = await this.findOne(ArticleId);
+    const disliked = await Article.dislikeArticle();
+    await this.articleRepo.update(ArticleId, disliked);
+
+    const result = await this.articleRepo.findOne(ArticleId);
+    return result;
+  }
+
 
 }

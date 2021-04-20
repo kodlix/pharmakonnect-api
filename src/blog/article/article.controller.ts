@@ -65,6 +65,17 @@ export class ArticleController {
     }
   }
 
+  @Put(':articleId/publish')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async publish(@Param('articleId') articleId: string) {
+    try {
+      return await this.articleService.publish(articleId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   @Delete(':articleId')
   @ApiBearerAuth()
   @UseGuards(AuthGuard())

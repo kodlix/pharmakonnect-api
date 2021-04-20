@@ -12,7 +12,6 @@ import { PackageFeatureEntity } from 'src/package/entities/packagefeature.entity
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
-  // co-operation and individual
   @IsEmail()
   @Length(128)
   @Column({ unique: true, length: 128 })
