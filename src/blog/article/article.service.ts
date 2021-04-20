@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
 import { AccountEntity } from 'src/account/entities/account.entity';
@@ -25,6 +25,16 @@ export class ArticleService {
 
   public findAll(page = 1, take = 25): Promise<ArticleEntity[]> {
     return this.articleRepo.find({ relations: ['comments', 'categories', 'author'],
+      skip: take * (page - 1), take,
+      order: { published: 'ASC', createdAt: 'DESC' },
+    });
+  }
+
+
+  public findAllPublished(page = 1, take = 25): Promise<ArticleEntity[]> {
+    return this.articleRepo.find( { 
+      where: { published : true }, 
+      relations: ['comments', 'categories', 'author'],
       skip: take * (page - 1), take,
       order: { createdAt: 'DESC' },
     });
@@ -127,6 +137,9 @@ export class ArticleService {
 
   public async publish(articleId): Promise<ArticleEntity> {
     const article = await this.articleRepo.findOne(articleId);
+    if (!article) {
+      throw new BadRequestException("article does not exist");
+    }
     const published = await article.publishArticle();
     await this.articleRepo.update(articleId, published);
     
@@ -136,6 +149,9 @@ export class ArticleService {
 
   public async reject(articleId, message): Promise<ArticleEntity> {
     const article = await this.articleRepo.findOne(articleId);
+    if (!article) {
+      throw new BadRequestException("article does not exist");
+    }
     const rejectedArticle = await article.rejectArticle(message);
     await this.articleRepo.update(articleId, rejectedArticle);
     
@@ -146,6 +162,9 @@ export class ArticleService {
 
   public async likeArticle(articleId): Promise<ArticleEntity> {
     const article = await this.articleRepo.findOne(articleId);
+    if (!article) {
+      throw new BadRequestException("article does not exist");
+    }
     const liked = await article.likeArticle();
     await this.articleRepo.update(articleId, liked);
     
@@ -155,6 +174,9 @@ export class ArticleService {
 
   public async dislikeArticle(articleId): Promise<ArticleEntity> {
     const article = await this.findOne(articleId);
+    if (!article) {
+      throw new BadRequestException("article does not exist");
+    }
     const disliked = await article.dislikeArticle();
     await this.articleRepo.update(articleId, disliked);
 

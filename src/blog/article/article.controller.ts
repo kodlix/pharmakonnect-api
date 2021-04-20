@@ -33,6 +33,15 @@ export class ArticleController {
     }
   }
 
+  @Get("/published")
+  findAllPublished(@Query('page') page: number, @Query('take') take: number) {
+    try {
+      return this.articleService.findAllPublished(page, take);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
+  }
+
   @Get(':articleId')
   async findOne(@Param('articleId') articleId: string) {
     try {
