@@ -2,7 +2,7 @@ import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/com
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
 import { AccountEntity } from 'src/account/entities/account.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { CategoryService } from '../category/category.service';
 import { CategoryEntity } from '../category/entities/category.entity';
 import { CommentService } from '../comment/comment.service';
@@ -70,7 +70,7 @@ export class ArticleService {
       })
       .skip((page - 1) * take)
       .take(take)
-      .orderBy('article.createdAt', 'DESC')
+      .orderBy('article.editedAt', 'DESC')
       .getMany();
     return articles;
   }
@@ -190,5 +190,28 @@ export class ArticleService {
     return result;
   }
 
+
+  public async findBlog(search: string, page: number): Promise<ArticleEntity[]> {
+    if(search) {
+      const blogs =  await this.articleRepo.createQueryBuilder("article")
+           .where(new Brackets(qb => {
+                qb.where("article.title ILike :title", { title: `%${search}%` })
+                .orWhere("article.body ILike :body", { body: `%${search}%` })
+                .orWhere("article.rejectMessage ILike :rejectMessage", { rejectMessage: `%${search}%` })
+               }))
+            .orderBy("article.editedAt", "DESC")
+            .take(25)
+            .skip(25 * (page ? page - 1 : 0))
+            .getMany();
+
+       return blogs;
+   }
+
+   return await this.articleRepo.find(
+     {
+       order: { editedAt: 'DESC' },
+       take: 25, skip: page ? 25 * (page - 1) : 0
+    });
+  }
 
 }

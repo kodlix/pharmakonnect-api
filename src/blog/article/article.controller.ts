@@ -33,6 +33,15 @@ export class ArticleController {
     }
   }
 
+  @Get('/search')
+  searchBlog(@Query('page') page: number, @Query('search') search: string) {
+    try {
+      return this.articleService.findBlog(search, page);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
+  }
+
   @Get("/published")
   findAllPublished(@Query('page') page: number, @Query('take') take: number) {
     try {
