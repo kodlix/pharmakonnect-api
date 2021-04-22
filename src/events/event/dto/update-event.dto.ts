@@ -89,11 +89,6 @@ export class UpdateEventDto {
     @IsOptional()
     free: boolean
 
-    @ApiProperty({default: true})
-    @ApiPropertyOptional()
-    @IsOptional()
-    active: boolean
-
     @ApiProperty({default: false})
     @ApiPropertyOptional()
     @IsOptional()
@@ -113,11 +108,6 @@ export class UpdateEventDto {
     @ApiPropertyOptional()
     @IsOptional()
     requireRegistration: boolean;
-
-    @ApiProperty({default: false})
-    @ApiPropertyOptional()
-    @IsOptional()
-    published: boolean;
 
     @Expose()
     @IsString()
