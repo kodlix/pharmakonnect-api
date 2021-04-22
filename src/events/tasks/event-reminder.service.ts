@@ -50,12 +50,12 @@ export class EventReminderService {
 
                   for (const evUsers of tm.eventUsers) {
                     msg.to = evUsers.email;
-                    msg.from = 'zack.aminu@netopconsult.com';
+                    msg.from = '"Kaapsule" <zack.aminu@netopconsult.com>';
                     msg.subject = `Reminder email for your upcoming event`,
                     msg.html = `<p> Dear ${evUsers.name}, </p>
                         <p> Please be reminded that, the event <strong>${tm.name}</strong> you registered for, </p>
                         <p>starts on <strong>${evUsers.startDate}</strong> at <strong>${tm.startTime}</strong>.</p>
-                        <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`
+                        <p> Thank you for choosing <strong> Kaapsule. </strong></p>`
 
                     messages.push(msg);
                     msg = {};

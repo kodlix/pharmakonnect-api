@@ -11,6 +11,8 @@ import { EventRO } from "./interfaces/event.interface";
 import { UpdateEventDto } from "./dto/update-event.dto";
 import { EventRegistrationDto } from "./dto/event-registration.dto";
 import { EventUsersRepository } from "../eventusers/eventusers.repository";
+import { isNotValidDate } from "src/_utility/date-validator.util";
+import { isNotValidTime } from "src/_utility/time-validator.util";
 
 
 @EntityRepository(EventEntity)
@@ -19,22 +21,15 @@ export class EventRepository extends Repository<EventEntity> {
 
     async saveEvent(filename: string, payload: CreateEventDto, user: AccountEntity) : Promise<string> {
 
-        const today = new Date();
-
         if(new Date(payload.endDate).setHours(0,0,0,0) < new Date(payload.startDate).setHours(0,0,0,0)) {
             throw new HttpException(`Start date of event cannot be greater than End date`, HttpStatus.BAD_REQUEST,);
         }
 
-        if(today > payload.startDate) {
-            throw new HttpException( `Event Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
+        if(isNotValidDate(payload.startDate)) {
+            throw new HttpException( `Event Start Date cannot be less than current date`, HttpStatus.BAD_REQUEST);
         }
-
-        const todayTime = `${today.getHours()}.${today.getMinutes()}`;
-
-        const splitedStartTime = payload.startTime.toString().split(":");
-        const startTime = `${splitedStartTime[0]}.${splitedStartTime[1]}`;
-         
-        if (todayTime > startTime) {
+    
+        if (isNotValidTime(payload.startTime, payload.startDate)) {
             throw new HttpException( `Event Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
         } 
 
@@ -93,15 +88,15 @@ export class EventRepository extends Repository<EventEntity> {
                         qb.where("event.name ILike :name", { name: `%${search}%` })
                         .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
                     }))
-                    .orderBy("event.createdAt", "ASC")
-                    .skip(25 * (page ? page - 1 : 0))
-                    .take(25)
+                    .orderBy("event.createdAt", "DESC")
+                    .skip(15 * (page ? page - 1 : 0))
+                    .take(15)
                     .getMany();
 
             return events;
         }
 
-        return await this.find({relations: ['eventUsers'], order: { createdAt: 'ASC' }, take: 25, skip: 25 * (page - 1)});
+        return await this.find({relations: ['eventUsers'], order: { createdAt: 'DESC' }, take: 15, skip: 15 * (page - 1)});
     }
 
     
@@ -120,15 +115,15 @@ export class EventRepository extends Repository<EventEntity> {
                         qb.where("event.name ILike :name", { name: `%${search}%` })
                         .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
                     }))
-                    .orderBy("event.createdAt", "ASC")
-                    .skip(25 * (page ? page - 1 : 0))
-                    .take(25)
+                    .orderBy("event.createdAt", "DESC")
+                    .skip(15 * (page ? page - 1 : 0))
+                    .take(15)
                     .getMany();
 
             return events;
         }
 
-        return await this.find({where: {accountId: user.id}, relations: ['eventUsers'], order: { createdAt: 'ASC' }, take: 25, skip: 25 * (page - 1)});
+        return await this.find({where: {accountId: user.id}, relations: ['eventUsers'], order: { createdAt: 'DESC' }, take: 15, skip: 15 * (page - 1)});
     }
 
     async findEventById(id: string): Promise<EventRO> {
@@ -159,23 +154,16 @@ export class EventRepository extends Repository<EventEntity> {
         const event = await this.findOne(id);
         if (event ) {
 
-            const today = new Date();
-
-            if(payload.endDate < payload.startDate) {
+            if(new Date(payload.endDate).setHours(0,0,0,0) < new Date(payload.startDate).setHours(0,0,0,0)) {
                 throw new HttpException(`Start date of event cannot be greater than End date`, HttpStatus.BAD_REQUEST,);
             }
-
-            if(today > payload.startDate) {
-                throw new HttpException( `Event Start Date ${payload.startDate} cannot be less than current date`, HttpStatus.BAD_REQUEST);
-            }
     
-            const todayTime = `${today.getHours()}.${today.getMinutes()}`;
-
-            const splitedStartTime = payload.startTime.toString().split(":");
-            const startTime = `${splitedStartTime[0]}.${splitedStartTime[1]}`;
-            
-            if (todayTime > startTime) {
-                throw new HttpException( `Event Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
+            if(isNotValidDate(payload.startDate)) {
+                throw new HttpException( `Meeting Start Date cannot be less than current date`, HttpStatus.BAD_REQUEST);
+            }
+        
+            if (isNotValidTime(payload.startTime, payload.startDate)) {
+                throw new HttpException( `Meeting Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
             } 
 
             if(payload.online) {
@@ -250,7 +238,7 @@ export class EventRepository extends Repository<EventEntity> {
         }
 
         if(!eventRegistringFor.requireRegistration) {
-            throw new HttpException(`Invalid request`, HttpStatus.BAD_REQUEST);
+            throw new HttpException(`Invalid request, you cannot register for this event at this time.`, HttpStatus.BAD_REQUEST);
         }
 
         if(!eventRegistringFor.published) {

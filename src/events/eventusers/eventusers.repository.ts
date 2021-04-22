@@ -49,15 +49,15 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
                         qb.where("evu.email ILike :email", { email: `%${search}%` })
                         .orWhere("evu.accessCode ILike :accessCode", { accessCode: `%${search}%` })
                     }))
-                    .orderBy("evu.createdAt", "ASC")
-                    .skip(25 * (page ? page - 1 : 0))
-                    .take(25)
+                    .orderBy("evu.createdAt", "DESC")
+                    .skip(15 * (page ? page - 1 : 0))
+                    .take(15)
                     .getMany();
 
             return eventsUsers;
         }
 
-        return await this.find({order: { createdAt: 'ASC' }, relations: ['event'], take: 25, skip: 25 * (page - 1)});
+        return await this.find({order: { createdAt: 'ASC' }, relations: ['event'], take: 15, skip: 15 * (page - 1)});
     }
 
     async findMeFromEventUsers({search, page}: FilterDto, user: AccountEntity): Promise<EventUsersRO[]> {
@@ -76,15 +76,15 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
                         qb.where("evu.email ILike :email", { email: `%${search}%` })
                         .orWhere("evu.accessCode ILike :accessCode", { accessCode: `%${search}%` })
                     }))
-                    .orderBy("evu.createdAt", "ASC")
-                    .skip(25 * (page ? page - 1 : 0))
-                    .take(25)
+                    .orderBy("evu.createdAt", "DESC")
+                    .skip(15 * (page ? page - 1 : 0))
+                    .take(15)
                     .getMany();
 
             return eventsUsers;
         }
 
-        return await this.find({where: {accountId: user.id}, order: { createdAt: 'ASC' }, relations: ['event'], take: 25, skip: 25 * (page - 1)});
+        return await this.find({where: {accountId: user.id}, order: { createdAt: 'DESC' }, relations: ['event'], take: 15, skip: 15 * (page - 1)});
     }
 
 
