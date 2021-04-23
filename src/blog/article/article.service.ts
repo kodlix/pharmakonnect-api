@@ -191,10 +191,13 @@ export class ArticleService {
   }
 
 
-  public async findBlog(search: string, page: number): Promise<ArticleEntity[]> {
+  public async searchBlog(search: string, page: number): Promise<ArticleEntity[]> {
     if(search) {
       const blogs =  await this.articleRepo.createQueryBuilder("article")
-           .where(new Brackets(qb => {
+          .leftJoinAndSelect("article.author", "author")
+          .leftJoinAndSelect("article.comments", "comments")
+          .leftJoinAndSelect("article.categories", "categories")
+          .where(new Brackets(qb => {
                 qb.where("article.title ILike :title", { title: `%${search}%` })
                 .orWhere("article.body ILike :body", { body: `%${search}%` })
                 .orWhere("article.rejectMessage ILike :rejectMessage", { rejectMessage: `%${search}%` })
@@ -207,11 +210,12 @@ export class ArticleService {
        return blogs;
    }
 
-   return await this.articleRepo.find(
-     {
+   const blogs = await this.articleRepo.find({ relations: ['comments', 'categories', 'author'],
        order: { editedAt: 'DESC' },
        take: 25, skip: page ? 25 * (page - 1) : 0
     });
+
+    return blogs;
   }
 
 }

@@ -36,7 +36,7 @@ export class ArticleController {
   @Get('/search')
   searchBlog(@Query('page') page: number, @Query('search') search: string) {
     try {
-      return this.articleService.findBlog(search, page);
+      return this.articleService.searchBlog(search, page);
     } catch (err) {
       throw new HttpException(err, HttpStatus.NOT_FOUND);
     }
