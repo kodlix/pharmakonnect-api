@@ -159,11 +159,11 @@ export class EventRepository extends Repository<EventEntity> {
             }
     
             if(isNotValidDate(payload.startDate)) {
-                throw new HttpException( `Meeting Start Date cannot be less than current date`, HttpStatus.BAD_REQUEST);
+                throw new HttpException( `Event Start Date cannot be less than current date`, HttpStatus.BAD_REQUEST);
             }
         
             if (isNotValidTime(payload.startTime, payload.startDate)) {
-                throw new HttpException( `Meeting Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
+                throw new HttpException( `Event Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
             } 
 
             if(payload.online) {
