@@ -201,13 +201,14 @@ export class EventRepository extends Repository<EventEntity> {
 
     async publishEvent(id: string, user: AccountEntity): Promise<string> {
         const ev = await this.findOne(id);
+        
         if(!ev) {
             throw new HttpException(`The event with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
         }
 
-        if(ev.accountId != user.id) {
-            throw new HttpException(`You can only publish an event created by you`, HttpStatus.NOT_FOUND);
-        }
+        // if(ev.accountId != user.id) {
+        //     throw new HttpException(`You can only publish an event created by you`, HttpStatus.NOT_FOUND);
+        // }
 
         ev.published = true;
         ev.publishedOn = new Date();
