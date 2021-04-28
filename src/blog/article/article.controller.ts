@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AccountService } from 'src/account/account.service';
 import { CategoryService } from '../category/category.service';
 import { ArticleService } from './article.service';
-import { ArticleDto } from './dto/article.dto';
+import { ArticleDto, RejectArticleDto } from './dto/article.dto';
 
 @ApiTags('article')
 @Controller('article')
@@ -33,6 +33,24 @@ export class ArticleController {
     }
   }
 
+  @Get('/search')
+  searchBlog(@Query('page') page: number, @Query('search') search: string) {
+    try {
+      return this.articleService.searchBlog(search, page);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Get("/published")
+  findAllPublished(@Query('page') page: number, @Query('take') take: number) {
+    try {
+      return this.articleService.findAllPublished(page, take);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
+  }
+
   @Get(':articleId')
   async findOne(@Param('articleId') articleId: string) {
     try {
@@ -43,6 +61,7 @@ export class ArticleController {
   }
 
   @Post()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async create(@Body() articleDto: ArticleDto, @Req() req: any) {
     try {
@@ -54,6 +73,7 @@ export class ArticleController {
   }
 
   @Put(':articleId')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async update(@Param('articleId') articleId: string, @Body() articleDto: ArticleDto) {
     try {
@@ -63,7 +83,30 @@ export class ArticleController {
     }
   }
 
+  @Put(':articleId/publish')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async publish(@Param('articleId') articleId: string) {
+    try {
+      return await this.articleService.publish(articleId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Put(':articleId/reject')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async reject(@Param('articleId') articleId: string, @Body() rejectDto: RejectArticleDto) {
+    try {
+      return await this.articleService.reject(articleId, rejectDto.message);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   @Delete(':articleId')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async remove(@Param('articleId') articleId: string) {
     try {

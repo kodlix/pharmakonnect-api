@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js'></script>
+
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
+</head>
+
+<body>
+    <div>
+        <form action="">
+            <input type="text" id="chattext">
+            <button type="submit" onclick="makecall(); return false;">Send</button>
+        </form>
+
+
+
+    </div>
+    <script>
+
+        let messages = [];
+        var tes = {};
+        const username = prompt();
+        const room = promt();
+
+        this.socket = io('http://localhost:4500/')
+
+        const makecall = () => {
+            var textmsg = document.getElementById("chattext").value;
+
+            this.socket.emit('chatToServer', { sender: username, room: "NON", message: textmsg });
+
+            this.socket.on('chatToClient', (inmsg) => {
+                tes = Object.assign(inmsg);
+                messages.push(inmsg);
+               processmessage()
+            });
+
+        }
+
+
+
+
+        const processmessage = () => {
+            // for (var i of messages) {
+            //     // document.write("<li>" + i.message + "</li>");
+
+            //     console.log(i.message);
+            // }
+            
+            console.log(tes.sender + ': ' + tes.message);
+            document.getElementById("chattext").value = '';
+        }
+
+
+
+    </script>
+</body>
+
+</html>

@@ -1,8 +1,8 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
 import { AccountEntity } from 'src/account/entities/account.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { CategoryService } from '../category/category.service';
 import { CategoryEntity } from '../category/entities/category.entity';
 import { CommentService } from '../comment/comment.service';
@@ -25,6 +25,16 @@ export class ArticleService {
 
   public findAll(page = 1, take = 25): Promise<ArticleEntity[]> {
     return this.articleRepo.find({ relations: ['comments', 'categories', 'author'],
+      skip: take * (page - 1), take,
+      order: { published: 'ASC', createdAt: 'DESC' },
+    });
+  }
+
+
+  public findAllPublished(page = 1, take = 25): Promise<ArticleEntity[]> {
+    return this.articleRepo.find( { 
+      where: { published : true }, 
+      relations: ['comments', 'categories', 'author'],
       skip: take * (page - 1), take,
       order: { createdAt: 'DESC' },
     });
@@ -53,14 +63,14 @@ export class ArticleService {
   public async getArticlesByCategory(category: CategoryEntity, page = 1, take = 25): Promise<ArticleEntity[]> {
     const articles = await this.articleRepo
       .createQueryBuilder('article')
-      .leftJoinAndSelect('article.author', 'user', 'user.id = article.author') // n->1
-      .leftJoinAndSelect('article.comments', 'comment', 'comment.article = article.id') // 1->n
+      .leftJoinAndSelect('article.author', 'user', 'user.id = article.author') 
+      .leftJoinAndSelect('article.comments', 'comment', 'comment.article = article.id') 
       .innerJoinAndSelect('article.categories', 'category', 'category.id = :catId', {
         catId: category.id,
       })
       .skip((page - 1) * take)
       .take(take)
-      .orderBy('article.createdAt', 'DESC')
+      .orderBy('article.editedAt', 'DESC')
       .getMany();
     return articles;
   }
@@ -125,5 +135,87 @@ export class ArticleService {
     return entities;
   }
 
+  public async publish(articleId): Promise<ArticleEntity> {
+    const article = await this.articleRepo.findOne(articleId);
+    if (!article) {
+      throw new BadRequestException("article does not exist");
+    }
+    if (article.published) {
+      throw new BadRequestException("article has been published already.");
+    }
+    const published = await article.publishArticle();
+    await this.articleRepo.update(articleId, published);
+    
+    const result = await this.articleRepo.findOne(articleId);
+    return result;
+  }
+
+  public async reject(articleId, message): Promise<ArticleEntity> {
+    const article = await this.articleRepo.findOne(articleId);
+    if (!article) {
+      throw new BadRequestException("article does not exist");
+    }
+    if (article.rejected) {
+      throw new BadRequestException("article has been rejected already.");
+    }
+    const rejectedArticle = await article.rejectArticle(message);
+    await this.articleRepo.update(articleId, rejectedArticle);
+    
+    const result = await this.articleRepo.findOne(articleId);
+    return result;
+  }
+
+
+  public async likeArticle(articleId): Promise<ArticleEntity> {
+    const article = await this.articleRepo.findOne(articleId);
+    if (!article) {
+      throw new BadRequestException("article does not exist");
+    }
+    const liked = await article.likeArticle();
+    await this.articleRepo.update(articleId, liked);
+    
+    const result = await this.articleRepo.findOne(articleId);
+    return result;
+  }
+
+  public async dislikeArticle(articleId): Promise<ArticleEntity> {
+    const article = await this.findOne(articleId);
+    if (!article) {
+      throw new BadRequestException("article does not exist");
+    }
+    const disliked = await article.dislikeArticle();
+    await this.articleRepo.update(articleId, disliked);
+
+    const result = await this.articleRepo.findOne(articleId);
+    return result;
+  }
+
+
+  public async searchBlog(search: string, page: number): Promise<ArticleEntity[]> {
+    if(search) {
+      const blogs =  await this.articleRepo.createQueryBuilder("article")
+          .leftJoinAndSelect("article.author", "author")
+          .leftJoinAndSelect("article.comments", "comments")
+          .leftJoinAndSelect("article.categories", "categories")
+          .where(new Brackets(qb => {
+                qb.where("article.title ILike :title", { title: `%${search}%` })
+                .orWhere("article.body ILike :body", { body: `%${search}%` })
+                .orWhere("article.rejectMessage ILike :rejectMessage", { rejectMessage: `%${search}%` })
+               }))
+            .orderBy("article.editedAt", "DESC")
+            .take(25)
+            .skip(25 * (page ? page - 1 : 0))
+            .getMany();
+
+       return blogs;
+   }
+
+   const blogs = await this.articleRepo.find({ relations: ['comments', 'categories', 'author'],
+       order: { editedAt: 'DESC' },
+       take: 25, skip: page ? 25 * (page - 1) : 0
+    });
+
+    return blogs;
+  }
 
 }

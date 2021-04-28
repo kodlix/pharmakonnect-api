@@ -6,6 +6,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { UserFromDbRO } from './interfaces/account.interface';
 import { OrganizationRO, UserDataRO } from './interfaces/user.interface';
 import { accountTypes } from './account.constant';
+import { constants } from 'buffer';
 
 @EntityRepository(AccountEntity)
 export class AccountRepository extends Repository<AccountEntity> {
@@ -53,7 +54,7 @@ export class AccountRepository extends Repository<AccountEntity> {
         isRegComplete: user.isRegComplete,
         accountType: user.accountType,
         accountId: user.id,
-
+        profileImage: user.accountType === accountTypes.INDIVIDUAL ? user.profileImage : user.premisesImage
       };
       return data;
     } else {
@@ -199,6 +200,7 @@ export class AccountRepository extends Repository<AccountEntity> {
       accountPackage: user.accountPackage,
       organizationName: user.organizationName,
       organizationType: user.organizationType,
+      typesOfPractice: user.typesOfPractice,
       isRegComplete: user.isRegComplete,
       accountType: user.accountType,
       address: user.address,

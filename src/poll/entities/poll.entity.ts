@@ -1,6 +1,6 @@
 import { AccountEntity } from "src/account/entities/account.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
 import { PollOptionEntity } from "./poll-option.entity";
 import { PollQuestionEntity } from "./poll-question.entity";
 

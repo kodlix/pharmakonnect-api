@@ -4,7 +4,7 @@ import { EventEntity } from "src/events/event/entities/event.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { Column, Entity, ManyToOne } from "typeorm";
 
-@Entity('Eventuser')
+@Entity('EventUser')
 export class EventUsersEntity extends AbstractBaseEntity{
 
     @Column({type: "varchar", length: 128})

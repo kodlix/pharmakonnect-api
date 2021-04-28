@@ -15,3 +15,10 @@ export class ArticleDto {
   categoryIds: string[];
 
 }
+
+export class RejectArticleDto {
+
+  @IsNotEmpty({message: "Rejection reason is required"}) 
+  @ApiProperty()
+  message: string;
+}

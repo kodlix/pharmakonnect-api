@@ -28,6 +28,7 @@ import { EventReminderModule } from './events/tasks/event-reminder.module';
 import { PollModule } from './poll/poll.module';
 import { PackageModule } from './package/package.module';
 import { FeatureModule } from './features/feature.module';
+import { SendgridModule } from './sendgrid/sendgrid.module';
 
 
 @Module({
@@ -42,9 +43,9 @@ import { FeatureModule } from './features/feature.module';
     SeederModule,
     ScheduleMeetingsModule,
     FlatMeetingModule,
-    // ChatModule,
-    // ContactModule,
-    // GroupchatModule,
+    ChatModule,
+    ContactModule,
+    GroupchatModule,
     OutletModule,
     ScheduleMeetingGatewayModule,
     ScheduleModule.forRoot(),
@@ -55,7 +56,8 @@ import { FeatureModule } from './features/feature.module';
     EventsModule,
     PollModule,
     PackageModule,
-    FeatureModule
+    FeatureModule,
+    SendgridModule
   ],
   controllers: [AppController],
   providers: [AppService],

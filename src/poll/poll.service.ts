@@ -29,8 +29,8 @@ export class PollService {
 
   async getPollSettings() {
     return await  {
-      pollTypes:  Object.values(pollTypes),
-      questionTypes: Object.values(pollQuestionType)
+      pollTypes:  this.convertEnumToArray(pollTypes),
+      questionTypes: this.convertEnumToArray(pollQuestionType)
     }
   }
 
@@ -40,5 +40,17 @@ export class PollService {
 
   async remove(id: string) {
     return await  this.pollRepository.deleteEntity(id);
+  }
+
+  private convertEnumToArray (enumEntity) {
+    const result = Object.keys(enumEntity).map(el => {
+      return {
+        name: el,
+        value: enumEntity[el]
+      }
+    })
+
+    return result;   
+    
   }
 }

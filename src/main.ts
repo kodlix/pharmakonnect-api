@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -16,7 +17,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
   app.enableCors();
-  await app.listen(process.env.PORT || 4500);
+  await app.listen(4500);
   console.log(`server running on ${await app.getUrl()} : ` + new Date());
 }
 bootstrap();

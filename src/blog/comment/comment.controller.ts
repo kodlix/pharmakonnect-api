@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Query, HttpException, HttpStatus, UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CommentService } from './comment.service';
 import { CommentDto } from './dto/comment.dto';
 
@@ -28,6 +28,7 @@ export class CommentController {
   }
 
   @Post()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async create(@Param('articleId') articleId: string, @Body() commentDto: CommentDto, @Req() req: any) {
     try {
@@ -39,6 +40,7 @@ export class CommentController {
   }
 
   @Put(':commentId')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async update(@Param('commentId') commentId: string, @Body() commentDto: CommentDto) {
     try {
@@ -48,7 +50,30 @@ export class CommentController {
     }
   }
 
+  @Put(':commentId/like')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async likeComment(@Param('commentId') commentId: string) {
+    try {
+      return await this.commentService.likeComment(commentId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Put(':commentId/dislike')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async dislikeComment(@Param('commentId') commentId: string) {
+    try {
+      return await this.commentService.dislikeComment(commentId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   @Delete(':commentId')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async remove(@Param('commentId') commentId: string) {
     try {

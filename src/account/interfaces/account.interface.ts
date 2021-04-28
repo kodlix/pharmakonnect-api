@@ -6,6 +6,7 @@ export interface UserRO {
     accountPackage: string;
     isRegComplete: boolean;
     accountType: string;
+    profileImage: string;
 }
 
 export interface UserFromDbRO {
@@ -14,6 +15,7 @@ export interface UserFromDbRO {
     isRegComplete: boolean;
     accountType: string;
     accountId: string;
+    profileImage: string;
 }
 
 export interface IndividualRO {

@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { ArticleService } from '../article/article.service';
 import { CommentDto } from './dto/comment.dto';
 import { CommentEntity } from './entities/comment.entity';
@@ -21,6 +21,7 @@ export class CommentService {
     }
   }
 
+
   public async findOne(commentId: string) {
     return this.commentRepo.findOneOrFail(commentId, {
       relations: ['article'],
@@ -36,6 +37,7 @@ export class CommentService {
     const comment = new CommentEntity();
     comment.article = article;
     comment.message = commentDto.message;
+    comment.createdBy = commentDto.createdBy;
     comment.author = (await this.accountService.getOneUserByEmail(userEmail)).email;
     const createdComment = await this.commentRepo.save(comment);
     return this.findOne(createdComment.id);
@@ -55,6 +57,24 @@ export class CommentService {
   public async remove(commentId: string): Promise<CommentEntity> {
     const comment = await this.commentRepo.findOneOrFail(commentId);
     return this.commentRepo.remove(comment);
+  }
+
+  public async likeComment(commentId): Promise<CommentEntity> {
+    const comment = await this.commentRepo.findOne(commentId);
+    const liked = await comment.likeComment();
+    await this.commentRepo.update(commentId, liked);
+    
+    const result = await this.commentRepo.findOne(commentId);
+    return result;
+  }
+
+  public async dislikeComment(commentId): Promise<CommentEntity> {
+    const comment = await this.findOne(commentId);
+    const disliked = await comment.dislikeComment();
+    await this.commentRepo.update(commentId, disliked);
+
+    const result = await this.commentRepo.findOne(commentId);
+    return result;
   }
 
 }
