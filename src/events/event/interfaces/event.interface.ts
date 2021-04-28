@@ -19,7 +19,6 @@ export interface EventRO {
     online: boolean;
     free: boolean;
     active: boolean;
-    requireAccessCode: boolean;
     requireUniqueAccessCode: boolean;
     requireRegistration: boolean;
     published: boolean;

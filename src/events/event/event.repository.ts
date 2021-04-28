@@ -47,7 +47,7 @@ export class EventRepository extends Repository<EventEntity> {
             }
         }
 
-        if(payload.requireAccessCode || payload.requireUniqueAccessCode) {
+        if(payload.requireUniqueAccessCode) {
             if(!payload.accessCode) {
                 throw new HttpException( `Please provide the access code to the event.`, HttpStatus.BAD_REQUEST);
             }
@@ -176,7 +176,7 @@ export class EventRepository extends Repository<EventEntity> {
                 }
             }
     
-            if(payload.requireAccessCode || payload.requireUniqueAccessCode) {
+            if(payload.requireUniqueAccessCode) {
                 if(!payload.accessCode) {
                     throw new HttpException( `Please provide the access code to the event.`, HttpStatus.BAD_REQUEST);
                 }
@@ -251,7 +251,7 @@ export class EventRepository extends Repository<EventEntity> {
             }
         }
 
-        if(eventRegistringFor.requireUniqueAccessCode || eventRegistringFor.requireAccessCode) {
+        if(eventRegistringFor.requireUniqueAccessCode) {
             if(!payload.accessCode) {
                 throw new HttpException(`Please provide the access code for this event`, HttpStatus.BAD_REQUEST);
             }

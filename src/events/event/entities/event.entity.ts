@@ -63,9 +63,6 @@ export class EventEntity extends AbstractBaseEntity{
     active: boolean
 
     @Column({ type: 'bool', default: false})
-    requireAccessCode: boolean;
-
-    @Column({ type: 'bool', default: false})
     requireUniqueAccessCode: boolean;
 
     @Column({ type: 'bool', default: false})
