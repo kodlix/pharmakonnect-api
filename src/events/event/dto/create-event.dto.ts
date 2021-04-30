@@ -102,11 +102,6 @@ export class CreateEventDto {
     @ApiProperty({default: false})
     @ApiPropertyOptional()
     @IsOptional()
-    requireAccessCode: boolean;
-
-    @ApiProperty({default: false})
-    @ApiPropertyOptional()
-    @IsOptional()
     requireUniqueAccessCode: boolean;
 
     @ApiProperty({default: false})
@@ -114,7 +109,7 @@ export class CreateEventDto {
     @IsOptional()
     requireRegistration: boolean;
 
-
+    
     @ApiProperty()
     @ApiPropertyOptional()
     @IsOptional()

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Req, UseInterceptors, ClassSerializerInterceptor, Query, Patch, UseGuards, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Req, UseInterceptors, ClassSerializerInterceptor, Query, Patch, UseGuards, UploadedFile, HttpException, HttpStatus } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -69,6 +69,9 @@ export class EventController {
   @ApiOperation({ summary: 'Publish event' })
   @ApiResponse({ status: 200, description: 'Return event successfully published' })
   async publishEvent(@Param('id') id: string, @Req() req: any) : Promise<string> {
+    if(req.user.accountType != 'Admin') {
+      throw new HttpException('Only an admin user can publish event.', HttpStatus.BAD_REQUEST)
+    }
     return await this.eventService.publishEvent(id, req.user);
   }
 

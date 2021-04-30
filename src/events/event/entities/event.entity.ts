@@ -38,7 +38,7 @@ export class EventEntity extends AbstractBaseEntity{
     @Column({nullable: true})
     coverImage: string;
 
-    @Column({type: "varchar", nullable: true, length: 128})
+    @Column({unique: true, type: "varchar", nullable: true, length: 128})
     accessCode: string;
 
     @Column({type: "varchar", length: 128})
@@ -61,9 +61,6 @@ export class EventEntity extends AbstractBaseEntity{
 
     @Column({ type: 'bool', default: true })
     active: boolean
-
-    @Column({ type: 'bool', default: false})
-    requireAccessCode: boolean;
 
     @Column({ type: 'bool', default: false})
     requireUniqueAccessCode: boolean;
