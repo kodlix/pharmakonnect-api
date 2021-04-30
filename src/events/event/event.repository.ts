@@ -93,11 +93,12 @@ export class EventRepository extends Repository<EventEntity> {
         if(search) {
 
            const events =  await this.createQueryBuilder("event")
-                     .innerJoinAndSelect("event.eventUsers", "eventUsers")
+                    .innerJoinAndSelect("event.eventUsers", "eventUsers")
                     .where(new Brackets(qb => {
                         qb.where("event.name ILike :name", { name: `%${search}%` })
                         .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
                     }))
+                    .andWhere("event.published = true")
                     .orderBy("event.createdAt", "DESC")
                     .skip(15 * (page ? page - 1 : 0))
                     .take(15)
@@ -119,7 +120,7 @@ export class EventRepository extends Repository<EventEntity> {
         if(search) {
 
            const events =  await this.createQueryBuilder("event")
-                     .innerJoinAndSelect("event.eventUsers", "eventUsers")
+                    .innerJoinAndSelect("event.eventUsers", "eventUsers")
                     .where("event.accountId = :accountId", { accountId: user.id })
                     .andWhere(new Brackets(qb => {
                         qb.where("event.name ILike :name", { name: `%${search}%` })
