@@ -97,11 +97,6 @@ export class UpdateEventDto {
     @ApiProperty({default: false})
     @ApiPropertyOptional()
     @IsOptional()
-    requireAccessCode: boolean;
-
-    @ApiProperty({default: false})
-    @ApiPropertyOptional()
-    @IsOptional()
     requireUniqueAccessCode: boolean;
 
     @ApiProperty({default: false})

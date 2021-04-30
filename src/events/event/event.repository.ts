@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
-import {Brackets, DeleteResult, EntityRepository, getCustomRepository, Repository} from "typeorm";
+import {Brackets, DeleteResult, EntityRepository, getCustomRepository, ILike, Repository} from "typeorm";
 import { plainToClass, plainToClassFromExist } from 'class-transformer';
 import {validate} from 'class-validator';
 import { FilterDto } from "src/_common/filter.dto";
@@ -20,6 +20,16 @@ export class EventRepository extends Repository<EventEntity> {
 
 
     async saveEvent(filename: string, payload: CreateEventDto, user: AccountEntity) : Promise<string> {
+
+        const isEventName = await this.findOne({where: {name: ILike(`%${payload.name}%`)}});
+        if(isEventName) {
+            throw new HttpException( `Event with ${payload.name} already exist`, HttpStatus.BAD_REQUEST);
+        }
+
+        const isAccessCodeExist = await this.findOne({where: {accessCode: ILike(`%${payload.accessCode}%`)}});
+        if(isAccessCodeExist) {
+            throw new HttpException( `Event with ${payload.accessCode} already exist`, HttpStatus.BAD_REQUEST);
+        }
 
         if(new Date(payload.endDate).setHours(0,0,0,0) < new Date(payload.startDate).setHours(0,0,0,0)) {
             throw new HttpException(`Start date of event cannot be greater than End date`, HttpStatus.BAD_REQUEST,);
@@ -47,7 +57,7 @@ export class EventRepository extends Repository<EventEntity> {
             }
         }
 
-        if(payload.requireAccessCode || payload.requireUniqueAccessCode) {
+        if(payload.requireUniqueAccessCode) {
             if(!payload.accessCode) {
                 throw new HttpException( `Please provide the access code to the event.`, HttpStatus.BAD_REQUEST);
             }
@@ -154,6 +164,20 @@ export class EventRepository extends Repository<EventEntity> {
         const event = await this.findOne(id);
         if (event ) {
 
+            if( event.name != payload.name) { 
+                const isEventName = await this.findOne({where: {name: ILike(`%${payload.name}%`)}});
+                if(isEventName) {
+                    throw new HttpException( `Event with ${payload.name} already exist`, HttpStatus.BAD_REQUEST);
+                }
+            }
+
+            if( event.accessCode != payload.accessCode) { 
+                const isAccessCodeExist = await this.findOne({where: {accessCode: ILike(`%${payload.accessCode}%`)}});
+                if(isAccessCodeExist) {
+                    throw new HttpException( `Event with ${payload.accessCode} already exist`, HttpStatus.BAD_REQUEST);
+                }
+            }
+
             if(new Date(payload.endDate).setHours(0,0,0,0) < new Date(payload.startDate).setHours(0,0,0,0)) {
                 throw new HttpException(`Start date of event cannot be greater than End date`, HttpStatus.BAD_REQUEST,);
             }
@@ -176,7 +200,7 @@ export class EventRepository extends Repository<EventEntity> {
                 }
             }
     
-            if(payload.requireAccessCode || payload.requireUniqueAccessCode) {
+            if(payload.requireUniqueAccessCode) {
                 if(!payload.accessCode) {
                     throw new HttpException( `Please provide the access code to the event.`, HttpStatus.BAD_REQUEST);
                 }
@@ -201,13 +225,14 @@ export class EventRepository extends Repository<EventEntity> {
 
     async publishEvent(id: string, user: AccountEntity): Promise<string> {
         const ev = await this.findOne(id);
+        
         if(!ev) {
             throw new HttpException(`The event with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
         }
 
-        if(ev.accountId != user.id) {
-            throw new HttpException(`You can only publish an event created by you`, HttpStatus.NOT_FOUND);
-        }
+        // if(ev.accountId != user.id) {
+        //     throw new HttpException(`You can only publish an event created by you`, HttpStatus.NOT_FOUND);
+        // }
 
         ev.published = true;
         ev.publishedOn = new Date();
@@ -251,7 +276,7 @@ export class EventRepository extends Repository<EventEntity> {
             }
         }
 
-        if(eventRegistringFor.requireUniqueAccessCode || eventRegistringFor.requireAccessCode) {
+        if(eventRegistringFor.requireUniqueAccessCode) {
             if(!payload.accessCode) {
                 throw new HttpException(`Please provide the access code for this event`, HttpStatus.BAD_REQUEST);
             }
