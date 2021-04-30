@@ -7,13 +7,13 @@ import { ScheduleMeetingsRO } from './interfaces/schedule-meetings.interface';
 import { AuthGuard } from '@nestjs/passport';
 import { FilterDto } from 'src/_common/filter.dto';
 
-@Controller('meeting')
 @ApiBearerAuth()
-@UseGuards(AuthGuard())
+@Controller('meeting')
 @ApiTags('schedule-meeting')
 export class ScheduleMeetingsController {
   constructor(private readonly scheduleMeetingsService: ScheduleMeetingsService) {}
 
+  @UseGuards(AuthGuard())
   @Post('/schedule-meeting')
   @ApiOperation({ summary: 'Save meeting scheduling' })
   @ApiResponse({ status: 400, description: 'Bad request' })
@@ -22,6 +22,7 @@ export class ScheduleMeetingsController {
     return await this.scheduleMeetingsService.create(createScheduleMeetingDto, req.user);
   }
 
+  @UseGuards(AuthGuard())
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   @ApiOperation({ summary: 'Get all meetings' })
@@ -37,6 +38,7 @@ export class ScheduleMeetingsController {
     return await this.scheduleMeetingsService.findOne(id);
   }
 
+  @UseGuards(AuthGuard())
   @Put(':id')
   @ApiOperation({ summary: 'Update a meeting' })
   @ApiResponse({ status: 200, description: 'Return meeting successfully updated' })
@@ -44,6 +46,7 @@ export class ScheduleMeetingsController {
     return await this.scheduleMeetingsService.update(id, updateScheduleMeetingDto, req);
   }
 
+  @UseGuards(AuthGuard())
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a meeting' })
   @ApiResponse({ status: 200, description: 'Meeting successfully deleted' })

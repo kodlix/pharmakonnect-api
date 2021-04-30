@@ -11,7 +11,7 @@ export class ScheduleMeetingEntity extends AbstractBaseEntity{
     @Column({unique: true, type: "varchar", length: 128})
     topic: string;
 
-    @Column({type: "varchar", length: 128})
+    @Column({type: "varchar"})
     description: string;
 
     @Column({type: 'int'})
