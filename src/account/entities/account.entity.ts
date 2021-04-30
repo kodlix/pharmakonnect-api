@@ -12,7 +12,6 @@ import { PackageFeatureEntity } from 'src/package/entities/packagefeature.entity
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
-  // co-operation and individual
   @IsEmail()
   @Length(128)
   @Column({ unique: true, length: 128 })
@@ -72,6 +71,10 @@ export class AccountEntity extends AbstractBaseEntity {
   @Length(50)
   @Column({ nullable: true, length: 50 })
   public pcn: string;
+
+  @Length(50)
+  @Column({ nullable: true, length: 50 })
+  public typesOfPractice: string;
 
   @Length(128)
   @Column({ nullable: true, length: 128 })

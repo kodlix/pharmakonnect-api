@@ -43,5 +43,7 @@ export abstract class BaseAccountDTO {
     @ApiProperty()
     readonly profileImage: string;
     @ApiProperty()
-    isRegComplete: boolean;
+    isRegComplete: boolean;    
+    @ApiProperty()
+    readonly typesOfPractice: string;
 }
