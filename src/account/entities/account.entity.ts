@@ -9,6 +9,7 @@ import { ArticleEntity } from "src/blog/article/entities/article.entity";
 import { PollEntity } from 'src/poll/entities/poll.entity';
 import { FeatureEntity } from 'src/features/entity/feature.entity';
 import { PackageFeatureEntity } from 'src/package/entities/packagefeature.entity';
+import { AdvertEntity } from 'src/advert/entity/advert.entity';
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
@@ -151,6 +152,9 @@ export class AccountEntity extends AbstractBaseEntity {
 
   @OneToMany(() => JobVacancyEntity, (s) => s.account)
   jobVacancy: JobVacancyEntity[];
+
+  @OneToMany(() => AdvertEntity, (s) => s.account)
+  advert: AdvertEntity[];
 
   @OneToMany(() => FeatureEntity, (s) => s.account)
   feature: FeatureEntity[];
