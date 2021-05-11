@@ -1,7 +1,7 @@
 import { Exclude } from "class-transformer";
 import { AccountEntity } from "src/account/entities/account.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
-import { Column, Entity, ManyToOne, OneToMany, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { AdvertCategoryEntity } from "./advertcategory.entity";
 import { ClickEntity } from "./click.entity";
 import { ImpressionEntity } from "./impressions.entity";
@@ -40,13 +40,15 @@ export class AdvertEntity extends AbstractBaseEntity{
     contactPhoneNumber: string;
 
     @Column('uuid')
-    advertCategoryId
+    advertCategoryId: string;
 
     @Column({ nullable: true })
     advertImage: string;
 
-    @OneToOne(() => AdvertCategoryEntity, (s) => s.advert)
+    @ManyToOne(() => AdvertCategoryEntity, (s) => s.advert)
+    @JoinColumn()
     advertCategory: AdvertCategoryEntity;
+
 
     @OneToMany(() => ClickEntity, (s) => s.advert)
     click: ClickEntity[];
