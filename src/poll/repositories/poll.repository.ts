@@ -47,18 +47,19 @@ export class PollRepository extends Repository<PollEntity> {
   }
 
     const pollId = uuidv4().toString();
-
     const poll = plainToClass(PollEntity, dto);
     poll.id = pollId;
     poll.accountId = user.id;
     poll.createdBy = user.email;
     poll.createdAt = new Date()
     if (poll.questions?.length > 0) {
-      for (const question of poll.questions) {
+      for (const [index, question] of poll.questions.entries()) {
         question.id = uuidv4();
         question.createdBy = user.email;
         question.createdAt = new Date()
         question.pollId = pollId;
+        question.pollType = poll.type;
+        question.SN = index + 1;
 
         if (question.options?.length > 0) {
           for (const option of question.options) {

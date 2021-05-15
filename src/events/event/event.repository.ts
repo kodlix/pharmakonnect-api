@@ -26,11 +26,6 @@ export class EventRepository extends Repository<EventEntity> {
             throw new HttpException( `Event with ${payload.name} already exist`, HttpStatus.BAD_REQUEST);
         }
 
-        const isAccessCodeExist = await this.findOne({where: {accessCode: ILike(`%${payload.accessCode}%`)}});
-        if(isAccessCodeExist) {
-            throw new HttpException( `Event with ${payload.accessCode} already exist`, HttpStatus.BAD_REQUEST);
-        }
-
         if(new Date(payload.endDate).setHours(0,0,0,0) < new Date(payload.startDate).setHours(0,0,0,0)) {
             throw new HttpException(`Start date of event cannot be greater than End date`, HttpStatus.BAD_REQUEST,);
         }
@@ -58,8 +53,14 @@ export class EventRepository extends Repository<EventEntity> {
         }
 
         if(payload.requireUniqueAccessCode) {
+            
             if(!payload.accessCode) {
                 throw new HttpException( `Please provide the access code to the event.`, HttpStatus.BAD_REQUEST);
+            }
+
+            const isAccessCodeExist = await this.findOne({where: {accessCode: ILike(`%${payload.accessCode}%`)}});
+            if(isAccessCodeExist) {
+                throw new HttpException( `Event with ${payload.accessCode} already exist`, HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -93,11 +94,12 @@ export class EventRepository extends Repository<EventEntity> {
         if(search) {
 
            const events =  await this.createQueryBuilder("event")
-                     .innerJoinAndSelect("event.eventUsers", "eventUsers")
+                    .innerJoinAndSelect("event.eventUsers", "eventUsers")
                     .where(new Brackets(qb => {
                         qb.where("event.name ILike :name", { name: `%${search}%` })
                         .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
                     }))
+                    .andWhere("event.published = true")
                     .orderBy("event.createdAt", "DESC")
                     .skip(15 * (page ? page - 1 : 0))
                     .take(15)
@@ -119,7 +121,7 @@ export class EventRepository extends Repository<EventEntity> {
         if(search) {
 
            const events =  await this.createQueryBuilder("event")
-                     .innerJoinAndSelect("event.eventUsers", "eventUsers")
+                    .innerJoinAndSelect("event.eventUsers", "eventUsers")
                     .where("event.accountId = :accountId", { accountId: user.id })
                     .andWhere(new Brackets(qb => {
                         qb.where("event.name ILike :name", { name: `%${search}%` })
@@ -171,13 +173,6 @@ export class EventRepository extends Repository<EventEntity> {
                 }
             }
 
-            if( event.accessCode != payload.accessCode) { 
-                const isAccessCodeExist = await this.findOne({where: {accessCode: ILike(`%${payload.accessCode}%`)}});
-                if(isAccessCodeExist) {
-                    throw new HttpException( `Event with ${payload.accessCode} already exist`, HttpStatus.BAD_REQUEST);
-                }
-            }
-
             if(new Date(payload.endDate).setHours(0,0,0,0) < new Date(payload.startDate).setHours(0,0,0,0)) {
                 throw new HttpException(`Start date of event cannot be greater than End date`, HttpStatus.BAD_REQUEST,);
             }
@@ -203,6 +198,13 @@ export class EventRepository extends Repository<EventEntity> {
             if(payload.requireUniqueAccessCode) {
                 if(!payload.accessCode) {
                     throw new HttpException( `Please provide the access code to the event.`, HttpStatus.BAD_REQUEST);
+                }
+                
+                if( event.accessCode != payload.accessCode) { 
+                    const isAccessCodeExist = await this.findOne({where: {accessCode: ILike(`%${payload.accessCode}%`)}});
+                    if(isAccessCodeExist) {
+                        throw new HttpException( `Event with ${payload.accessCode} already exist`, HttpStatus.BAD_REQUEST);
+                    }
                 }
             }
     

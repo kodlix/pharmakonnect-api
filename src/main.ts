@@ -12,12 +12,16 @@ async function bootstrap() {
     .setDescription('Pharma Connect API description')
     .setVersion('1.0')
     .addBearerAuth()
-    .addTag('api')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: {
+      tagsSorter: 'alpha',
+      operationsSorter: 'alpha',
+    },
+  });
   app.enableCors();
-  await app.listen(process.env.PORT || 4500);
+  await app.listen(process.env.SERVER_PORT || 4500);
   console.log(`server running on ${await app.getUrl()} : ` + new Date());
 }
 bootstrap();

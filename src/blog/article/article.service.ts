@@ -2,6 +2,7 @@ import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/com
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
 import { AccountEntity } from 'src/account/entities/account.entity';
+import { UserLikeService } from 'src/user-like/like.service';
 import { Brackets, Repository } from 'typeorm';
 import { CategoryService } from '../category/category.service';
 import { CategoryEntity } from '../category/entities/category.entity';
@@ -15,6 +16,7 @@ export class ArticleService {
     @InjectRepository(ArticleEntity) private readonly articleRepo: Repository<ArticleEntity>,
     private readonly catService: CategoryService,
     @Inject(forwardRef(() => AccountService)) private readonly accountService: AccountService,
+    @Inject(forwardRef(() => UserLikeService)) private readonly userLikeService: UserLikeService,
     @Inject(forwardRef(() => CommentService)) private readonly commentService: CommentService,
   ) { }
 
@@ -166,28 +168,59 @@ export class ArticleService {
   }
 
 
-  public async likeArticle(articleId): Promise<ArticleEntity> {
+  public async likeArticle(accountId : string, articleId: string): Promise<ArticleEntity> {
     const article = await this.articleRepo.findOne(articleId);
     if (!article) {
       throw new BadRequestException("article does not exist");
     }
-    const liked = await article.likeArticle();
-    await this.articleRepo.update(articleId, liked);
-    
-    const result = await this.articleRepo.findOne(articleId);
-    return result;
+
+    const hasLiked = await this.userLikeService.hasLikedArticle(accountId, articleId);
+
+    if(!hasLiked){
+     article.likes += 1;
+     const hasDisliked = await this.userLikeService.hasdislikedArticle(accountId, articleId);
+     if (hasDisliked && article.dislikes > 0) {
+      article.dislikes -= 1;
+      await this.userLikeService.resetDisLike(accountId, articleId, "article");
+     }
+     await this.userLikeService.likeArticle(accountId, articleId);
+    }     
+     
+    const result = await this.articleRepo.save(article);    
+    return result; 
   }
 
-  public async dislikeArticle(articleId): Promise<ArticleEntity> {
-    const article = await this.findOne(articleId);
+  public async dislikeArticle(accountId, articleId): Promise<ArticleEntity> {
+    const article = await this.articleRepo.findOne(articleId);
     if (!article) {
       throw new BadRequestException("article does not exist");
     }
-    const disliked = await article.dislikeArticle();
-    await this.articleRepo.update(articleId, disliked);
 
-    const result = await this.articleRepo.findOne(articleId);
-    return result;
+    const hasDisliked= await this.userLikeService.hasdislikedArticle(accountId, articleId);
+
+    if(!hasDisliked){
+     article.dislikes += 1;
+     const hasLiked = await this.userLikeService.hasLikedArticle(accountId, articleId); //check if user has liked this article before
+     if (hasLiked && article.likes > 0) {
+      article.likes -= 1;
+      await this.userLikeService.resetLike(accountId, articleId, "article");
+     }
+     await this.userLikeService.dislikeArticle(accountId, articleId);
+    }      
+     
+    const result = await this.articleRepo.save(article);    
+    return result;  
+  }
+
+  public async viewArticle(articleId): Promise<ArticleEntity> {
+    const article = await this.articleRepo.findOne(articleId);
+    if (!article) {
+      return;
+    }
+    
+    article.views += 1;
+    const result = await this.articleRepo.save(article);    
+    return result;  
   }
 
 
