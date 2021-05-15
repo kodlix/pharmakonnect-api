@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AccountService } from 'src/account/account.service';
 import { CategoryService } from '../category/category.service';
 import { ArticleService } from './article.service';
@@ -157,6 +157,51 @@ export class ArticleController {
       return await this.articleService.getArticlesByAuthor(author, page, take);
     } catch (err) {
       throw new HttpException(err, HttpStatus.NO_CONTENT);
+    }
+  }
+
+  @Put('/like/:articleId')
+  @ApiResponse({ status: 201, description: 'liked article successfully.' })
+  @ApiResponse({ status: 404, description: 'Not Found.' })
+  @ApiOperation({ summary: 'Like Article' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  likeArticle(@Param('articleId') articleId: string,  @Req() req ) {
+    try {
+      const { user } = req;
+      return this.articleService.likeArticle(user.id, articleId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
+  }
+
+
+  @Put('/dislike/:articleId')
+  @ApiResponse({ status: 201, description: 'disliked article successfully.' })
+  @ApiResponse({ status: 404, description: 'Not Found.' })
+  @ApiOperation({ summary: 'Dislike Article' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  dislikeArticle(@Param('articleId') articleId: string,  @Req() req ) {
+    try {
+      const { user } = req;
+      return this.articleService.dislikeArticle(user.id, articleId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Put('/view/:articleId')
+  @ApiResponse({ status: 201, description: 'article  viewd successfully.' })
+  @ApiResponse({ status: 404, description: 'Not Found.' })
+  @ApiOperation({ summary: 'View Article' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  viewArticle(@Param('articleId') articleId: string ) {
+    try {
+      return this.articleService.viewArticle(articleId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
     }
   }
 

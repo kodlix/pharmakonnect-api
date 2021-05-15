@@ -6,6 +6,7 @@ import { AccountModule } from 'src/account/account.module';
 import { CategoryModule } from '../category/category.module';
 import { CommentModule } from '../comment/comment.module';
 import { ArticleEntity } from './entities/article.entity';
+import { LikeModule } from 'src/user-like/like.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ArticleEntity } from './entities/article.entity';
     CategoryModule,
     forwardRef(() => CommentModule),
     forwardRef(() => AccountModule),
+    forwardRef(() => LikeModule),
   ],
   controllers: [ArticleController],
   providers: [ArticleService],

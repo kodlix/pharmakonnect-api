@@ -1,5 +1,6 @@
 import { ArticleEntity } from 'src/blog/article/entities/article.entity';
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { UserLikeEntity } from 'src/user-like/entities/like.entity';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 
 @Entity('Comment')
@@ -25,27 +26,14 @@ export class CommentEntity {
 
   @Column({ default: 'n/a' })
   author?: string;
-
+  
   @Column({ default: 0 })
   likes?: number;
 
   @Column({ default: 0 })
   dislikes?: number;
 
-
-  likeComment?(): CommentEntity {
-    this.likes  = this.likes + 1;
-    return this;
-  }
-
-  dislikeComment?(): CommentEntity {
-    this.dislikes  = this.dislikes + 1;
-    return this;
-  }
-
-  @ManyToOne(type => ArticleEntity, article => article.comments)
-  article?: ArticleEntity;
-
-
+  @ManyToOne(() => ArticleEntity, article => article.comments)
+  article?: ArticleEntity;  
 
 }

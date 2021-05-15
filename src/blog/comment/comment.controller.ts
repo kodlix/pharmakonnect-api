@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Query, HttpException, HttpStatus, UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CommentService } from './comment.service';
 import { CommentDto } from './dto/comment.dto';
 
@@ -50,27 +50,6 @@ export class CommentController {
     }
   }
 
-  @Put(':commentId/like')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard())
-  async likeComment(@Param('commentId') commentId: string) {
-    try {
-      return await this.commentService.likeComment(commentId);
-    } catch (err) {
-      throw new HttpException(err, HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  @Put(':commentId/dislike')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard())
-  async dislikeComment(@Param('commentId') commentId: string) {
-    try {
-      return await this.commentService.dislikeComment(commentId);
-    } catch (err) {
-      throw new HttpException(err, HttpStatus.BAD_REQUEST);
-    }
-  }
 
   @Delete(':commentId')
   @ApiBearerAuth()
@@ -78,6 +57,32 @@ export class CommentController {
   async remove(@Param('commentId') commentId: string) {
     try {
       return await this.commentService.remove(commentId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Put('/like/:commentId')
+  @ApiResponse({ status: 201, description: 'liked comment successfully.' })
+  @ApiResponse({ status: 404, description: 'Not Found.' })
+  @ApiOperation({ summary: 'Like Comment' })
+  likeComment(@Param('commentId') commentId: string,  @Req() req ) {
+    try {
+      const { user } = req;
+      return this.commentService.likeComment(user.id, commentId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Put('/dislike/:commentId')
+  @ApiResponse({ status: 201, description: 'disliked comment successfully.' })
+  @ApiResponse({ status: 404, description: 'Not Found.' })
+  @ApiOperation({ summary: 'Disike Comment' })
+  dislikeComment(@Param('commentId') commentId: string,  @Req() req ) {
+    try {
+      const { user } = req;
+      return this.commentService.dislikeComment(user.id, commentId);
     } catch (err) {
       throw new HttpException(err, HttpStatus.NOT_FOUND);
     }
