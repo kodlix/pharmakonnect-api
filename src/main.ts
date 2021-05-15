@@ -21,7 +21,7 @@ async function bootstrap() {
     },
   });
   app.enableCors();
-  await app.listen(process.env.SERVER_PORT || 4500);
+  await app.listen(process.env.PORT || 4500);
   console.log(`server running on ${await app.getUrl()} : ` + new Date());
 }
 bootstrap();
