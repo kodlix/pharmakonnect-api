@@ -162,7 +162,7 @@ export class EventRepository extends Repository<EventEntity> {
 
     }
 
-    async updateEvent(id: string, payload: UpdateEventDto, user: AccountEntity) : Promise<string> {
+    async updateEvent(id: string, filename: string, payload: UpdateEventDto, user: AccountEntity) : Promise<string> {
         const event = await this.findOne(id);
         if (event ) {
 
@@ -211,6 +211,11 @@ export class EventRepository extends Repository<EventEntity> {
 
             event.updatedAt = new Date();
             event.updatedBy = user.updatedBy || user.createdBy;
+
+            if(filename) {
+                event.coverImage = filename;
+            }
+            
 
             const updated = plainToClassFromExist(event, payload);
 

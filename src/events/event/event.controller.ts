@@ -20,7 +20,7 @@ export class EventController {
   constructor(private readonly eventService: EventService) {}
 
    @UseInterceptors(
-     FileInterceptor('image', {
+     FileInterceptor('coverImage', {
        storage: diskStorage({
          destination: './uploads',
          filename: editFileName,
@@ -58,11 +58,20 @@ export class EventController {
     return await this.eventService.findOne(id);
   }
 
+  @UseInterceptors(
+    FileInterceptor('coverImage', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
   @Put(':id')
   @ApiOperation({ summary: 'Update event' })
   @ApiResponse({ status: 200, description: 'Return event successfully updated' })
-  async update(@Param('id') id: string, @Body() request: UpdateEventDto, @Req() req: any): Promise<string> {
-    return await this.eventService.update(id, request, req);
+  async update(@Param('id') id: string, @UploadedFile() file, @Body() request: UpdateEventDto, @Req() req: any): Promise<string> {
+    return await this.eventService.update(id, file ? file.filename : "" , request, req);
   }
 
   @Patch('publish/:id')
