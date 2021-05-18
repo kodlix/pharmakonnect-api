@@ -283,11 +283,11 @@ export class EventRepository extends Repository<EventEntity> {
             }
         }
 
-        if(eventRegistringFor.requireUniqueAccessCode) {
-            if(!payload.accessCode) {
-                throw new HttpException(`Please provide the access code for this event`, HttpStatus.BAD_REQUEST);
-            }
-        }
+        // if(eventRegistringFor.requireUniqueAccessCode) {
+        //     if(!payload.accessCode) {
+        //         throw new HttpException(`Please provide the access code for this event`, HttpStatus.BAD_REQUEST);
+        //     }
+        // }
 
         const userRegisteredForSameEvent = await eventUsersRepository.findByEmailAndEventId(payload.eventId, payload.email);
         if(userRegisteredForSameEvent) {
