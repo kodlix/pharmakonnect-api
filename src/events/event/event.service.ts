@@ -76,6 +76,9 @@ export class EventService {
   }
 
   stringToBoolean(val: any){
+    if(!val) {
+      throw new HttpException( `Please make sure all required fields are set.`, HttpStatus.BAD_REQUEST);
+    }
     switch(val.toLowerCase().trim()){
         case 'true': return true;
         case 'false':return false;
