@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import SendGridMail from '@sendgrid/mail';
 
 @Injectable()
-export default class SendGridService {
+export class MailerService {
   constructor() {
     if (process.env.SENDGRID_API_KEY && process.env.SENDGRID_FROM_EMAIL) {
       SendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
