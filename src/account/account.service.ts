@@ -12,7 +12,7 @@ import * as nodemailer from 'nodemailer';
 import * as SendGrid from "@sendgrid/mail";
 import { default as config } from './config';
 import { AccountEntity } from './entities/account.entity';
-SendGrid.setApiKey("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");
+SendGrid.setApiKey("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");
 
 
 @Injectable()

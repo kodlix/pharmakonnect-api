@@ -265,16 +265,20 @@ export class EventRepository extends Repository<EventEntity> {
             throw new HttpException(`The event you are trying to register for is invalid or does not exist`, HttpStatus.BAD_REQUEST);
         }
 
-        if(today.getDate() > new Date(eventRegistringFor.startDate).getDate()) {
-            throw new HttpException(`This event does not accept registration anymore`, HttpStatus.BAD_REQUEST);
-        }
-
         if(!eventRegistringFor.requireRegistration) {
             throw new HttpException(`Invalid request, you cannot register for this event at this time.`, HttpStatus.BAD_REQUEST);
         }
 
         if(!eventRegistringFor.published) {
             throw new HttpException(`This event has not been published yet`, HttpStatus.BAD_REQUEST);
+        }
+
+        if(today.getDate() > new Date(eventRegistringFor.startDate).getDate()) {
+            throw new HttpException(`This event does not accept registration anymore`, HttpStatus.BAD_REQUEST);
+        }
+
+        if(today.getDate() > new Date(eventRegistringFor.endDate).getDate()) {
+            throw new HttpException(`The event has ended.`, HttpStatus.BAD_REQUEST);
         }
 
         if(eventRegistringFor.cost > 0) {
@@ -301,7 +305,7 @@ export class EventRepository extends Repository<EventEntity> {
             throw new HttpException(`Sorry, The maximum number of participants has been reached for this event`, HttpStatus.BAD_REQUEST);
         }
 
-        return await eventUsersRepository.createEventUsers(payload, user);
+        return await eventUsersRepository.createEventUsers(payload, user, eventRegistringFor);
 
     }
 
