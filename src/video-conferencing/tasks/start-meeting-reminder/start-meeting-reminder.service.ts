@@ -5,7 +5,7 @@ import { ScheduleMeetingRepository } from 'src/video-conferencing/schedule-meeti
 import { Connection } from 'typeorm';
 import * as SendGrid from "@sendgrid/mail";
 import { isNotValidTime } from 'src/_utility/time-validator.util';
-SendGrid.setApiKey("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")
+SendGrid.setApiKey("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")
 
 
 @Injectable()
@@ -58,12 +58,12 @@ export class StartMeetingReminderService {
                       msr.startTime = msr.startTime.split(':')[0] >= 12 ? `${msr.startTime} PM` : `${msr.startTime} AM`;
 
                       msg.to = msr.schedulerEmail;
-                      msg.from = 'zack.aminu@netopconsult.com';
+                      msg.from = 'Kaapsule <zack.aminu@netopconsult.com>';
                       msg.subject = `Reminder to Start your scheduled meeting`,
                       msg.html = `<p> Dear ${msr.schedulerName}, </p>
                           <p> Due to your busy schedule, this is a reminder email for you to Start the meeting you scheduled for <strong>${msr.startDate}</strong> at <strong>${msr.startTime}</strong>.</p>
                           <p> Please login to your account and proceed to start meeting.</p>
-                          <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`
+                          <p> Thank you for choosing <strong> Kaapsul. </strong></p>`
 
                       messages.push(msg);
                       msg = {};
@@ -85,6 +85,7 @@ export class StartMeetingReminderService {
 
               } catch (error) {
                   console.log(`error while sending reminder - ${error}`);
+                  Logger.log(`error while sending reminder - ${error}`);
               }
           }
 

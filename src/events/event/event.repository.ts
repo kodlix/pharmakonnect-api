@@ -140,7 +140,7 @@ export class EventRepository extends Repository<EventEntity> {
 
     async findEventById(id: string): Promise<EventRO> {
 
-        const event = await this.findOne(id);
+        const event = await this.findOne(id, {relations: ['eventUsers']});
         if(event) {
             return event;
         }
@@ -162,7 +162,7 @@ export class EventRepository extends Repository<EventEntity> {
 
     }
 
-    async updateEvent(id: string, payload: UpdateEventDto, user: AccountEntity) : Promise<string> {
+    async updateEvent(id: string, filename: string, payload: UpdateEventDto, user: AccountEntity) : Promise<string> {
         const event = await this.findOne(id);
         if (event ) {
 
@@ -212,6 +212,11 @@ export class EventRepository extends Repository<EventEntity> {
             event.updatedAt = new Date();
             event.updatedBy = user.updatedBy || user.createdBy;
 
+            if(filename) {
+                event.coverImage = filename;
+            }
+            
+
             const updated = plainToClassFromExist(event, payload);
 
             try {
@@ -260,10 +265,6 @@ export class EventRepository extends Repository<EventEntity> {
             throw new HttpException(`The event you are trying to register for is invalid or does not exist`, HttpStatus.BAD_REQUEST);
         }
 
-        if(today.getDate() > new Date(eventRegistringFor.startDate).getDate()) {
-            throw new HttpException(`This event does not accept registration anymore`, HttpStatus.BAD_REQUEST);
-        }
-
         if(!eventRegistringFor.requireRegistration) {
             throw new HttpException(`Invalid request, you cannot register for this event at this time.`, HttpStatus.BAD_REQUEST);
         }
@@ -272,16 +273,26 @@ export class EventRepository extends Repository<EventEntity> {
             throw new HttpException(`This event has not been published yet`, HttpStatus.BAD_REQUEST);
         }
 
+        if(today.getDate() > new Date(eventRegistringFor.startDate).getDate()) {
+            throw new HttpException(`This event does not accept registration anymore`, HttpStatus.BAD_REQUEST);
+        }
+
+        if(today.getDate() > new Date(eventRegistringFor.endDate).getDate()) {
+            throw new HttpException(`The event has ended.`, HttpStatus.BAD_REQUEST);
+        }
+
         if(eventRegistringFor.cost > 0) {
+
             if(!payload.paid) {
                 throw new HttpException(`Sorry, This a paid event, make sure you complete your payment before proceeding`, HttpStatus.BAD_REQUEST);
             }
         }
 
         if(eventRegistringFor.requireUniqueAccessCode) {
-            if(!payload.accessCode) {
-                throw new HttpException(`Please provide the access code for this event`, HttpStatus.BAD_REQUEST);
+            if(!eventRegistringFor.accessCode) {
+                throw new HttpException(`This event does not have an access code.`, HttpStatus.BAD_REQUEST);
             }
+            payload.accessCode = (Math.floor(Math.random() * (9000000)) + 1000000).toString();
         }
 
         const userRegisteredForSameEvent = await eventUsersRepository.findByEmailAndEventId(payload.eventId, payload.email);
@@ -294,7 +305,7 @@ export class EventRepository extends Repository<EventEntity> {
             throw new HttpException(`Sorry, The maximum number of participants has been reached for this event`, HttpStatus.BAD_REQUEST);
         }
 
-        return await eventUsersRepository.createEventUsers(payload, user);
+        return await eventUsersRepository.createEventUsers(payload, user, eventRegistringFor);
 
     }
 
