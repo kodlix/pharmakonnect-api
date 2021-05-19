@@ -29,6 +29,7 @@ import { PollModule } from './poll/poll.module';
 import { PackageModule } from './package/package.module';
 import { FeatureModule } from './features/feature.module';
 import { SendgridModule } from './sendgrid/sendgrid.module';
+import { LikeModule } from './user-like/like.module';
 
 
 @Module({
@@ -57,7 +58,8 @@ import { SendgridModule } from './sendgrid/sendgrid.module';
     PollModule,
     PackageModule,
     FeatureModule,
-    SendgridModule
+    SendgridModule,
+    LikeModule
   ],
   controllers: [AppController],
   providers: [AppService],

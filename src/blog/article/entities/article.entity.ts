@@ -1,14 +1,17 @@
 import { AccountEntity } from 'src/account/entities/account.entity';
 import { CategoryEntity } from 'src/blog/category/entities/category.entity';
 import { CommentEntity } from 'src/blog/comment/entities/comment.entity';
+import { UserLikeEntity } from 'src/user-like/entities/like.entity';
 import {
     Column,
   CreateDateColumn,
     Entity,
+    JoinColumn,
     JoinTable,
     ManyToMany,
     ManyToOne,
     OneToMany,
+    OneToOne,
     PrimaryGeneratedColumn,
   } from 'typeorm';
     
@@ -41,7 +44,8 @@ import {
 
     @Column({ length: 512,  nullable: true })
     rejectMessage?: string;
-  
+
+    
     @Column({ default: 0 })
     claps?: number;
   
@@ -68,24 +72,14 @@ import {
       this.editedAt = new Date();
       return this;
     }
-
-    likeArticle?(): ArticleEntity {
-      this.likes  = this.likes + 1;
-      return this;
-    }
   
-    dislikeArticle?(): ArticleEntity {
-      this.dislikes  = this.dislikes + 1;
-      return this;
-    }
-  
-    @OneToMany(type => CommentEntity, comment => comment.article)
+    @OneToMany(() => CommentEntity, comment => comment.article)
     comments?: CommentEntity[];
   
-    @ManyToOne(type => AccountEntity, user => user.articles)
+    @ManyToOne(() => AccountEntity, user => user.articles)
     author?: AccountEntity;
-  
-    @ManyToMany(type => CategoryEntity, category => category.articles)
+    
+    @ManyToMany(() => CategoryEntity, category => category.articles)
     @JoinTable({ name: 'article_category'})
     categories?: CategoryEntity[];
   }

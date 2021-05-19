@@ -1,6 +1,7 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
+import { UserLikeService } from 'src/user-like/like.service';
 import { Repository, UpdateResult } from 'typeorm';
 import { ArticleService } from '../article/article.service';
 import { CommentDto } from './dto/comment.dto';
@@ -11,6 +12,7 @@ export class CommentService {
   constructor(
     @InjectRepository(CommentEntity) private readonly commentRepo: Repository<CommentEntity>,
     @Inject(forwardRef(() => ArticleService)) private readonly articleService: ArticleService,
+    @Inject(forwardRef(() => UserLikeService)) private readonly userLikeService: UserLikeService,
     @Inject(forwardRef(() => AccountService)) private readonly accountService: AccountService
   ) { }
 
@@ -59,22 +61,48 @@ export class CommentService {
     return this.commentRepo.remove(comment);
   }
 
-  public async likeComment(commentId): Promise<CommentEntity> {
+  public async likeComment(accountId : string, commentId: string): Promise<CommentEntity> {
     const comment = await this.commentRepo.findOne(commentId);
-    const liked = await comment.likeComment();
-    await this.commentRepo.update(commentId, liked);
-    
-    const result = await this.commentRepo.findOne(commentId);
-    return result;
+    if (!comment) {
+      throw new BadRequestException("comment does not exist");
+    }
+
+    const hasLiked = await this.userLikeService.hasLikedComment(accountId, commentId);
+
+    if(!hasLiked){
+     comment.likes += 1;
+     const hasDisliked = await this.userLikeService.hasdislikedComment(accountId, commentId);
+     if (hasDisliked && comment.dislikes > 0) {
+      comment.dislikes -= 1;
+      await this.userLikeService.resetDisLike(accountId, commentId, "comment");
+     }
+     await this.userLikeService.likeComment(accountId, commentId);
+    }     
+     
+    const result = await this.commentRepo.save(comment);    
+    return result; 
   }
 
-  public async dislikeComment(commentId): Promise<CommentEntity> {
-    const comment = await this.findOne(commentId);
-    const disliked = await comment.dislikeComment();
-    await this.commentRepo.update(commentId, disliked);
+  public async dislikeComment(accountId, commentId): Promise<CommentEntity> {
+    const comment = await this.commentRepo.findOne(commentId);
+    if (!comment) {
+      throw new BadRequestException("comment does not exist");
+    }
 
-    const result = await this.commentRepo.findOne(commentId);
-    return result;
+    const hasDisliked= await this.userLikeService.hasdislikedComment(accountId, commentId);
+
+    if(!hasDisliked){
+     comment.dislikes += 1;
+     const hasLiked = await this.userLikeService.hasLikedComment(accountId, commentId); //check if user has liked this comment before
+     if (hasLiked && comment.likes > 0) {
+      comment.likes -= 1;
+      await this.userLikeService.resetLike(accountId, commentId, "comment");
+     }
+     await this.userLikeService.dislikeComment(accountId, commentId);
+    }      
+     
+    const result = await this.commentRepo.save(comment);    
+    return result;  
   }
 
 }
