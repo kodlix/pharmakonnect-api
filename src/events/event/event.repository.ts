@@ -140,7 +140,7 @@ export class EventRepository extends Repository<EventEntity> {
 
     async findEventById(id: string): Promise<EventRO> {
 
-        const event = await this.findOne(id);
+        const event = await this.findOne(id, {relations: ['eventUsers']});
         if(event) {
             return event;
         }
