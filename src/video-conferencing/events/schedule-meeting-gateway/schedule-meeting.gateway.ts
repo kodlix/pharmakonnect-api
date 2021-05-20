@@ -252,8 +252,8 @@ import { gatewayData } from './gateway-data.interface';
 
     @SubscribeMessage('newUserStart')
     public handleNewUserStart(client: Socket, data: any): void {
-
-        client.to( data.to ).emit( 'newUserStart', { sender: data.sender } );
+        const userThatStart = this.meetings.find(x => x.socketId === data.sender);
+        client.to( data.to ).emit( 'newUserStart', { sender: data.sender, user: userThatStart ? userThatStart.name : '' } );
     }
 
     @SubscribeMessage('sdp')
