@@ -96,8 +96,8 @@ import {
 
     @SubscribeMessage('newUserStart')
     public handleNewUserStart(client: Socket, data: any): void {
-
-        client.to( data.to ).emit( 'newUserStart', { sender: data.sender } );
+        let userName = this.users[data.sender];
+        client.to( data.to ).emit( 'newUserStart', { sender: data.sender, user: userName.split('*')[0] } );
     }
 
     @SubscribeMessage('sdp')
