@@ -6,7 +6,6 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { ScheduleMeetingsRO } from './interfaces/schedule-meetings.interface';
 import { AuthGuard } from '@nestjs/passport';
 import { FilterDto } from 'src/_common/filter.dto';
-import { ScheduleMeetingEntity } from './entities/schedule-meeting.entity';
 
 @ApiBearerAuth()
 @Controller('meeting')
@@ -28,14 +27,14 @@ export class ScheduleMeetingsController {
   @Get()
   @ApiOperation({ summary: 'Get all meetings' })
   @ApiResponse({ status: 200, description: 'Return all meetings' })
-  async findAll(@Query() filterDto: FilterDto,  @Req() req: any ) : Promise<ScheduleMeetingEntity[]>{
+  async findAll(@Query() filterDto: FilterDto,  @Req() req: any ) : Promise<ScheduleMeetingsRO[]>{
     return await this.scheduleMeetingsService.findAll(filterDto, req.user);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a meeting' })
   @ApiResponse({ status: 200, description: 'Return a meeting' })
-  async findOne(@Param('id') id: string) : Promise<ScheduleMeetingEntity> {
+  async findOne(@Param('id') id: string) : Promise<ScheduleMeetingsRO> {
     return await this.scheduleMeetingsService.findOne(id);
   }
 

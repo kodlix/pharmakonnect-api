@@ -4,7 +4,6 @@ import { FilterDto } from 'src/_common/filter.dto';
 import { DeleteResult } from 'typeorm';
 import { CreateScheduleMeetingDto } from './dto/create-schedule-meeting.dto';
 import { UpdateScheduleMeetingDto } from './dto/update-schedule-meeting.dto';
-import { ScheduleMeetingEntity } from './entities/schedule-meeting.entity';
 import { ScheduleMeetingsRO } from './interfaces/schedule-meetings.interface';
 import { ScheduleMeetingRepository } from './schedule-meeting.repository';
 
@@ -17,11 +16,11 @@ export class ScheduleMeetingsService {
       return await this.scheduleMeetingsRepo.saveMeetingSchedule(request, user);
   }
 
-  async findAll(queryParam: FilterDto, user: AccountEntity): Promise<ScheduleMeetingEntity[]> {
+  async findAll(queryParam: FilterDto, user: AccountEntity): Promise<ScheduleMeetingsRO[]> {
     return await this.scheduleMeetingsRepo.getAllMeetingsSchedules(queryParam, user);
   }
 
-  async findOne(id: string) : Promise<ScheduleMeetingEntity>{
+  async findOne(id: string) : Promise<ScheduleMeetingsRO>{
     return await this.scheduleMeetingsRepo.findMeetingById(id);
   }
 

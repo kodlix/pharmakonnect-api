@@ -62,7 +62,7 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
 
     }
 
-    async getAllMeetingsSchedules({search, page}: FilterDto, user: AccountEntity): Promise<ScheduleMeetingEntity[]> {
+    async getAllMeetingsSchedules({search, page}: FilterDto, user: AccountEntity): Promise<ScheduleMeetingsRO[]> {
         
         if(!user.id) {
             throw new HttpException( `User Id is required.`, HttpStatus.BAD_REQUEST);
@@ -87,7 +87,7 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
         return await this.find({where: {accountId: user.id}, order: {createdAt: 'DESC'}, take: 15, skip: page ? 15 * (page - 1) : 0});
     }
 
-    async findMeetingById(id: string): Promise<ScheduleMeetingEntity> {
+    async findMeetingById(id: string): Promise<ScheduleMeetingsRO> {
 
         const meeting = await this.findOne(id);
         if(meeting) {
@@ -97,7 +97,7 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
 
     }
 
-    async findMeetingByAccountId(accountId: string): Promise<ScheduleMeetingEntity[]> {
+    async findMeetingByAccountId(accountId: string): Promise<ScheduleMeetingsRO[]> {
 
         const meeting = await this.find({ where: { accountId: accountId }});
         return meeting;
