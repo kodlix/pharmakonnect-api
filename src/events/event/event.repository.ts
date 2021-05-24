@@ -108,7 +108,7 @@ export class EventRepository extends Repository<EventEntity> {
             return events;
         }
 
-        return await this.find({relations: ['eventUsers'], order: { createdAt: 'DESC' }, take: 15, skip: 15 * (page - 1)});
+        return await this.find({where: {published: true}, relations: ['eventUsers'], order: { createdAt: 'DESC' }, take: 15, skip: 15 * (page - 1)});
     }
 
     
