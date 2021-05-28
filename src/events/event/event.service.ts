@@ -33,9 +33,14 @@ export class EventService {
     return await this.eventRepo.saveEvent(filename, request, user);
   }
 
-  async findAll(queryParam: FilterDto): Promise<EventRO[]> {
-    return await this.eventRepo.getAllEvents(queryParam);
+  async findAllPublishEvents(queryParam: FilterDto): Promise<EventRO[]> {
+    return await this.eventRepo.findAllPublishEvents(queryParam);
   }
+
+  async GetAllEvents(queryParam: FilterDto): Promise<EventRO[]> {
+    return await this.eventRepo.GetAllEvents(queryParam);
+  }
+
 
   async findMyEvents(queryParam: FilterDto, user: AccountEntity): Promise<EventRO[]> {
     return await this.eventRepo.findMyEvents(queryParam, user);

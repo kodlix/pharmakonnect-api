@@ -89,7 +89,7 @@ export class EventRepository extends Repository<EventEntity> {
 
     }
 
-    async getAllEvents({search, page}: FilterDto): Promise<EventRO[]> {
+    async findAllPublishEvents({search, page}: FilterDto): Promise<EventRO[]> {
     
         if(search) {
 
@@ -100,6 +100,27 @@ export class EventRepository extends Repository<EventEntity> {
                         .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
                     }))
                     .andWhere("event.published = true")
+                    .orderBy("event.createdAt", "DESC")
+                    .skip(15 * (page ? page - 1 : 0))
+                    .take(15)
+                    .getMany();
+
+            return events;
+        }
+
+        return await this.find({where: {published: true}, relations: ['eventUsers'], order: { createdAt: 'DESC' }, take: 15, skip: 15 * (page - 1)});
+    }
+
+    async GetAllEvents({search, page}: FilterDto): Promise<EventRO[]> {
+    
+        if(search) {
+
+           const events =  await this.createQueryBuilder("event")
+                    .innerJoinAndSelect("event.eventUsers", "eventUsers")
+                    .where(new Brackets(qb => {
+                        qb.where("event.name ILike :name", { name: `%${search}%` })
+                        .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
+                    }))
                     .orderBy("event.createdAt", "DESC")
                     .skip(15 * (page ? page - 1 : 0))
                     .take(15)
@@ -214,6 +235,10 @@ export class EventRepository extends Repository<EventEntity> {
 
             if(filename) {
                 event.coverImage = filename;
+            } else {
+                if(event.coverImage) {
+                    payload.coverImage = event.coverImage;
+                }
             }
             
 

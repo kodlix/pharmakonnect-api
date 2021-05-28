@@ -38,10 +38,18 @@ export class EventController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
+  @ApiOperation({ summary: 'Get all publish events' })
+  @ApiResponse({ status: 200, description: 'Return all publish events' })
+  async findAll(@Query() filterDto: FilterDto) : Promise<EventRO[]>{
+    return await this.eventService.findAllPublishEvents(filterDto);
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('allevents')
   @ApiOperation({ summary: 'Get all events' })
   @ApiResponse({ status: 200, description: 'Return all events' })
-  async findAll(@Query() filterDto: FilterDto) : Promise<EventRO[]>{
-    return await this.eventService.findAll(filterDto);
+  async Get(@Query() filterDto: FilterDto) : Promise<EventRO[]>{
+    return await this.eventService.GetAllEvents(filterDto);
   }
 
   @Get('myevent')

@@ -45,7 +45,6 @@ export class UpdateEventDto {
     @IsNotEmpty({message: 'Start Time cannot be empty'})
     startTime: Date;
 
-
     @Expose()
     @ApiProperty()
     @IsNotEmpty({message: 'End Time cannot be empty'})
