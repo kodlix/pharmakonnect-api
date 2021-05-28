@@ -29,8 +29,8 @@ import { PollModule } from './poll/poll.module';
 import { PackageModule } from './package/package.module';
 import { FeatureModule } from './features/feature.module';
 import { SendgridModule } from './sendgrid/sendgrid.module';
-
-
+import { AdvertModule } from './advert/advert/advert.module';
+import { AdvertCategoryModule } from './advert/advertcategory/advertcategory.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot(),
@@ -57,7 +57,9 @@ import { SendgridModule } from './sendgrid/sendgrid.module';
     PollModule,
     PackageModule,
     FeatureModule,
-    SendgridModule
+    SendgridModule,
+    AdvertModule,
+    AdvertCategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

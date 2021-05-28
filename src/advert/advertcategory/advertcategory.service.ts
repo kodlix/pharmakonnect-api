@@ -23,6 +23,10 @@ export class AdvertCategoryService {
         return await this.advertCategoryRepository.findAll();
     }
 
+    async findOne(id: string): Promise<AdvertCategoryRO> {
+        return await this.advertCategoryRepository.findById(id);
+    }
+
     async remove(id: string) {
         return await this.advertCategoryRepository.deleteEntity(id);
     }
