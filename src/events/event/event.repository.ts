@@ -281,7 +281,7 @@ export class EventRepository extends Repository<EventEntity> {
 
     }
 
-    async rejectEvent(id: string, user: AccountEntity): Promise<string> {
+    async rejectEvent(id: string, rejectionMessage, user: AccountEntity): Promise<string> {
         const ev = await this.findOne(id);
         
         if(!ev) {
@@ -293,6 +293,7 @@ export class EventRepository extends Repository<EventEntity> {
         }
 
         ev.rejected = true;
+        ev.rejectionMessage = rejectionMessage;
         ev.rejectedOn = new Date();
         
         try {

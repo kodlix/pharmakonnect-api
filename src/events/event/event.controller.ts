@@ -95,11 +95,11 @@ export class EventController {
   @Put('reject/:id')
   @ApiOperation({ summary: 'Reject event' })
   @ApiResponse({ status: 200, description: 'Return event successfully rejected' })
-  async rejectEvent(@Param('id') id: string, @Req() req: any) : Promise<string> {
+  async rejectEvent(@Param('id') id: string, @Body() payload: { rejectionMessage}, @Req() req: any) : Promise<string> {
     if(req.user.accountType != 'Admin') {
       throw new HttpException('Only an admin user can reject event.', HttpStatus.BAD_REQUEST)
     }
-    return await this.eventService.rejectEvent(id, req.user);
+    return await this.eventService.rejectEvent(id, payload, req.user);
   }
 
 
