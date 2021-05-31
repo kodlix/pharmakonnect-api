@@ -265,6 +265,9 @@ export class EventRepository extends Repository<EventEntity> {
         // if(ev.accountId != user.id) {
         //     throw new HttpException(`You can only publish an event created by you`, HttpStatus.NOT_FOUND);
         // }
+        if(ev.published) {
+            throw new HttpException(`This event has been published already`, HttpStatus.BAD_REQUEST);
+        }
 
         ev.published = true;
         ev.publishedOn = new Date();
@@ -276,6 +279,28 @@ export class EventRepository extends Repository<EventEntity> {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    async rejectEvent(id: string, user: AccountEntity): Promise<string> {
+        const ev = await this.findOne(id);
+        
+        if(!ev) {
+            throw new HttpException(`The event with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
+        }
+
+        if(ev.rejected) {
+            throw new HttpException(`This event has been rejected already`, HttpStatus.BAD_REQUEST);
+        }
+
+        ev.rejected = true;
+        ev.rejectedOn = new Date();
+        
+        try {
+            await this.save(ev);
+            return "Event successfully Rejected";
+        } catch (error) {
+            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     async addEventRegistration(payload: EventRegistrationDto, user: AccountEntity): Promise<string> {

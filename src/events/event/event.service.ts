@@ -72,6 +72,10 @@ export class EventService {
     return await this.eventRepo.publishEvent(id, user);
   }
 
+  async rejectEvent(id: string, user: AccountEntity) : Promise<string> {
+    return await this.eventRepo.rejectEvent(id, user);
+  }
+
   async addEventRegistration(payload: EventRegistrationDto, user: AccountEntity): Promise<string> {
     return await this.eventRepo.addEventRegistration(payload, user);
   }

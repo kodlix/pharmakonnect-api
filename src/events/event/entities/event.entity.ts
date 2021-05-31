@@ -71,6 +71,9 @@ export class EventEntity extends AbstractBaseEntity{
     @Column({ type: 'bool', default: false})
     published: boolean;
 
+    @Column({ type: 'bool', default: false})
+    rejected: boolean;
+
     @ManyToOne(() => AccountEntity, s => s.meeting)
     account: AccountEntity;
 
@@ -83,6 +86,10 @@ export class EventEntity extends AbstractBaseEntity{
     @Exclude()
     @Column({nullable: true})
     publishedOn: Date;
+
+    @Exclude()
+    @Column({nullable: true})
+    rejectedOn: Date;
 
     @Exclude()
     @Column({ type: 'bool', default: false})

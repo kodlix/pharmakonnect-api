@@ -82,7 +82,7 @@ export class EventController {
     return await this.eventService.update(id, file ? file.filename : "" , request, req);
   }
 
-  @Patch('publish/:id')
+  @Put('publish/:id')
   @ApiOperation({ summary: 'Publish event' })
   @ApiResponse({ status: 200, description: 'Return event successfully published' })
   async publishEvent(@Param('id') id: string, @Req() req: any) : Promise<string> {
@@ -90,6 +90,16 @@ export class EventController {
       throw new HttpException('Only an admin user can publish event.', HttpStatus.BAD_REQUEST)
     }
     return await this.eventService.publishEvent(id, req.user);
+  }
+
+  @Put('reject/:id')
+  @ApiOperation({ summary: 'Reject event' })
+  @ApiResponse({ status: 200, description: 'Return event successfully rejected' })
+  async rejectEvent(@Param('id') id: string, @Req() req: any) : Promise<string> {
+    if(req.user.accountType != 'Admin') {
+      throw new HttpException('Only an admin user can reject event.', HttpStatus.BAD_REQUEST)
+    }
+    return await this.eventService.rejectEvent(id, req.user);
   }
 
 
