@@ -117,6 +117,12 @@ import {
     }
 
 
+    @SubscribeMessage('orientationchange')
+    public handleOrientationChange(client: Socket, data: any): void {
+      client.to( data.room ).emit( 'orientationchange', { message :"change" } );
+    }
+
+
     /// watchers
     public afterInit(server: Server): void {
       return console.log("init");
