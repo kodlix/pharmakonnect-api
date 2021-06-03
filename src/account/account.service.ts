@@ -43,6 +43,13 @@ export class AccountService {
     return dataToReturn;
   }
 
+  public async forgetPassword(email: string): Promise<string> {
+      if (await this.createEmailToken(email)) {
+        await this.sendEmailForgotPassword(email);
+      }
+      return "Forgot password email sent successfully";
+  }
+
   public async register(registerDto: RegisterDTO): Promise<string> {
     if (await this.accountRepository.register(registerDto)) {
       if (await this.createEmailToken(registerDto.email)) {
@@ -164,12 +171,15 @@ export class AccountService {
     }
   }
 
-  public async sendEmailForgotPassword(email: string): Promise<any> {
+  private async sendEmailForgotPassword(email: string): Promise<any> {
     var model = await this.accountRepository.findOne({ where: { email: email } });
     if (!model) throw new HttpException(`Account does not exists`, HttpStatus.NOT_FOUND);
 
+    if (!model.emailToken) throw new HttpException(`Invalid token`, HttpStatus.NOT_FOUND);
+
     const envUrl = process.env.NODE_ENV === "development" ? process.env.WEB_URL_DEV: process.env.WEB_URL_PROD;
-    const url = `${envUrl}/reset-password`;
+    const url = `${envUrl}/reset-password?email=${email}&token=${model.emailToken}`;
+    
     const to = model.email;
     const subject = 'Forget Password Request';
     const html = `<p> Hello <strong>${model.firstName || model.organizationName}</strong>,</p>

@@ -158,11 +158,11 @@ export class AccountRepository extends Repository<AccountEntity> {
     return await user.save();
   }
 
-  public async setNewPassord({ email, newPassword }: ResetPasswordDto): Promise<string> {
+  public async setNewPassord({ email, password, token }: ResetPasswordDto): Promise<string> {
     try {
-      var user = await this.findOne({ where: { email: email } });
+      var user = await this.findOne({ where: { email: email, emailToken: token } });
       if (!user) throw new HttpException(`User with email: ${email}, does not exists`, HttpStatus.NOT_FOUND);
-      user.password = await this.hashPassword(newPassword, user.salt);
+      user.password = await this.hashPassword(password, user.salt);
       await user.save();
       return "Password was changed successfully";
     } catch (error) {

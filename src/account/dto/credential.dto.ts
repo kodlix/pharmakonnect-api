@@ -29,9 +29,10 @@ export class LockUserDTO {
 }
 
 export class ResetPasswordDto {
-    @IsEmail() @IsNotEmpty() @ApiProperty() readonly email: string;
+    @IsEmail() @IsNotEmpty({message: "Invalid email"}) @ApiProperty() readonly email: string;
     @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, { message: 'password too weak' })
-    @MinLength(8) @IsNotEmpty() @ApiProperty() readonly newPassword: string;
+    @MinLength(8) @IsNotEmpty({message: "Password is required"}) @ApiProperty() readonly password: string;
+    @IsNotEmpty({message: "Invalid token"}) @ApiProperty() readonly token: string;
 }
 
 export class ChangePasswordDto {
