@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus } from "@nestjs/common";
+import { HttpException, HttpStatus, Logger } from "@nestjs/common";
 import { Brackets, DeleteResult, EntityRepository, Like, Repository} from "typeorm";
 import { plainToClass, plainToClassFromExist } from 'class-transformer';
 import {validate} from 'class-validator';
@@ -8,14 +8,18 @@ import { EventUsersEntity } from "./entities/eventusers.entity";
 import { EventRegistrationDto } from "../event/dto/event-registration.dto";
 import { EventUsersRO } from "./interfaces/eventusers.interface";
 import { UpdateEventUserRegistrationDto } from "./dto/update-eventuser.dto";
-
+import { EventEntity } from "../event/entities/event.entity";
+import * as SendGrid from "@sendgrid/mail";
 
 @EntityRepository(EventUsersEntity)
 export class EventUsersRepository extends Repository<EventUsersEntity> {
 
+    constructor() {
+        super();
+        SendGrid.setApiKey(process.env.SENDGRID_API_KEY)
+    }
 
-
-    async createEventUsers(payload: EventRegistrationDto, user: AccountEntity): Promise<string> {
+    async createEventUsers(payload: EventRegistrationDto, user: AccountEntity, event: EventEntity): Promise<string> {
         
         const newEventUsers = plainToClass(EventUsersEntity, payload);
         newEventUsers.createdBy = user.createdBy;
@@ -27,8 +31,32 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
 
         try {
              await this.save(newEventUsers);
+             (event.startTime as any) = (event.startTime as any).split(':')[0] >= 12 ? `${event.startTime} PM` : `${event.startTime} AM`;
+             (event.endTime as any) = (event.endTime as any).split(':')[0] >= 12 ? `${event.endTime} PM` : `${event.endTime} AM`;
+
+             const msg = {
+                to: payload.email,
+                from: "Kaapsul <zack.aminu@netopconsult.com>",
+                templateId: 'd-3f12473cbde44380be0c9a66f34a8784',
+                dynamicTemplateData: {
+                    name: payload.name,
+                    eventName: event.name,
+                    Sdate: event.startDate,
+                    Edate: event.endDate,
+                    startTime: event.startTime,
+                    endTime: event.endTime,
+                    venue: event.venue,
+                    organizerName: event.organizerName,
+                    organizerPhoneNo: event.organizerPhoneNumber,
+                    accessCode: event.requireUniqueAccessCode ? payload.accessCode : 'NIL',
+                    url: event.online ? event.url : 'NIL'
+                }
+            }
+
+             await SendGrid.send(msg);
              return "Successfully registered for the event.";
         } catch(error)  {
+            Logger.log("Reg + Sendgrid", error);
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

@@ -89,7 +89,7 @@ export class EventRepository extends Repository<EventEntity> {
 
     }
 
-    async getAllEvents({search, page}: FilterDto): Promise<EventRO[]> {
+    async findAllPublishEvents({search, page}: FilterDto): Promise<EventRO[]> {
     
         if(search) {
 
@@ -100,6 +100,27 @@ export class EventRepository extends Repository<EventEntity> {
                         .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
                     }))
                     .andWhere("event.published = true")
+                    .orderBy("event.createdAt", "DESC")
+                    .skip(15 * (page ? page - 1 : 0))
+                    .take(15)
+                    .getMany();
+
+            return events;
+        }
+
+        return await this.find({where: {published: true}, relations: ['eventUsers'], order: { createdAt: 'DESC' }, take: 15, skip: 15 * (page - 1)});
+    }
+
+    async GetAllEvents({search, page}: FilterDto): Promise<EventRO[]> {
+    
+        if(search) {
+
+           const events =  await this.createQueryBuilder("event")
+                    .innerJoinAndSelect("event.eventUsers", "eventUsers")
+                    .where(new Brackets(qb => {
+                        qb.where("event.name ILike :name", { name: `%${search}%` })
+                        .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
+                    }))
                     .orderBy("event.createdAt", "DESC")
                     .skip(15 * (page ? page - 1 : 0))
                     .take(15)
@@ -140,7 +161,7 @@ export class EventRepository extends Repository<EventEntity> {
 
     async findEventById(id: string): Promise<EventRO> {
 
-        const event = await this.findOne(id);
+        const event = await this.findOne(id, {relations: ['eventUsers']});
         if(event) {
             return event;
         }
@@ -162,7 +183,7 @@ export class EventRepository extends Repository<EventEntity> {
 
     }
 
-    async updateEvent(id: string, payload: UpdateEventDto, user: AccountEntity) : Promise<string> {
+    async updateEvent(id: string, filename: string, payload: UpdateEventDto, user: AccountEntity) : Promise<string> {
         const event = await this.findOne(id);
         if (event ) {
 
@@ -212,6 +233,15 @@ export class EventRepository extends Repository<EventEntity> {
             event.updatedAt = new Date();
             event.updatedBy = user.updatedBy || user.createdBy;
 
+            if(filename) {
+                event.coverImage = filename;
+            } else {
+                if(event.coverImage) {
+                    payload.coverImage = event.coverImage;
+                }
+            }
+            
+
             const updated = plainToClassFromExist(event, payload);
 
             try {
@@ -235,6 +265,9 @@ export class EventRepository extends Repository<EventEntity> {
         // if(ev.accountId != user.id) {
         //     throw new HttpException(`You can only publish an event created by you`, HttpStatus.NOT_FOUND);
         // }
+        if(ev.published) {
+            throw new HttpException(`This event has been published already`, HttpStatus.BAD_REQUEST);
+        }
 
         ev.published = true;
         ev.publishedOn = new Date();
@@ -246,6 +279,29 @@ export class EventRepository extends Repository<EventEntity> {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    async rejectEvent(id: string, rejectionMessage, user: AccountEntity): Promise<string> {
+        const ev = await this.findOne(id);
+        
+        if(!ev) {
+            throw new HttpException(`The event with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
+        }
+
+        if(ev.rejected) {
+            throw new HttpException(`This event has been rejected already`, HttpStatus.BAD_REQUEST);
+        }
+
+        ev.rejected = true;
+        ev.rejectionMessage = rejectionMessage;
+        ev.rejectedOn = new Date();
+        
+        try {
+            await this.save(ev);
+            return "Event successfully Rejected";
+        } catch (error) {
+            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     async addEventRegistration(payload: EventRegistrationDto, user: AccountEntity): Promise<string> {
@@ -260,10 +316,6 @@ export class EventRepository extends Repository<EventEntity> {
             throw new HttpException(`The event you are trying to register for is invalid or does not exist`, HttpStatus.BAD_REQUEST);
         }
 
-        if(today.getDate() > new Date(eventRegistringFor.startDate).getDate()) {
-            throw new HttpException(`This event does not accept registration anymore`, HttpStatus.BAD_REQUEST);
-        }
-
         if(!eventRegistringFor.requireRegistration) {
             throw new HttpException(`Invalid request, you cannot register for this event at this time.`, HttpStatus.BAD_REQUEST);
         }
@@ -272,16 +324,26 @@ export class EventRepository extends Repository<EventEntity> {
             throw new HttpException(`This event has not been published yet`, HttpStatus.BAD_REQUEST);
         }
 
+        if(today.getDate() > new Date(eventRegistringFor.startDate).getDate()) {
+            throw new HttpException(`This event does not accept registration anymore`, HttpStatus.BAD_REQUEST);
+        }
+
+        if(today.getDate() > new Date(eventRegistringFor.endDate).getDate()) {
+            throw new HttpException(`The event has ended.`, HttpStatus.BAD_REQUEST);
+        }
+
         if(eventRegistringFor.cost > 0) {
+
             if(!payload.paid) {
                 throw new HttpException(`Sorry, This a paid event, make sure you complete your payment before proceeding`, HttpStatus.BAD_REQUEST);
             }
         }
 
         if(eventRegistringFor.requireUniqueAccessCode) {
-            if(!payload.accessCode) {
-                throw new HttpException(`Please provide the access code for this event`, HttpStatus.BAD_REQUEST);
+            if(!eventRegistringFor.accessCode) {
+                throw new HttpException(`This event does not have an access code.`, HttpStatus.BAD_REQUEST);
             }
+            payload.accessCode = (Math.floor(Math.random() * (9000000)) + 1000000).toString();
         }
 
         const userRegisteredForSameEvent = await eventUsersRepository.findByEmailAndEventId(payload.eventId, payload.email);
@@ -294,7 +356,7 @@ export class EventRepository extends Repository<EventEntity> {
             throw new HttpException(`Sorry, The maximum number of participants has been reached for this event`, HttpStatus.BAD_REQUEST);
         }
 
-        return await eventUsersRepository.createEventUsers(payload, user);
+        return await eventUsersRepository.createEventUsers(payload, user, eventRegistringFor);
 
     }
 

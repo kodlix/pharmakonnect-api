@@ -4,7 +4,7 @@ import { Cron, CronExpression  } from '@nestjs/schedule';
 import { Connection } from 'typeorm';
 import * as SendGrid from "@sendgrid/mail";
 import { EventRepository } from '../event/event.repository';
-SendGrid.setApiKey("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")
+SendGrid.setApiKey(process.env.SENDGRID_API_KEY)
 
 
 @Injectable()
@@ -50,7 +50,7 @@ export class EventReminderService {
 
                   for (const evUsers of tm.eventUsers) {
                     msg.to = evUsers.email;
-                    msg.from = '"Kaapsule" <zack.aminu@netopconsult.com>';
+                    msg.from = 'Kaapsule <zack.aminu@netopconsult.com>';
                     msg.subject = `Reminder email for your upcoming event`,
                     msg.html = `<p> Dear ${evUsers.name}, </p>
                         <p> Please be reminded that, the event <strong>${tm.name}</strong> you registered for, </p>
@@ -77,6 +77,7 @@ export class EventReminderService {
 
         } catch (error) {
             console.log(`error while sending reminder - ${error}`);
+            Logger.log(`error while sending reminder - ${error}`);
         }
       }
 

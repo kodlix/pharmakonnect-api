@@ -19,25 +19,23 @@ export class UpdateEventDto {
     description: string;
 
     @Expose()
-    @IsNumber()
+    @IsString()
     @ApiProperty()
     @IsNotEmpty({message: 'Number of participants cannot be empty'})
-    numberOfParticipants: number;
+    numberOfParticipants: any;
 
     @Expose()
-    @IsNumber()
+    @IsString()
     @ApiProperty()
     @ApiPropertyOptional()
-    cost: number;
+    cost: any;
 
     @Expose()
-    @IsDateString()
     @ApiProperty()
     @IsNotEmpty({message: 'Start Date cannot be empty'})
     startDate: Date;
 
     @Expose()
-    @IsDateString()
     @ApiProperty()
     @IsNotEmpty({message: 'Start Date cannot be empty'})
     endDate: Date;
@@ -46,7 +44,6 @@ export class UpdateEventDto {
     @ApiProperty()
     @IsNotEmpty({message: 'Start Time cannot be empty'})
     startTime: Date;
-
 
     @Expose()
     @ApiProperty()
