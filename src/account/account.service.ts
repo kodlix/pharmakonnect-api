@@ -143,13 +143,13 @@ export class AccountService {
     if (model && model.emailToken) {
       const envUrl = process.env.NODE_ENV === "development" ? process.env.URL_DEV: process.env.URL_PROD;
       const url = `${envUrl}/account/verify/${model.emailToken}`;
-        const to = model.email;
-        const subject = 'Email Confirmation';
-        const html = `<p> Hello ${model.firstName || model.organizationName},</p><br>
+      const to = model.email;
+      const subject = 'Email Confirmation';
+      const html = `<p> Hello <strong>${model.firstName || model.organizationName}</strong>,</p>
       <p> Thanks for getting started with <strong>Pharma Konnect!</strong> We need a little more information to complete your registration, including confirmation of your email address. <br>
       Click below to confirm your email address: 
       <a href=${url}>Click here</a></p>
-      <p> If you have problems, please paste the above URL into the browser. </p> <br><br>
+      <p> If you have problems, please paste the above URL into the browser. </p> 
       <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`;
 
       try {
@@ -166,33 +166,27 @@ export class AccountService {
 
   public async sendEmailForgotPassword(email: string): Promise<any> {
     var model = await this.accountRepository.findOne({ where: { email: email } });
-    if (!model) throw new HttpException(`${email} does not exists`, HttpStatus.NOT_FOUND);
+    if (!model) throw new HttpException(`Account does not exists`, HttpStatus.NOT_FOUND);
 
+    const envUrl = process.env.NODE_ENV === "development" ? process.env.WEB_URL_DEV: process.env.WEB_URL_PROD;
+    const url = `${envUrl}/reset-password`;
     const to = model.email;
-    const from = 'zack.aminu@netopconsult.com';
-    const subject = 'Frogotten Password';
-    const html = `<p> Hello ${model.firstName} ${model.lastName}, </p>
-        <p> We're sending you this email because you requested a password reset. Click on this link to create a new password: <br><br>
-        <a href='${config.host.url}:${config.host.port}/auth/reset-password'>Click here</a></p><br>
+    const subject = 'Forget Password Request';
+    const html = `<p> Hello <strong>${model.firstName || model.organizationName}</strong>,</p>
+        <p> We're sending you this email because you requested a password reset. Click on this link to create a new password: <br>
+        <a href=${url}>Click here</a></p>
         <p> If you didn't request a password reset, you can ignore this email. Your password will not be changed.</p>
         <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`;
 
-    try {
-      let emailSent = await this.sendEmailAsync(to, from, subject, html);
-      // if (emailSent) {
-      //   return "Email for forget password successfully sent";
-      // } else {
-      //   throw new HttpException(
-      //     { error: `Unable to send verification email`, status: HttpStatus.BAD_REQUEST },
-      //     HttpStatus.BAD_REQUEST,
-      //   );
-      // }
-    } catch (error) {
-      throw new HttpException(
-        { error: `${error}`, status: HttpStatus.INTERNAL_SERVER_ERROR },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+        try {
+          await this.mailService.sendHtmlMailAsync(to, subject, html);
+        return true;
+        } catch (error) {
+          throw new HttpException(
+            { error: `An error occurred while trying to send verify email ${error}`, status: HttpStatus.INTERNAL_SERVER_ERROR },
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
   }
 
 

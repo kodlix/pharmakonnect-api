@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, Matches, MinLength, IsEnum } from "class-validator";
+import { IsEmail, IsNotEmpty, Matches, MinLength, IsEnum, IsOptional } from "class-validator";
 import { accountTypes } from "../account.constant";
 
 export class RegisterDTO {
@@ -9,6 +9,12 @@ export class RegisterDTO {
     @IsEnum(accountTypes, { message: "Account type can either be 'Individual' or 'Corporate'" })
     @IsNotEmpty() @ApiProperty()
     readonly accountType: string;
+    @IsOptional() @ApiProperty()
+    readonly firstName?: string;
+    @IsOptional() @ApiProperty()
+    readonly lastName?: string;
+    @IsOptional() @ApiProperty()
+    readonly organizationName?: string;
     isRegComplete: boolean;
 }
 
