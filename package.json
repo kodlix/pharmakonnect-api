@@ -32,7 +32,7 @@
     "@nestjs/swagger": "^4.7.12",
     "@nestjs/typeorm": "^7.1.5",
     "@nestjs/websockets": "^7.6.13",
-    "@sendgrid/mail": "^7.4.2",
+    "@sendgrid/mail": "^7.4.4",
     "@types/uuid": "^8.3.0",
     "bcrypt": "^5.0.0",
     "class-transformer": "^0.3.2",

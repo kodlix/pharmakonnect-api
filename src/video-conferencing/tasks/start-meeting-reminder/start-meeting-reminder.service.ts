@@ -5,7 +5,7 @@ import { ScheduleMeetingRepository } from 'src/video-conferencing/schedule-meeti
 import { Connection } from 'typeorm';
 import * as SendGrid from "@sendgrid/mail";
 import { isNotValidTime } from 'src/_utility/time-validator.util';
-SendGrid.setApiKey("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")
+SendGrid.setApiKey(process.env.SENDGRID_API_KEY)
 
 
 @Injectable()

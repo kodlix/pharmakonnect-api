@@ -15,6 +15,7 @@ export interface UserFromDbRO {
     isRegComplete: boolean;
     accountType: string;
     accountId: string;
+    verified: boolean;
     profileImage: string;
 }
 

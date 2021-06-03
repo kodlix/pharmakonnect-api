@@ -16,7 +16,7 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
 
     constructor() {
         super();
-        SendGrid.setApiKey("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")
+        SendGrid.setApiKey(process.env.SENDGRID_API_KEY)
     }
 
     async createEventUsers(payload: EventRegistrationDto, user: AccountEntity, event: EventEntity): Promise<string> {

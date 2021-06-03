@@ -4,7 +4,7 @@ import { Cron, CronExpression  } from '@nestjs/schedule';
 import { Connection } from 'typeorm';
 import * as SendGrid from "@sendgrid/mail";
 import { EventRepository } from '../event/event.repository';
-SendGrid.setApiKey("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")
+SendGrid.setApiKey(process.env.SENDGRID_API_KEY)
 
 
 @Injectable()

@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import SendGridMail from '@sendgrid/mail';
+import  * as SendGrid from '@sendgrid/mail';
 
 @Injectable()
-export class MailerService {
+export class SendGridService {
   constructor() {
     if (process.env.SENDGRID_API_KEY && process.env.SENDGRID_FROM_EMAIL) {
-      SendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
+      SendGrid.setApiKey(process.env.SENDGRID_API_KEY);
     }
   }
 
@@ -15,7 +15,7 @@ export class MailerService {
     }
 
     try {
-      await SendGridMail.send({
+      await SendGrid.send({
         from: process.env.SENDGRID_FROM_EMAIL,
         to,
         subject,
@@ -32,7 +32,7 @@ export class MailerService {
     }
 
     try {
-      await SendGridMail.send({
+      await SendGrid.send({
         from: process.env.SENDGRID_FROM_EMAIL,
         to,
         subject,

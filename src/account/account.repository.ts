@@ -54,6 +54,7 @@ export class AccountRepository extends Repository<AccountEntity> {
         isRegComplete: user.isRegComplete,
         accountType: user.accountType,
         accountId: user.id,
+        verified: user.emailVerified,
         profileImage: user.accountType === accountTypes.INDIVIDUAL ? user.profileImage : user.premisesImage
       };
       return data;

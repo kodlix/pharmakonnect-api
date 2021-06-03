@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, UseGuards, Patch, Query, UseInterceptors, HttpStatus, UploadedFile, Res, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, UseGuards, Patch, Query, UseInterceptors, HttpStatus, UploadedFile, Res, Req, Redirect } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -149,8 +149,11 @@ export class AccountController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiResponse({ status: 200, description: 'Email verified successfully' })
-  public async verifyEmail(@Param() params): Promise<string> {
-    return await this.accountService.verifyEmail(params.token);
+  @Redirect()
+  public async verifyEmail(@Param() params) {
+    const envUrl = process.env.NODE_ENV === "development" ? process.env.WEB_URL_DEV: process.env.WEB_URL_PROD;
+    await this.accountService.verifyEmail(params.token); 
+     return { url: envUrl + '/login?verified=true' };
   }
 
   @Get('/resend-verification/:email')
