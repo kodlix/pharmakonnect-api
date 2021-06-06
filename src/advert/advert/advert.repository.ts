@@ -3,13 +3,14 @@ import { AccountEntity } from "src/account/entities/account.entity";
 import { Brackets, DeleteResult, EntityRepository, ILike, Repository } from "typeorm";
 import { AdvertEntity } from "../entity/advert.entity";
 import { CreateAdvertDto } from "./dto/create-advert";
-import { UpdateAdvertDto } from "./dto/update-advert";
+import { RejectAdvertDto, UpdateAdvertDto } from "./dto/update-advert";
 
 @EntityRepository(AdvertEntity)
 export class AdvertRepository extends Repository<AdvertEntity>{
    async createEntity(
       dto: CreateAdvertDto,
-      user: AccountEntity
+      user: AccountEntity,
+      filename: string
     ): Promise<AdvertEntity> {
       const advert = new AdvertEntity();        
   
@@ -19,7 +20,7 @@ export class AdvertRepository extends Repository<AdvertEntity>{
         advert.url = dto.url;        
         advert.publishedAt = dto.publishedAt;   
         advert.endDate = dto.endDate;        
-        advert.advertserId = dto.advertserId;
+        advert.advertiserId = dto.advertiserId;
         advert.advertCategoryId = dto.advertCategory
         advert.zone = dto.zone;
         advert.website = dto.website;
@@ -27,6 +28,9 @@ export class AdvertRepository extends Repository<AdvertEntity>{
         advert.accountId = user.id;
         advert.createdBy = user.email
         advert.createdAt = new Date();
+        if(filename) {
+          advert.advertImage = filename;
+      }
   
       return await this.save(advert);
     }
@@ -35,6 +39,8 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       id: string,
       dto: UpdateAdvertDto,
       user: AccountEntity,
+      filename: string
+
     ): Promise<AdvertEntity> {
       const advert = await this.findOne(id);
       advert.title = dto.title;
@@ -43,7 +49,7 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       advert.url = dto.url;        
       advert.publishedAt = dto.publishedAt;   
       advert.endDate = dto.endDate;        
-      advert.advertserId = dto.advertserId;
+      advert.advertiserId = dto.advertiserId;
       advert.advertCategoryId = dto.advertCategory
       advert.zone = dto.zone;
       advert.website = dto.website;
@@ -51,21 +57,60 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       advert.accountId = user.id;
       advert.updatedBy = user.email;
       advert.updatedAt = new Date();
-
+      advert.approved = false;
+      advert.rejected = false;
+      if(filename) {
+        advert.advertImage = filename;
+    }
+    else{
+        advert.advertImage = dto.advertImage;
+    }
+      
       return await this.save(advert);
     }
 
-    public async uploadAdvertImage(advertImage: string, advertId: string) {
-        const adimage = await this.findOne({ id: advertId });
-        if (!adimage) {
-        throw new HttpException(
-            `advert does not exist`,
-            HttpStatus.NOT_FOUND,
-        );}   
+    async updateApprove(
+      id: string,
+      user: AccountEntity
 
-        adimage.advertImage = advertImage;
-        return await adimage.save();
+    ): Promise<AdvertEntity> {
+      const advert = await this.findOne(id);
+  
+      advert.approvedOn = new Date();
+      advert.approvedBy = user.email;
+      advert.approved = true;
+      advert.rejected = false;
+
+      return await advert.save();
     }
+
+    async updateReject(
+      id: string,
+      dto: RejectAdvertDto,
+      user: AccountEntity
+
+    ): Promise<AdvertEntity> {
+      const advert = await this.findOne(id);
+  
+      advert.rejectedBy = user.email;
+      advert.rejectionMessage = dto.rejectionMessage
+      advert.approved = false;
+      advert.rejected = true;
+      
+      return await advert.save();
+    }
+
+    // public async uploadAdvertImage(advertImage: string, advertId: string) {
+    //     const adimage = await this.findOne({ id: advertId });
+    //     if (!adimage) {
+    //     throw new HttpException(
+    //         `advert does not exist`,
+    //         HttpStatus.NOT_FOUND,
+    //     );}   
+
+    //     adimage.advertImage = advertImage;
+    //     return await adimage.save();
+    // }
     
 
     async findall(page: number,search: string ): Promise<AdvertEntity[]> {
@@ -79,7 +124,7 @@ export class AdvertRepository extends Repository<AdvertEntity>{
                        .orWhere("advert.advertserId ILike :advertserId", { advertserId: `%${search}%` })
                        .orWhere("advertCategory.name ILike :name", { name: `%${search}%`})
                    }))
-                   .orderBy("advert.createdAt", "DESC")
+                   .orderBy("advert.ApprovedOn", "DESC")
                    .take(25)
                    .skip(25 * (page ? page - 1 : 0))
                    .getMany();

@@ -3,7 +3,7 @@ import { AccountEntity } from "src/account/entities/account.entity";
 import { AdvertRO } from "./advert.interface";
 import { AdvertRepository } from "./advert.repository";
 import { CreateAdvertDto } from "./dto/create-advert";
-import { UpdateAdvertDto } from "./dto/update-advert";
+import { ApproveAdvertDto, RejectAdvertDto, UpdateAdvertDto } from "./dto/update-advert";
 
 @Injectable()
 export class AdvertService{
@@ -11,18 +11,35 @@ export class AdvertService{
 
     async create(
         dto: CreateAdvertDto,
-        user: AccountEntity
+        user: AccountEntity,
+        filename: string
+
     ): Promise<AdvertRO> {
-        return await this.advertRepository.createEntity(dto, user);
+        return await this.advertRepository.createEntity(dto, user,filename);
     }
 
-    async update(id: string, dto: UpdateAdvertDto, user: AccountEntity): Promise<AdvertRO> {
-        return await this.advertRepository.updateEntity(id, dto, user);
+    async update(id: string, dto: UpdateAdvertDto, user: AccountEntity, filename: string): Promise<AdvertRO> {
+        return await this.advertRepository.updateEntity(id, dto, user,filename);
     }
 
-    async uploadAdvertImage(advertImage: string, advertId: string) {
-        return await this.advertRepository.uploadAdvertImage(advertImage, advertId);
-    }
+    async updateApprove(
+        id: string,
+        user: AccountEntity
+      ): Promise<AdvertRO> {
+        return await this.advertRepository.updateApprove(id, user);
+      }
+    
+      async updateReject(
+        id: string,
+        dto: RejectAdvertDto,
+        user: AccountEntity
+      ): Promise<AdvertRO> {
+        return await this.advertRepository.updateReject(id, dto, user);
+      }
+
+    // async uploadAdvertImage(advertImage: string, advertId: string) {
+    //     return await this.advertRepository.uploadAdvertImage(advertImage, advertId);
+    // }
 
     async findAll(page, search): Promise<AdvertRO[]> {
         return await this.advertRepository.findall(page, search);

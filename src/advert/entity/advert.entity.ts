@@ -21,7 +21,7 @@ export class AdvertEntity extends AbstractBaseEntity{
     endDate: Date;
 
     @Column({ nullable: true })
-    advertserId: string;
+    advertiserId: string;
 
     @Column({ nullable: true })
     zone: string;
