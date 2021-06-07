@@ -28,7 +28,7 @@ import { EventReminderModule } from './events/tasks/event-reminder.module';
 import { PollModule } from './poll/poll.module';
 import { PackageModule } from './package/package.module';
 import { FeatureModule } from './features/feature.module';
-import { SendgridModule } from './sendgrid/sendgrid.module';
+import { MailerModule } from './mailer/mailer.module';
 import { LikeModule } from './user-like/like.module';
 
 
@@ -58,7 +58,7 @@ import { LikeModule } from './user-like/like.module';
     PollModule,
     PackageModule,
     FeatureModule,
-    SendgridModule,
+    MailerModule,
     LikeModule
   ],
   controllers: [AppController],

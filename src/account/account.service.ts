@@ -8,11 +8,9 @@ import { JwtService } from '@nestjs/jwt';
 import { AccountRepository } from './account.repository';
 import { FilterDto } from 'src/_common/filter.dto';
 import { Not } from 'typeorm';
-import * as nodemailer from 'nodemailer';
-import * as SendGrid from "@sendgrid/mail";
 import { default as config } from './config';
 import { AccountEntity } from './entities/account.entity';
-SendGrid.setApiKey("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");
+import { SendGridService } from 'src/mailer/sendgrid.service';
 
 
 @Injectable()
@@ -20,6 +18,7 @@ export class AccountService {
   constructor(
     private readonly accountRepository: AccountRepository,
     private jwtService: JwtService,
+    private readonly mailService: SendGridService
   ) { }
 
   public async login(loginDto: LoginDTO): Promise<UserRO> {
@@ -31,6 +30,10 @@ export class AccountService {
     if (!email) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.UNAUTHORIZED);
     }
+
+    if (!user.verified) {
+      throw new HttpException({ error: `Account has not been verified. Check your email to verify the account.` }, HttpStatus.UNAUTHORIZED);
+    }
     const payload: JwtPayload = { email };
     const accessToken = await this.jwtService.sign(payload);
     let dataToReturn = {
@@ -40,11 +43,18 @@ export class AccountService {
     return dataToReturn;
   }
 
+  public async forgetPassword(email: string): Promise<string> {
+      if (await this.createEmailToken(email)) {
+        await this.sendEmailForgotPassword(email);
+      }
+      return "Forgot password email sent successfully";
+  }
+
   public async register(registerDto: RegisterDTO): Promise<string> {
     if (await this.accountRepository.register(registerDto)) {
-      // if (await this.createEmailToken(registerDto.email)) {
-      //   await this.sendEmailVerification(registerDto.email);
-      // }
+      if (await this.createEmailToken(registerDto.email)) {
+        await this.sendEmailVerification(registerDto.email);
+      }
       return "Registration successfully";
     }
   }
@@ -138,63 +148,55 @@ export class AccountService {
   public async sendEmailVerification(email: string): Promise<boolean> {
     let model = await this.accountRepository.findOne({ where: { email: email } });
     if (model && model.emailToken) {
-        const to = model.email;
-        const from = 'zack.aminu@netopconsult.com';
-        const subject = 'Email Confirmation';
-        const html = `<p> Hello ${model.firstName} ${model.lastName},</p><br>
-            <p> Thanks for getting started with <strong>Pharma Konnect!</strong> We need a little more information to complete your registration, including confirmation of your email address. Click below to confirm your email address: 
-            <a href='${config.host.url}:${config.host.port}/auth/verify/${model.emailToken}'>Click here</a></p><br>
-            <p> If you have problems, please paste the above URL into the browser. </p> <br><br>
-            <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`;
+      const envUrl = process.env.NODE_ENV === "development" ? process.env.URL_DEV: process.env.URL_PROD;
+      const url = `${envUrl}/account/verify/${model.emailToken}`;
+      const to = model.email;
+      const subject = 'Email Confirmation';
+      const html = `<p> Hello <strong>${model.firstName || model.organizationName}</strong>,</p>
+      <p> Thanks for getting started with <strong>Pharma Konnect!</strong> We need a little more information to complete your registration, including confirmation of your email address. <br>
+      Click below to confirm your email address: 
+      <a href=${url}>Click here</a></p>
+      <p> If you have problems, please paste the above URL into the browser. </p> 
+      <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`;
 
       try {
-        let isEmailSent = await this.sendEmailAsync(to, from, subject, html);
-        if (isEmailSent) {
-          return true;
-        } else {
-          throw new HttpException(
-            { error: `Unable to send verification email`, status: HttpStatus.BAD_REQUEST },
-            HttpStatus.BAD_REQUEST,
-          );
-        }
+        await this.mailService.sendHtmlMailAsync(to, subject, html);
+      return true;
       } catch (error) {
         throw new HttpException(
-          { error: `An error occurred while trying to send verify email`, status: HttpStatus.INTERNAL_SERVER_ERROR },
+          { error: `An error occurred while trying to send verify email ${error}`, status: HttpStatus.INTERNAL_SERVER_ERROR },
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
     }
   }
 
-  public async sendEmailForgotPassword(email: string): Promise<string> {
+  private async sendEmailForgotPassword(email: string): Promise<any> {
     var model = await this.accountRepository.findOne({ where: { email: email } });
-    if (!model) throw new HttpException(`${email} does not exists`, HttpStatus.NOT_FOUND);
+    if (!model) throw new HttpException(`Account does not exists`, HttpStatus.NOT_FOUND);
 
+    if (!model.emailToken) throw new HttpException(`Invalid token`, HttpStatus.NOT_FOUND);
+
+    const envUrl = process.env.NODE_ENV === "development" ? process.env.WEB_URL_DEV: process.env.WEB_URL_PROD;
+    const url = `${envUrl}/reset-password?email=${email}&token=${model.emailToken}`;
+    
     const to = model.email;
-    const from = 'zack.aminu@netopconsult.com';
-    const subject = 'Frogotten Password';
-    const html = `<p> Hello ${model.firstName} ${model.lastName}, </p>
-        <p> We're sending you this email because you requested a password reset. Click on this link to create a new password: <br><br>
-        <a href='${config.host.url}:${config.host.port}/auth/reset-password'>Click here</a></p><br>
+    const subject = 'Forget Password Request';
+    const html = `<p> Hello <strong>${model.firstName || model.organizationName}</strong>,</p>
+        <p> We're sending you this email because you requested a password reset. Click on this link to create a new password: <br>
+        <a href=${url}>Click here</a></p>
         <p> If you didn't request a password reset, you can ignore this email. Your password will not be changed.</p>
         <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`;
 
-    try {
-      let emailSent = await this.sendEmailAsync(to, from, subject, html);
-      if (emailSent) {
-        return "Email for forget password successfully sent";
-      } else {
-        throw new HttpException(
-          { error: `Unable to send verification email`, status: HttpStatus.BAD_REQUEST },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-    } catch (error) {
-      throw new HttpException(
-        { error: `${error}`, status: HttpStatus.INTERNAL_SERVER_ERROR },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+        try {
+          await this.mailService.sendHtmlMailAsync(to, subject, html);
+        return true;
+        } catch (error) {
+          throw new HttpException(
+            { error: `An error occurred while trying to send verify email ${error}`, status: HttpStatus.INTERNAL_SERVER_ERROR },
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
   }
 
 
@@ -219,8 +221,8 @@ export class AccountService {
     msg = {};
 
     if (messages.length > 0) {
-      const sent = await SendGrid.send(messages);
-      return sent;
+      // const sent = await SendGrid.send(messages);
+      // return sent;
     }
   }
 

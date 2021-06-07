@@ -66,6 +66,8 @@ export class CommentController {
   @ApiResponse({ status: 201, description: 'liked comment successfully.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Like Comment' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
   likeComment(@Param('commentId') commentId: string,  @Req() req ) {
     try {
       const { user } = req;
@@ -79,6 +81,8 @@ export class CommentController {
   @ApiResponse({ status: 201, description: 'disliked comment successfully.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Disike Comment' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
   dislikeComment(@Param('commentId') commentId: string,  @Req() req ) {
     try {
       const { user } = req;
