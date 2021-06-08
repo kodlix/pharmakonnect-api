@@ -6,7 +6,7 @@ import { editFileName, imageFileFilter } from "src/_utility/fileupload.util";
 import { AdvertRO } from "./advert.interface";
 import { AdvertService } from "./advert.service";
 import { CreateAdvertDto } from "./dto/create-advert";
-import { UpdateAdvertDto } from "./dto/update-advert";
+import { RejectAdvertDto, UpdateAdvertDto } from "./dto/update-advert";
 import { diskStorage } from 'multer';
 
 
@@ -17,12 +17,22 @@ import { diskStorage } from 'multer';
 @ApiTags('advert')
 export class AdvertController {
     constructor(private readonly advertservice: AdvertService) { }
+
+    @UseInterceptors(
+      FileInterceptor('advertImage', {
+        storage: diskStorage({
+          destination: './uploads',
+          filename: editFileName,
+        }),
+        fileFilter: imageFileFilter,
+      }),
+    )
     @Post()
     @ApiOperation({ summary: 'Create Advert Category' })
     @ApiResponse({ status: 403, description: 'Forbidden.' })
     @ApiResponse({ status: 201, description: 'Advert successfully created' })
-    create(@Body()dto: CreateAdvertDto,@Req() req: any) {
-        return this.advertservice.create(dto,req.user);
+    create(@Body()dto: CreateAdvertDto,@Req() req: any, @UploadedFile() file,) {
+        return this.advertservice.create(dto, req.user, file ? file.filename : "" );
     }
 
     @Get()
@@ -55,16 +65,41 @@ export class AdvertController {
     }
 
     @Put(':id')
-    @ApiResponse({ status: 201, description: 'Update Successfull.' })
+    @ApiResponse({ status: 201, description: 'Update Successful.' })
     @ApiResponse({ status: 404, description: 'Not Found.' })
     @ApiOperation({ summary: 'Update Advert' })
     async update(
         @Param('id') id: string,
         @Body() updateAdvertDto: UpdateAdvertDto,
-        @Req() req: any
+        @Req() req: any,
+        @UploadedFile() file,
     ): Promise<AdvertRO> {
-        return await this.advertservice.update(id, updateAdvertDto, req.user);
+        return await this.advertservice.update(id, updateAdvertDto, req.user,file);
     }
+
+
+    @Put('approve/:id')
+  @ApiResponse({ status: 201, description: 'Approved.' })
+  @ApiResponse({ status: 404, description: 'Not Found.' })
+  @ApiOperation({ summary: 'Approve Advert' })
+  async approve(
+    @Param('id') id: string,
+    @Req() req: any
+  ): Promise<AdvertRO> {
+    return await this.advertservice.updateApprove(id, req.user);
+  }
+
+  @Put('reject/:id')
+  @ApiResponse({ status: 201, description: 'Rejected.' })
+  @ApiResponse({ status: 404, description: 'Not Found.' })
+  @ApiOperation({ summary: 'Reject Advert' })
+  async reject(
+    @Param('id') id: string,
+    @Body() dto: RejectAdvertDto,
+    @Req() req: any
+  ): Promise<AdvertRO> {
+    return await this.advertservice.updateReject(id, dto, req.user);
+  }
 
    
   // upload single file
@@ -80,27 +115,27 @@ export class AdvertController {
       fileFilter: imageFileFilter,
     }),
   )
-  async uploadedFile(@UploadedFile() file, @Req() req) {
-    if (!file) {
-      return {
-        status: HttpStatus.BAD_REQUEST,
-        message: 'no file to upload',
-        data: file,
-      };
-    }
-    const response = {
-      originalname: file.originalname,
-      filename: file.filename,
-    };
+  // async uploadedFile(@UploadedFile() file, @Req() req) {
+  //   if (!file) {
+  //     return {
+  //       status: HttpStatus.BAD_REQUEST,
+  //       message: 'no file to upload',
+  //       data: file,
+  //     };
+  //   }
+  //   const response = {
+  //     originalname: file.originalname,
+  //     filename: file.filename,
+  //   };
 
-    await this.advertservice.uploadAdvertImage(file.advertImage, req.advertId);
+  //   await this.advertservice.uploadAdvertImage(file.advertImage, req.advertId);
 
-    return {
-      status: HttpStatus.OK,
-      message: 'Image uploaded successfully!',
-      data: response,
-    };
-  }
+  //   return {
+  //     status: HttpStatus.OK,
+  //     message: 'Image uploaded successfully!',
+  //     data: response,
+  //   };
+  // }
 
 
     @Delete(':id')

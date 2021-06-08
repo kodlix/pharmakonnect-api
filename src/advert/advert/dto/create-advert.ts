@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsNotEmpty, IsInt, IsNumber, IsPositive } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsString, IsNotEmpty, IsInt, IsNumber, IsPositive, IsOptional } from "class-validator";
 
 export class CreateAdvertDto{
 
@@ -26,7 +26,7 @@ export class CreateAdvertDto{
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    advertserId: string;
+    advertiserId: string;
 
     @ApiProperty()
     @IsString()
@@ -58,4 +58,12 @@ export class CreateAdvertDto{
     @IsString()
     @IsNotEmpty()
     contactPhoneNumber: string;
+
+
+    @ApiProperty()
+    @ApiPropertyOptional()
+    @IsOptional()
+    advertImage: string;
+
+
 }

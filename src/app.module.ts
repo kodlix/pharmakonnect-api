@@ -30,8 +30,8 @@ import { PackageModule } from './package/package.module';
 import { FeatureModule } from './features/feature.module';
 import { MailerModule } from './mailer/mailer.module';
 import { LikeModule } from './user-like/like.module';
-
-
+import { AdvertModule } from './advert/advert/advert.module';
+import { AdvertCategoryModule } from './advert/advertcategory/advertcategory.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot(),
@@ -59,7 +59,9 @@ import { LikeModule } from './user-like/like.module';
     PackageModule,
     FeatureModule,
     MailerModule,
-    LikeModule
+    LikeModule,
+    AdvertModule,
+    AdvertCategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
