@@ -11,6 +11,7 @@ import { Not } from 'typeorm';
 import { default as config } from './config';
 import { AccountEntity } from './entities/account.entity';
 import { SendGridService } from 'src/mailer/sendgrid.service';
+import { MailGunService } from 'src/mailer/mailgun.service';
 
 
 @Injectable()
@@ -18,7 +19,8 @@ export class AccountService {
   constructor(
     private readonly accountRepository: AccountRepository,
     private jwtService: JwtService,
-    private readonly mailService: SendGridService
+    private readonly mailService: SendGridService,
+    private readonly mailGunService: MailGunService
   ) { }
 
   public async login(loginDto: LoginDTO): Promise<UserRO> {
@@ -189,7 +191,7 @@ export class AccountService {
         <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`;
 
         try {
-          await this.mailService.sendHtmlMailAsync(to, subject, html);
+          await this.mailGunService.sendMailAsync(to, subject, html);
         return true;
         } catch (error) {
           throw new HttpException(

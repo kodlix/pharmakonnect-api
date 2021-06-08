@@ -98,6 +98,11 @@ export class ArticleService {
   }
 
   public async create(articleDto: ArticleDto, userEmail: string): Promise<ArticleEntity> {
+    const author = await this.accountService.findByEmail(userEmail);
+
+    if (author && !author.isRegComplete) {
+      throw new Error("Complete your profile registration to be able to create blogs.");      
+    }
     const articleToCreate: ArticleEntity = { ...articleDto };
     articleToCreate.author = await this.accountService.getOneUserByEmail(userEmail);
     articleToCreate.categories = await this.categoryIdsToEntities(articleDto.categoryIds);
