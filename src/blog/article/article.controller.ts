@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Query, Req, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { diskStorage } from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AccountService } from 'src/account/account.service';
 import { CategoryService } from '../category/category.service';
 import { ArticleService } from './article.service';
 import { ArticleDto, RejectArticleDto } from './dto/article.dto';
+import { editFileName, imageFileFilter } from 'src/_utility/fileupload.util';
 
 @ApiTags('article')
 @Controller('article')
@@ -63,9 +66,22 @@ export class ArticleController {
   @Post()
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  async create(@Body() articleDto: ArticleDto, @Req() req: any) {
+  @UseInterceptors(
+    FileInterceptor('coverImage', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async create(@UploadedFile() file, @Body() articleDto: ArticleDto, @Req() req: any) {
+    console.log(file);
     try {
+      const catIds = articleDto.categoryIds.split(',');
       articleDto.createdBy = req.user.createdBy;
+      articleDto.coverImage = file.filename;
+      articleDto.categoryIds = catIds;
       return await this.articleService.create(articleDto, req.user.email);
     } catch (err) {
       throw new HttpException(err, HttpStatus.NOT_ACCEPTABLE);
@@ -204,5 +220,45 @@ export class ArticleController {
       throw new HttpException(err, HttpStatus.NOT_FOUND);
     }
   }
+  
+  
+    // upload single file
+    @Put('/uploads')
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard())
+    @UseInterceptors(
+      FileInterceptor('image', {
+        storage: diskStorage({
+          destination: './uploads',
+          filename: editFileName,
+        }),
+        fileFilter: imageFileFilter,
+      }),
+    )
+    async uploadedFile(@UploadedFile() file, @Body() articleDto: ArticleDto, @Req() req) {
+      if (!file) {
+        return {
+          status: HttpStatus.BAD_REQUEST,
+          message: 'no file to upload',
+          data: file,
+        };
+      }
+      const response = {
+        originalname: file.originalname,
+        filename: file.filename,
+      };
+
+      console.log(articleDto);
+      
+  
+      // await this.accountService.updateProfileImage(file.filename, req.user.id);
+  
+      return {
+        status: HttpStatus.OK,
+        message: 'Image uploaded successfully!',
+        data: response,
+      };
+    }
+  
 
 }

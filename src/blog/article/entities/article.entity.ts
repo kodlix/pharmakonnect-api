@@ -32,6 +32,9 @@ import {
   
     @Column({ type: 'text' })
     body?: string;
+
+    @Column({ nullable: true })
+    coverImage: string;
     
     @Column({ nullable: true })
     editedAt?: Date;
