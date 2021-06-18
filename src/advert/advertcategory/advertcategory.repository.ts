@@ -30,14 +30,19 @@ export class AdvertCategoryRepository extends Repository<AdvertCategoryEntity>{
 
     }
 
-    async findAll(): Promise<AdvertCategoryEntity[]> {
-        const adcat = await this.find();    
-        return adcat;
-      }
+  async findAll(): Promise<AdvertCategoryEntity[]> {
+      const adcat = await this.find();    
+      return adcat;
+    }
+
+    async findById(id: string): Promise<AdvertCategoryEntity> {
+      const adcat = await this.findOne(id);
+      return adcat;
+    }
     
-      async deleteEntity(id: string): Promise<DeleteResult> {
-        const adcat = await this.findOne(id);
-        return await this.delete({ id: adcat.id });
-      }
+    async deleteEntity(id: string): Promise<DeleteResult> {
+      const adcat = await this.findOne(id);
+      return await this.delete({ id: adcat.id });
+    }
     
 }

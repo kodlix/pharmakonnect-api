@@ -21,7 +21,7 @@ export class AdvertEntity extends AbstractBaseEntity{
     endDate: Date;
 
     @Column({ nullable: true })
-    advertserId: string;
+    advertiserId: string;
 
     @Column({ nullable: true })
     zone: string;
@@ -61,6 +61,25 @@ export class AdvertEntity extends AbstractBaseEntity{
 
     @Column('uuid')
     accountId: string;
+
+    @Column({ default: null, nullable: true })
+    approvedOn: Date;
+
+    @Column({ default: null, nullable: true })
+    approvedBy: string;
+
+    @Column({ default: false })
+    approved: boolean;
+
+    @Column({ default: false })
+    rejected: boolean;
+
+    @Column({ nullable: true })
+    rejectedBy: string;
+
+    @Column({ nullable: true })
+    rejectionMessage: string;
+
 
 
 

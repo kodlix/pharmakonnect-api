@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 // import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -30,10 +31,14 @@ import { PackageModule } from './package/package.module';
 import { FeatureModule } from './features/feature.module';
 import { MailerModule } from './mailer/mailer.module';
 import { LikeModule } from './user-like/like.module';
-
-
+import { AdvertModule } from './advert/advert/advert.module';
+import { AdvertCategoryModule } from './advert/advertcategory/advertcategory.module';
+import { join } from 'path';
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),   // <-- path to the static files
+    }),
     TypeOrmModule.forRoot(),
     AccountModule,
     SectorModule,
@@ -51,6 +56,7 @@ import { LikeModule } from './user-like/like.module';
     ScheduleMeetingGatewayModule,
     ScheduleModule.forRoot(),
     StartMeetingReminderModule,
+    EventReminderModule,
     ArticleModule,
     CommentModule,
     CategoryModule,
@@ -59,7 +65,9 @@ import { LikeModule } from './user-like/like.module';
     PackageModule,
     FeatureModule,
     MailerModule,
-    LikeModule
+    LikeModule,
+    AdvertModule,
+    AdvertCategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

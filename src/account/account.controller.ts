@@ -173,7 +173,7 @@ export class AccountController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   public async sendEmailForgotPassword(@Param() params): Promise<string> {
-    return await this.accountService.sendEmailForgotPassword(params.email);
+    return await this.accountService.forgetPassword(params.email);
   }
 
   @Post('/reset-password')
