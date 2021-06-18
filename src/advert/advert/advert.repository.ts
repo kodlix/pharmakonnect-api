@@ -1,9 +1,12 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { AccountEntity } from "src/account/entities/account.entity";
-import { Brackets, DeleteResult, EntityRepository, ILike, Repository } from "typeorm";
+import { Brackets, DeleteResult, EntityRepository, ILike, LessThanOrEqual, MoreThanOrEqual, Repository } from "typeorm";
 import { AdvertEntity } from "../entity/advert.entity";
 import { CreateAdvertDto } from "./dto/create-advert";
 import { RejectAdvertDto, UpdateAdvertDto } from "./dto/update-advert";
+import {validate} from 'class-validator';
+import { isNotValidDate } from "src/_utility/date-validator.util";
+
 
 @EntityRepository(AdvertEntity)
 export class AdvertRepository extends Repository<AdvertEntity>{
@@ -12,13 +15,31 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       user: AccountEntity,
       filename: string
     ): Promise<AdvertEntity> {
-      const advert = new AdvertEntity();        
-  
+      
+      const checkAdvert = await this.findOne({ where: { title: ILike(`%${dto.title}%`), companyName: ILike(`%${dto.companyName}%`) } });
+      const advert = new AdvertEntity();  
+
+      if ( checkAdvert ){
+        throw new HttpException( `Advert with ${dto.title} and Company  ${dto.companyName} already exist`, HttpStatus.BAD_REQUEST);
+      }
+
+      if (isNotValidDate (dto.endDate)) {
+        throw new HttpException(
+          `End date of Advert '${dto.title}' can not be less than today`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if(new Date(dto.endDate).setHours(0,0,0,0) < new Date(dto.startDate).setHours(0,0,0,0)) {
+        throw new HttpException(`Start date of advert cannot be greater than End date`, HttpStatus.BAD_REQUEST,);
+    }
+      
         advert.title = dto.title;
         advert.companyName = dto.companyName;
         advert.contactPerson = dto.contactPerson;
         advert.url = dto.url;        
-        advert.publishedAt = dto.publishedAt;   
+        advert.publishedAt = dto.publishedAt;
+        advert.startDate = dto.startDate;           
         advert.endDate = dto.endDate;        
         advert.advertiserId = dto.advertiserId;
         advert.advertCategoryId = dto.advertCategory
@@ -32,6 +53,11 @@ export class AdvertRepository extends Repository<AdvertEntity>{
           advert.advertImage = filename;
       }
   
+      const errors = await validate(advert);
+      if(errors.length > 0) {
+        throw new HttpException(errors, HttpStatus.BAD_REQUEST);
+    }
+
       return await this.save(advert);
     }
 
@@ -43,11 +69,32 @@ export class AdvertRepository extends Repository<AdvertEntity>{
 
     ): Promise<AdvertEntity> {
       const advert = await this.findOne(id);
+      
+      const checkAdvert = await this.findOne({ where: { title: ILike(`%${dto.title}%`), companyName: ILike(`%${dto.companyName}%`) } });
+
+      if ( checkAdvert ){
+        throw new HttpException( `Advert with ${dto.title} and Company  ${dto.companyName} already exist`, HttpStatus.BAD_REQUEST);
+      }
+
+      if (isNotValidDate (dto.endDate)) {
+        throw new HttpException(
+          `End date of Advert '${dto.title}' can not be less than today`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if(new Date(dto.endDate).setHours(0,0,0,0) < new Date(dto.startDate).setHours(0,0,0,0)) {
+        throw new HttpException(`Start date of advert cannot be greater than End date`, HttpStatus.BAD_REQUEST,);
+      }
+
+
+
       advert.title = dto.title;
       advert.companyName = dto.companyName;
       advert.contactPerson = dto.contactPerson;
       advert.url = dto.url;        
       advert.publishedAt = dto.publishedAt;   
+      advert.startDate = dto.startDate;        
       advert.endDate = dto.endDate;        
       advert.advertiserId = dto.advertiserId;
       advert.advertCategoryId = dto.advertCategory
@@ -142,7 +189,12 @@ export class AdvertRepository extends Repository<AdvertEntity>{
     }
   
     async findById(id: string): Promise<AdvertEntity> {
-      const advert = await this.findOne(id);
+      const advert = await this.findOne(id,
+        {
+          relations: ['advertCategory'],
+        }
+        )
+
       return advert;
     }
   
@@ -156,4 +208,19 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       });
       return advert;
     }
+
+
+    async findByAprroved(page = 1 ): Promise<AdvertEntity[]> {
+
+      const today = new Date();
+      const advert = await this.find({
+        relations: ["advertCategory"],
+        where: {approved: true , rejected : false , startDate: LessThanOrEqual (today), endDate: MoreThanOrEqual(today)},
+        order: { approvedOn: 'DESC' },
+
+        take: 25,  
+        skip: 25 * (page - 1)
+      });
+      return advert;
+  }
 }

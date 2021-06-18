@@ -18,6 +18,9 @@ export class AdvertEntity extends AbstractBaseEntity{
     publishedAt: string;
 
     @Column({ nullable: true })
+    startDate: Date;
+
+    @Column({ nullable: true })
     endDate: Date;
 
     @Column({ nullable: true })

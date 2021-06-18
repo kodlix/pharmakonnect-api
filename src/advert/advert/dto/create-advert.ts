@@ -21,6 +21,11 @@ export class CreateAdvertDto{
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
+    startDate: Date;
+
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
     endDate: Date;
 
     @ApiProperty()
