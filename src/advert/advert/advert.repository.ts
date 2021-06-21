@@ -72,10 +72,6 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       
       const checkAdvert = await this.findOne({ where: { title: ILike(`%${dto.title}%`), companyName: ILike(`%${dto.companyName}%`) } });
 
-      if ( checkAdvert ){
-        throw new HttpException( `Advert with ${dto.title} and Company  ${dto.companyName} already exist`, HttpStatus.BAD_REQUEST);
-      }
-
       if (isNotValidDate (dto.endDate)) {
         throw new HttpException(
           `End date of Advert '${dto.title}' can not be less than today`,
@@ -106,12 +102,21 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       advert.updatedAt = new Date();
       advert.approved = false;
       advert.rejected = false;
+    
       if(filename) {
         advert.advertImage = filename;
+    } else {
+        if(advert.advertImage) {
+            dto.advertImage = advert.advertImage;
+        }
     }
-    else{
-        advert.advertImage = dto.advertImage;
-    }
+
+    //   if(filename) {
+    //     advert.advertImage = filename;
+    // }
+    // else{
+    //     advert.advertImage = dto.advertImage;
+    // }
       
       return await this.save(advert);
     }

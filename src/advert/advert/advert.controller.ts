@@ -73,17 +73,26 @@ export class AdvertController {
       return await this.advertservice.findByApproved(page);
     }
 
+    @UseInterceptors(
+      FileInterceptor('advertImage', {
+        storage: diskStorage({
+          destination: './uploads',
+          filename: editFileName,
+        }),
+        fileFilter: imageFileFilter,
+      }),
+    )
     @Put(':id')
     @ApiResponse({ status: 201, description: 'Update Successful.' })
     @ApiResponse({ status: 404, description: 'Not Found.' })
     @ApiOperation({ summary: 'Update Advert' })
     async update(
         @Param('id') id: string,
-        @Body() updateAdvertDto: UpdateAdvertDto,
+        @Body() Dto: UpdateAdvertDto,
         @Req() req: any,
         @UploadedFile() file,
     ): Promise<AdvertRO> {
-        return await this.advertservice.update(id, updateAdvertDto, req.user,file);
+        return await this.advertservice.update(id, Dto, req.user,file ? file.filename : "" );
     }
 
 

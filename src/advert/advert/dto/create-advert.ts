@@ -19,12 +19,10 @@ export class CreateAdvertDto{
     publishedAt: string;
 
     @ApiProperty()
-    @IsString()
     @IsNotEmpty()
     startDate: Date;
 
     @ApiProperty()
-    @IsString()
     @IsNotEmpty()
     endDate: Date;
 
