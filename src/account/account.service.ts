@@ -7,18 +7,21 @@ import { JwtPayload, OrganizationRO, UserDataRO } from './interfaces/user.interf
 import { JwtService } from '@nestjs/jwt';
 import { AccountRepository } from './account.repository';
 import { FilterDto } from 'src/_common/filter.dto';
-import { Not } from 'typeorm';
+import { getRepository, Not } from 'typeorm';
 import { default as config } from './config';
 import { AccountEntity } from './entities/account.entity';
 import { SendGridService } from 'src/mailer/sendgrid.service';
 import { MailGunService } from 'src/mailer/mailgun.service';
 import { accountTypes } from './account.constant';
+import { ContactService } from 'src/contact/contact.service';
+import { ContactEnitiy } from 'src/contact/entities/contact.entity';
 
 
 @Injectable()
 export class AccountService {
   constructor(
     private readonly accountRepository: AccountRepository,
+    private readonly contactService: ContactService,
     private jwtService: JwtService,
     private readonly mailService: SendGridService,
     private readonly mailGunService: MailGunService
@@ -74,15 +77,41 @@ export class AccountService {
 
 
   public async getAvailableContactsByAccount(page = 1, take = 25, user: any): Promise<UserDataRO[]> {
-    const accounts = await this.accountRepository.find({
-      where: {
-        isRegComplete: true,
-        accountType: Not([accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]),
 
-      },
-      skip: take * (page - 1), take,
-      order: { createdAt: 'DESC' },
-    })
+    const contacts = await getRepository(ContactEnitiy)
+      .createQueryBuilder('contact')
+      .where('contact.creatorId = :id', { creatorId: user.id })
+      .select('accountId');
+
+    const accounts = await getRepository(AccountEntity)
+      .createQueryBuilder('account')
+      .where('account.isRegComplete = :status', { status: true })
+      .andWhere('account.accountType Not In (:...types)', {
+        types:
+          [accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]
+      })
+      .andWhere('account.id Not In (:...contacts)', { contacts })
+      .skip(take * (page - 1))
+      .take(take)
+      .orderBy('account.createdAt', 'DESC')
+      .getMany();
+
+    // const contactIds = await this.contactService.find({
+    //   where: {
+    //     creatorId: user.id
+    //   },
+    //   select: ["accountId"]
+    // });
+
+    // const accounts = await this.accountRepository.find({
+    //   where: {
+    //     isRegComplete: true,
+    //     accountType: Not([accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]),
+    //     id: Not([...contactIds])
+    //   },
+    //   skip: take * (page - 1), take,
+    //   order: { createdAt: 'DESC' },
+    // })
     return this.accountRepository.buildUserArrRO(accounts);
   }
 
