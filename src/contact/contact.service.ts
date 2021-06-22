@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { getRepository, Repository, getConnection } from 'typeorm';
 import { CreateContactDto } from './dto/create-contact.dto';
@@ -31,12 +32,11 @@ export class ContactService extends Repository<ContactEnitiy> {
           contactArr.push(contact)
         }
       }
-      const result = await contactrepository.save(contactArr);
-      if (contactExist.length <= 0) {
-        return result
+      if (contactExist.length > 0) {
+        throw new BadRequestException(contactExist[0])
       }
-      return contactExist
 
+      return await contactrepository.save(contactArr);
 
     } catch (error) {
       throw new HttpException({ error: `An error occured`, status: HttpStatus.INTERNAL_SERVER_ERROR },
