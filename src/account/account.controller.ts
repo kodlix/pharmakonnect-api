@@ -42,6 +42,15 @@ export class AccountController {
     return await this.accountService.findAll(filterDto);
   }
 
+  @Get("/contacts")
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @ApiOperation({ summary: 'Get all available contacts for user' })
+  @ApiResponse({ status: 200, description: 'Return all available contacts for user' })
+  async findAvailableContactsByAccount(@Query('page') page: number, @Query('take') take: number, @Req() req: any): Promise<UserDataRO[]> {
+    return await this.accountService.getAvailableContactsByAccount(page, take, req?.user);
+  }
+
   @Get(':id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
@@ -151,9 +160,9 @@ export class AccountController {
   @ApiResponse({ status: 200, description: 'Email verified successfully' })
   @Redirect()
   public async verifyEmail(@Param() params) {
-    const envUrl = process.env.NODE_ENV === "development" ? process.env.WEB_URL_DEV: process.env.WEB_URL_PROD;
-    await this.accountService.verifyEmail(params.token); 
-     return { url: envUrl + '/login?verified=true' };
+    const envUrl = process.env.NODE_ENV === "development" ? process.env.WEB_URL_DEV : process.env.WEB_URL_PROD;
+    await this.accountService.verifyEmail(params.token);
+    return { url: envUrl + '/login?verified=true' };
   }
 
   @Get('/resend-verification/:email')

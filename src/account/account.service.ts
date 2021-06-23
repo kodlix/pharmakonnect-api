@@ -7,11 +7,13 @@ import { JwtPayload, OrganizationRO, UserDataRO } from './interfaces/user.interf
 import { JwtService } from '@nestjs/jwt';
 import { AccountRepository } from './account.repository';
 import { FilterDto } from 'src/_common/filter.dto';
-import { Not } from 'typeorm';
+import { getRepository, Not } from 'typeorm';
 import { default as config } from './config';
 import { AccountEntity } from './entities/account.entity';
 import { SendGridService } from 'src/mailer/sendgrid.service';
 import { MailGunService } from 'src/mailer/mailgun.service';
+import { accountTypes } from './account.constant';
+import { ContactEnitiy } from 'src/contact/entities/contact.entity';
 
 
 @Injectable()
@@ -28,7 +30,7 @@ export class AccountService {
     if (!user) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.BAD_REQUEST);
     }
-    const { email, accountPackage, isRegComplete, accountType, accountId, profileImage} = user
+    const { email, accountPackage, isRegComplete, accountType, accountId, profileImage } = user
     if (!email) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.UNAUTHORIZED);
     }
@@ -70,6 +72,35 @@ export class AccountService {
     const users = await query.getMany();
     return this.accountRepository.buildUserArrRO(users);
   }
+
+
+  public async getAvailableContactsByAccount(page = 1, take = 25, user: any): Promise<UserDataRO[]> {
+    page = +page;
+    take = take && +take || 25;
+
+    const contacts = await getRepository(ContactEnitiy)
+      .createQueryBuilder('contact')
+      .where('contact.creatorId = :id', { id: user.id })
+      .select('contact.accountId')
+      .getMany();
+
+    const accounts = await getRepository(AccountEntity)
+      .createQueryBuilder('account')
+      .where('account.isRegComplete = :status', { status: true })
+      .andWhere('account.accountType Not In (:...types)', {
+        types:
+          [accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]
+      })
+      // .andWhere('account.id Not In (:...contacts)', { contacts: [...contacts] })
+      .skip(take * (page - 1))
+      .take(take)
+      .orderBy('account.createdAt', 'DESC')
+      .getMany();
+    return this.accountRepository.buildUserArrRO(accounts);
+  }
+
+
+
 
   public async findOne(id: string): Promise<UserDataRO> {
     return await this.accountRepository.getById(id);
@@ -150,7 +181,7 @@ export class AccountService {
   public async sendEmailVerification(email: string): Promise<boolean> {
     let model = await this.accountRepository.findOne({ where: { email: email } });
     if (model && model.emailToken) {
-      const envUrl = process.env.NODE_ENV === "development" ? process.env.URL_DEV: process.env.URL_PROD;
+      const envUrl = process.env.NODE_ENV === "development" ? process.env.URL_DEV : process.env.URL_PROD;
       const url = `${envUrl}/account/verify/${model.emailToken}`;
       const to = model.email;
       const subject = 'Email Confirmation';
@@ -163,7 +194,7 @@ export class AccountService {
 
       try {
         await this.mailService.sendHtmlMailAsync(to, subject, html);
-      return true;
+        return true;
       } catch (error) {
         throw new HttpException(
           { error: `An error occurred while trying to send verify email ${error}`, status: HttpStatus.INTERNAL_SERVER_ERROR },
