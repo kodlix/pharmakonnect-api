@@ -64,17 +64,35 @@ export class AdvertController {
         return await this.advertservice.findByAccountId(user.id, page);
     }
 
+    @Get('applications/active')
+    @ApiResponse({ status: 201, description: 'Success.' })
+    @ApiResponse({ status: 404, description: 'Not Found.' })
+    @ApiQuery({ name: 'page', required: false })
+    @ApiOperation({ summary: 'Get Advert by Approved' })
+    async findByApproved(@Query('page') page?: number): Promise<AdvertRO[]> {
+      return await this.advertservice.findByApproved(page);
+    }
+
+    @UseInterceptors(
+      FileInterceptor('advertImage', {
+        storage: diskStorage({
+          destination: './uploads',
+          filename: editFileName,
+        }),
+        fileFilter: imageFileFilter,
+      }),
+    )
     @Put(':id')
     @ApiResponse({ status: 201, description: 'Update Successful.' })
     @ApiResponse({ status: 404, description: 'Not Found.' })
     @ApiOperation({ summary: 'Update Advert' })
     async update(
         @Param('id') id: string,
-        @Body() updateAdvertDto: UpdateAdvertDto,
+        @Body() Dto: UpdateAdvertDto,
         @Req() req: any,
         @UploadedFile() file,
     ): Promise<AdvertRO> {
-        return await this.advertservice.update(id, updateAdvertDto, req.user,file);
+        return await this.advertservice.update(id, Dto, req.user,file ? file.filename : "" );
     }
 
 
@@ -102,19 +120,19 @@ export class AdvertController {
   }
 
    
-  // upload single file
-  @Put('/uploads')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard())
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './advertimages',
-        filename: editFileName,
-      }),
-      fileFilter: imageFileFilter,
-    }),
-  )
+  // // upload single file
+  // @Put('/uploads')
+  // @ApiBearerAuth()
+  // @UseGuards(AuthGuard())
+  // @UseInterceptors(
+  //   FileInterceptor('image', {
+  //     storage: diskStorage({
+  //       destination: './advertimages',
+  //       filename: editFileName,
+  //     }),
+  //     fileFilter: imageFileFilter,
+  //   }),
+  // )
   // async uploadedFile(@UploadedFile() file, @Req() req) {
   //   if (!file) {
   //     return {

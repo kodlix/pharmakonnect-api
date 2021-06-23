@@ -53,6 +53,11 @@ export class AdvertService{
         return await this.advertRepository.findByAccountId(accountId, page);
     }
 
+    
+    async findByApproved( page): Promise<AdvertRO[]> {
+        return await this.advertRepository.findByAprroved(page);
+    }
+
     async remove(id: string) {
         return await this.advertRepository.deleteEntity(id);
     }
