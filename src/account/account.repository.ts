@@ -7,6 +7,7 @@ import { UserFromDbRO } from './interfaces/account.interface';
 import { OrganizationRO, UserDataRO } from './interfaces/user.interface';
 import { accountTypes } from './account.constant';
 import { constants } from 'buffer';
+import { OutletEntity } from 'src/outlet/entity/outlet.entity';
 
 @EntityRepository(AccountEntity)
 export class AccountRepository extends Repository<AccountEntity> {
@@ -39,6 +40,17 @@ export class AccountRepository extends Repository<AccountEntity> {
     user.password = await this.hashPassword(password, user.salt);
     try {
       await user.save();
+      if (accountType = "corporate"){
+
+        const outlet = new OutletEntity()
+        
+        outlet.isHq = true;
+        outlet.name = "Headquarters"
+        outlet.accountId = user.id;
+        outlet.createdBy = user.createdBy;
+        outlet.organizationName = user.organizationName;
+        await outlet.save()
+      }
       return true;
     } catch (error) {
       throw new HttpException(
@@ -46,6 +58,7 @@ export class AccountRepository extends Repository<AccountEntity> {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+    
   }
 
   public async validateUserPassword({
