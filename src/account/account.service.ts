@@ -8,10 +8,8 @@ import { JwtService } from '@nestjs/jwt';
 import { AccountRepository } from './account.repository';
 import { FilterDto } from 'src/_common/filter.dto';
 import { getRepository, Not } from 'typeorm';
-import { default as config } from './config';
 import { AccountEntity } from './entities/account.entity';
 import { SendGridService } from 'src/mailer/sendgrid.service';
-import { MailGunService } from 'src/mailer/mailgun.service';
 import { accountTypes } from './account.constant';
 import { ContactEnitiy } from 'src/contact/entities/contact.entity';
 
@@ -22,7 +20,6 @@ export class AccountService {
     private readonly accountRepository: AccountRepository,
     private jwtService: JwtService,
     private readonly mailService: SendGridService,
-    private readonly mailGunService: MailGunService
   ) { }
 
   public async login(loginDto: LoginDTO): Promise<UserRO> {
@@ -222,7 +219,7 @@ export class AccountService {
         <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`;
 
         try {
-          await this.mailGunService.sendMailAsync(to, subject, html);
+          await this.mailService.sendHtmlMailAsync(to, subject, html);
         return true;
         } catch (error) {
           throw new HttpException(
@@ -239,24 +236,6 @@ export class AccountService {
 
   public async changedPassword(changeDto: ChangePasswordDto): Promise<string> {
     return await this.accountRepository.changedPassword(changeDto);
-  }
-
-  private async sendEmailAsync(email: string, from: string, subject: string, html: any) {
-    const messages = [];
-    let msg: any = {};
-
-    msg.to = email;
-    msg.from = from;
-    msg.subject = subject,
-      msg.html = html
-
-    messages.push(msg);
-    msg = {};
-
-    if (messages.length > 0) {
-      // const sent = await SendGrid.send(messages);
-      // return sent;
-    }
   }
 
   public async getOneUserByEmail(email: string): Promise<AccountEntity> {

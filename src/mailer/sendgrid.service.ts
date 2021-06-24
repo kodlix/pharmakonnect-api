@@ -36,7 +36,7 @@ export class SendGridService {
         from: process.env.SENDGRID_FROM_EMAIL,
         to,
         subject,
-        html: htmlText,
+        html: htmlText
       });
     } catch (error) {
       Logger.error(`SendGridService.sendHtmlMailAsync: ${error.toString()}`);
