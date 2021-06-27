@@ -72,15 +72,58 @@ export class AccountService {
   }
 
 
-  public async getAvailableContactsByAccount(page = 1, take = 25, user: any): Promise<UserDataRO[]> {
+  public async getAvailableContactsByAccount(search, page = 1, take = 20, user: any): Promise<UserDataRO[]> {
     page = +page;
-    take = take && +take || 25;
+    take = take && +take || 20;
 
     const contacts = await getRepository(ContactEnitiy)
       .createQueryBuilder('contact')
       .where('contact.creatorId = :id', { id: user.id })
       .select('contact.accountId')
       .getMany();
+
+    let contactIds = [user.id, ...contacts.map(c => c.accountId)];
+
+    if (search) {
+      const searchQuery = `
+         account.firstName like :firstName OR 
+         account.lastName like :lastName`;
+
+      //  const searchQuery = `
+      //  account.city like :city OR 
+      //  account.organizationName like :organizationName OR
+      //   account.email like :email OR account.phoneNumber like :phoneNumber OR
+      //   account.pcn like :pcn OR
+      //   account.firstName like :firstName OR 
+      //   account.lastName like :lastName OR
+      //   account.typeOFPractice like :typeOfPractice OR
+      //   account.organizationType like :organizationType OR
+      //   account.companyRegistrationNumber like :companyRegistrationNumber OR
+      //   account.address like :address OR
+      //   account._state.name like :state OR
+      //   account._lga.name like :lga OR
+      //   account._country.name like :country`;
+
+      const accts = await getRepository(AccountEntity)
+        .createQueryBuilder('account')
+        .where('account.isRegComplete = :status', { status: true })
+        .andWhere('account.accountType Not In (:...types)', {
+          types:
+            [accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]
+        })
+        .andWhere('account.id Not In (:...contacts)', { contacts: contactIds })
+        .andWhere(searchQuery, {
+          firstName: `%${search}%`,
+          lastName: `%${search}%`
+        })
+        .skip(take * (page - 1))
+        .take(take)
+        .orderBy('account.createdAt', 'DESC')
+        .getMany();
+
+      return this.accountRepository.buildUserArrRO(accts);
+    }
+
 
     const accounts = await getRepository(AccountEntity)
       .createQueryBuilder('account')
@@ -89,7 +132,7 @@ export class AccountService {
         types:
           [accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]
       })
-      // .andWhere('account.id Not In (:...contacts)', { contacts: [...contacts] })
+      .andWhere('account.id Not In (:...contacts)', { contacts: contactIds })
       .skip(take * (page - 1))
       .take(take)
       .orderBy('account.createdAt', 'DESC')

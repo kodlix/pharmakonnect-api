@@ -46,10 +46,17 @@ export class ContactService extends Repository<ContactEnitiy> {
 
   }
 
-  async findAll(id: string): Promise<ContactEnitiy[]> {
+  async findAll(page = 1, take = 20, user: any): Promise<ContactEnitiy[]> {
+
+    page = +page;
+    take = take && +take || 20;
+
+
     const conversations = await getRepository(ContactEnitiy)
       .createQueryBuilder('conversation')
-      .where('conversation.creatorId = :id', { id })
+      .where('conversation.creatorId = :id', { id: user.id })
+      .skip(take * (page - 1))
+      .take(take)
       .getMany();
     return conversations
   }
