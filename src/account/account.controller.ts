@@ -47,8 +47,8 @@ export class AccountController {
   @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Get all available contacts for user' })
   @ApiResponse({ status: 200, description: 'Return all available contacts for user' })
-  async findAvailableContactsByAccount(@Query('page') page: number, @Query('take') take: number, @Req() req: any): Promise<UserDataRO[]> {
-    return await this.accountService.getAvailableContactsByAccount(page, take, req?.user);
+  async findAvailableContactsByAccount(@Query('search') search: string, @Query('page') page: number, @Query('take') take: number, @Req() req: any): Promise<UserDataRO[]> {
+    return await this.accountService.getAvailableContactsByAccount(search, page, take, req?.user);
   }
 
   @Get(':id')

@@ -1,11 +1,12 @@
+import { AccountEntity } from "src/account/entities/account.entity";
 import { CountryEntity } from "src/country/entities/country.entity";
 import { LgaEntity } from "src/lga/entities/lga.entity";
 import { BaseEntity, Column, Entity, ManyToOne, OneToMany } from "typeorm";
 
 @Entity('State')
 export class StateEntity extends BaseEntity {
-    
-    @Column({primary:true})
+
+    @Column({ primary: true })
     public id: number;
     @Column({ unique: true, length: 50 })
     public code: string;
@@ -20,5 +21,8 @@ export class StateEntity extends BaseEntity {
 
     @OneToMany(() => LgaEntity, s => s.state)
     lgas: LgaEntity[];
+
+    @OneToMany(() => AccountEntity, s => s._state)
+    accounts: AccountEntity[];
 
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Req, UseGuards, Query } from '@nestjs/common';
 import { ContactService } from './contact.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
@@ -10,10 +10,10 @@ import { AuthGuard } from '@nestjs/passport';
 @ApiTags('contact')
 @UseGuards(AuthGuard())
 export class ContactController {
-  constructor(private readonly contactService: ContactService) {}
+  constructor(private readonly contactService: ContactService) { }
 
   @Post()
-  @ApiBody({type: [CreateContactDto] })
+  @ApiBody({ type: [CreateContactDto] })
   create(@Body() createContactDto: CreateContactDto[], @Req() req: any): Promise<any[]> {
     const user = req.user;
     const result = this.contactService.createContact(createContactDto, user);
@@ -21,9 +21,9 @@ export class ContactController {
   }
 
   @Get()
-  async findAll( @Req() req: any) {
+  async findAll(@Query('page') page: number, @Query('take') take: number, @Req() req: any) {
     const { user } = req;
-    return await this.contactService.findAll(user.id);
+    return await this.contactService.findAll(page, take, user);
   }
 
   @Get(':id')
