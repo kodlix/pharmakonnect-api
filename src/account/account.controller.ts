@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Put, Param, UseGuards, Patch, Query, UseIn
 import { AuthGuard } from '@nestjs/passport';
 import { diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AccountService } from './account.service';
 import { CorperateDTO } from './dto/cooperate.dto';
 import { IndividualDTO } from './dto/individual.dto';
@@ -201,4 +201,39 @@ export class AccountController {
     return await this.accountService.changedPassword(changeDto);
   }
 
+  @Get('/staff/unverified/:id')
+  @ApiResponse({ status: 404, description: 'Not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({ status: 200, description: 'Email verified successfully' })
+  @ApiQuery({ name: 'page', required: false})
+  public async findUnverifedStaff(@Param('id') id: string,@Query('page') page?: number,){
+    return await this.accountService.findUnverifedStaff(id,page)
+  }
+
+  @Get('/staff/verified/:id')
+  @ApiResponse({ status: 404, description: 'Not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({ status: 200, description: 'Staff verified successfully' })
+  @ApiQuery({ name: 'page', required: false})
+  public async findverifedStaff(@Param('id') id:string,@Query('page') page?: number,){
+    return await this.accountService.findVerifiedStaff(id,page)
+  }
+
+  @Put('verify/:id')
+  @ApiResponse({ status: 201, description: 'Approved.' })
+  @ApiResponse({ status: 404, description: 'Not Found.' })
+  @ApiOperation({ summary: 'Approve Staff' })
+  async approve(@Param('id') id: string,):Promise<UserDataRO>{
+    return await this.accountService.verifyStaff(id); 
+  }
+
+  @Put('reject/:id')
+  @ApiResponse({ status: 201, description: 'Approved.' })
+  @ApiResponse({ status: 404, description: 'Not Found.' })
+  @ApiOperation({ summary: 'reject Staff' })
+  async reject(
+    @Param('id') id: string, 
+    @Body() message:string):Promise<UserDataRO>{
+    return await this.accountService.rejectStaff(id,message); 
+  }
 }

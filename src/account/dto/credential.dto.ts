@@ -15,6 +15,8 @@ export class RegisterDTO {
     readonly lastName?: string;
     @IsOptional() @ApiProperty()
     readonly organizationName?: string;
+    @IsOptional() @ApiProperty()
+    readonly organizationId?: string;
     isRegComplete: boolean;
 }
 
