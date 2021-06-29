@@ -16,6 +16,7 @@ export class RegisterDTO {
     @IsOptional() @ApiProperty()
     readonly organizationName?: string;
     isRegComplete: boolean;
+    emailVerified: boolean;
 }
 
 export class LoginDTO {
