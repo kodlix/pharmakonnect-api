@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Query, Req, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus, Query, Req, UseGuards, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -80,22 +80,39 @@ export class ArticleController {
     try {
       const catIds = articleDto.categoryIds.split(',');
       articleDto.createdBy = req.user.createdBy;
-      articleDto.coverImage = file.filename;
+      articleDto.coverImage = file && file.filename;
       articleDto.categoryIds = catIds;
       return await this.articleService.create(articleDto, req.user.email);
     } catch (err) {
-      throw new HttpException(err, HttpStatus.NOT_ACCEPTABLE);
+      throw new BadRequestException(err.message);
     }
   }
 
   @Put(':articleId')
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  async update(@Param('articleId') articleId: string, @Body() articleDto: ArticleDto) {
+  @UseInterceptors(
+    FileInterceptor('coverImage', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async update(@UploadedFile() file, @Param('articleId') articleId: string, @Body() articleDto: ArticleDto) {
     try {
+
+      if(!articleDto.categoryIds){
+        throw new BadRequestException("Category is missing.");
+      }
+
+      const catIds = articleDto.categoryIds.split(',');
+      articleDto.coverImage = file && file.filename ? file.filename : articleDto.coverImage;
+      articleDto.categoryIds = catIds;
       return await this.articleService.update(articleId, articleDto);
     } catch (err) {
-      throw new HttpException(err, HttpStatus.NOT_ACCEPTABLE);
+      throw new BadRequestException(err.message);
     }
   }
 

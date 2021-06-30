@@ -43,4 +43,5 @@ export interface RegisterSeedRO {
     password: string;
     accountType: string;
     isRegComplete: boolean;
+    emailVerified: boolean;
 }
