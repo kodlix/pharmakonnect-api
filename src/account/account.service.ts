@@ -27,13 +27,14 @@ export class AccountService {
     if (!user) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.BAD_REQUEST);
     }
+    
     const { email, accountPackage, isRegComplete, accountType, accountId, profileImage } = user
     if (!email) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.UNAUTHORIZED);
     }
 
     if (!user.verified) {
-      throw new HttpException({ error: `Account has not been verified. Check your email to verify the account.` }, HttpStatus.UNAUTHORIZED);
+      throw new HttpException({ error: `emailNotVerified`, type: 'emailNotVerified' }, HttpStatus.UNAUTHORIZED);
     }
     const payload: JwtPayload = { email };
     const accessToken = await this.jwtService.sign(payload);
