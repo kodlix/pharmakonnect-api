@@ -184,11 +184,11 @@ export class AccountService {
       const to = model.email;
       const subject = 'Email Confirmation';
       const html = `<p> Hello <strong>${model.firstName || model.organizationName}</strong>,</p>
-      <p> Thanks for getting started with <strong>Pharma Konnect!</strong> We need a little more information to complete your registration, including confirmation of your email address. <br>
+      <p> Thanks for getting started with <strong>Kapsuul!</strong> We need a little more information to complete your registration, including confirmation of your email address. <br>
       Click below to confirm your email address: 
-      <a href=${url}>Click here</a></p>
+      <br/> <a href=${url}>Click here</a></p>
       <p> If you have problems, please paste the above URL into the browser. </p> 
-      <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`;
+      <p> Thank you for choosing <strong> Kapsuul. </strong></p>`;
 
       try {
         await this.mailService.sendHtmlMailAsync(to, subject, html);
@@ -199,6 +199,11 @@ export class AccountService {
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
+    }else{
+      throw new HttpException(
+        { error: `Unable to send verification email. Try again later.`, status: HttpStatus.BAD_REQUEST },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -215,9 +220,9 @@ export class AccountService {
     const subject = 'Forget Password Request';
     const html = `<p> Hello <strong>${model.firstName || model.organizationName}</strong>,</p>
         <p> We're sending you this email because you requested a password reset. Click on this link to create a new password: <br>
-        <a href=${url}>Click here</a></p>
+        <br/> <a href=${url}>Click here</a></p>
         <p> If you didn't request a password reset, you can ignore this email. Your password will not be changed.</p>
-        <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`;
+        <p> Thank you for choosing <strong> Kapsuul. </strong></p>`;
 
         try {
           await this.mailService.sendHtmlMailAsync(to, subject, html);

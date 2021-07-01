@@ -172,7 +172,7 @@ export class AccountController {
   public async sendEmailVerification(@Param() params): Promise<string> {
     if (await this.accountService.createEmailToken(params.email)) {
       if (await this.accountService.sendEmailVerification(params.email)) {
-        return "Verification email has been send kindly check your mail";
+        return "Verification email has been sent kindly check your mail";
       }
     }
   }
