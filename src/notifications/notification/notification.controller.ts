@@ -1,34 +1,31 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { NotificationService } from './notification.service';
-import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { NotificationRO } from './interface/notification.interface';
 
 @Controller('notification')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
-  @Post()
-  create(@Body() createNotificationDto: CreateNotificationDto) {
-    return this.notificationService.create(createNotificationDto);
-  }
-
   @Get()
-  findAll() {
-    return this.notificationService.findAll();
+  @ApiOperation({ summary: 'Get all notifications' })
+  @ApiResponse({ status: 200, description: 'Return all notifications' })
+  async findAll(): Promise<NotificationRO[]> {
+    return await this.notificationService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.notificationService.findOne(+id);
+  @ApiOperation({ summary: 'Get notification' })
+  @ApiResponse({ status: 200, description: 'Return notifications' })
+  async findOne(@Param('id') id: string): Promise<NotificationRO> {
+    return await this.notificationService.findOne(id);
   }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateNotificationDto: UpdateNotificationDto) {
-    return this.notificationService.update(+id, updateNotificationDto);
+  @Get('byaccount/:accountId')
+  @ApiOperation({ summary: 'Get notifications by account' })
+  @ApiResponse({ status: 200, description: 'Return notifications by account' })
+  async findByAccountId(@Param('id') id: string): Promise<NotificationRO[]> {
+    return await this.notificationService.findByAccount(id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.notificationService.remove(+id);
-  }
 }

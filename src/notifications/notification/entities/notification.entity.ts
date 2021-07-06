@@ -26,6 +26,9 @@ export class NotificationEntity extends AbstractBaseEntity{
     accountId: string;
 
     @Column('uuid')
+    entityId: string;
+
+    @Column('uuid')
     recieverId: string;
 
     @Column('uuid')
