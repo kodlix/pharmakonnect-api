@@ -2,8 +2,12 @@ import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/com
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
 import { AccountEntity } from 'src/account/entities/account.entity';
+import { NotificationType } from 'src/enum/enum';
+import { NotificationRO } from 'src/notifications/notification/interface/notification.interface';
+import { NotificationRepository } from 'src/notifications/notification/notification.repository';
+import { NotificationTypeRepository } from 'src/notifications/notificationtype/notificationtype.repository';
 import { UserLikeService } from 'src/user-like/like.service';
-import { Brackets, Repository } from 'typeorm';
+import { Brackets, Connection, Repository } from 'typeorm';
 import { CategoryService } from '../category/category.service';
 import { CategoryEntity } from '../category/entities/category.entity';
 import { CommentService } from '../comment/comment.service';
@@ -12,14 +16,22 @@ import { ArticleEntity } from './entities/article.entity';
 
 @Injectable()
 export class ArticleService {
+  
+  private  notTypeRepo: NotificationTypeRepository;
+  private  notiRepo: NotificationRepository
   constructor(
     @InjectRepository(ArticleEntity) private readonly articleRepo: Repository<ArticleEntity>,
     private readonly catService: CategoryService,
     @Inject(forwardRef(() => AccountService)) private readonly accountService: AccountService,
     @Inject(forwardRef(() => UserLikeService)) private readonly userLikeService: UserLikeService,
     @Inject(forwardRef(() => CommentService)) private readonly commentService: CommentService,
-  ) { }
+    connection: Connection
+  ) { 
+      this.notTypeRepo = connection.getCustomRepository(NotificationTypeRepository);
+      this.notiRepo = connection.getCustomRepository(NotificationRepository);
+  }
 
+  
 
   public getCount(): Promise<number> {
     return this.articleRepo.count({});
@@ -154,6 +166,29 @@ export class ArticleService {
     await this.articleRepo.update(articleId, published);
     
     const result = await this.articleRepo.findOne(articleId);
+
+    const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.BLOG}});
+      if(!notType) {
+          return;
+      }
+
+      const {id} = await this.accountService.findByEmail("admin@netopng.com");
+      
+      const noti: NotificationRO = {
+        message: `Hi ${result.author.firstName}, your article has been published`,
+        senderId: id,
+        entityId: article.id,
+        recieverId: result.author.id,
+        isGeneral: false,
+        accountId: result.author.id,
+        seen: false,
+        notificationType: notType,
+        createdBy: "admin@netopng.com"
+      }
+
+    await this.notiRepo.save(noti);
+
+
     return result;
   }
 

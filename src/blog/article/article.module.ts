@@ -7,6 +7,10 @@ import { CategoryModule } from '../category/category.module';
 import { CommentModule } from '../comment/comment.module';
 import { ArticleEntity } from './entities/article.entity';
 import { LikeModule } from 'src/user-like/like.module';
+import { BlogSubscriber } from 'src/_common/subscribers/blog.subscriber';
+import { NotificationRepository } from 'src/notifications/notification/notification.repository';
+import { AccountRepository } from 'src/account/account.repository';
+import { NotificationTypeRepository } from 'src/notifications/notificationtype/notificationtype.repository';
 
 @Module({
   imports: [
@@ -18,7 +22,7 @@ import { LikeModule } from 'src/user-like/like.module';
     forwardRef(() => LikeModule),
   ],
   controllers: [ArticleController],
-  providers: [ArticleService],
+  providers: [ArticleService, BlogSubscriber, NotificationRepository, AccountRepository, NotificationTypeRepository],
   exports: [ArticleService],
 })
 export class ArticleModule {}
