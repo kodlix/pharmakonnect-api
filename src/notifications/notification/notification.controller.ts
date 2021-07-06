@@ -5,7 +5,7 @@ import { NotificationRO } from './interface/notification.interface';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('notification')
-@ApiTags('notificationType')
+@ApiTags('Notification')
 @ApiBearerAuth()
 @UseGuards(AuthGuard())
 export class NotificationController {
