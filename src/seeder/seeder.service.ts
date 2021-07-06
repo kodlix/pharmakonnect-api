@@ -8,6 +8,9 @@ import { LgaService } from 'src/lga/lga.service';
 import { Country_Seed } from 'src/_common/seeds/country';
 import { Account_Seed } from 'src/_common/seeds/account';
 import { State_Seed } from 'src/_common/seeds/state';
+import { NotificationType_Seed } from 'src/_common/seeds/notificationtype.seed';
+import { NotificationtypeService } from 'src/notifications/notificationtype/notificationtype.service';
+
 
 
 @Injectable()
@@ -19,7 +22,8 @@ export class SeederService implements OnModuleInit {
     private readonly countryService: CountryService,
     private readonly stateService: StateService,
     private readonly lgaService: LgaService,
-    private readonly accountService: AccountService
+    private readonly accountService: AccountService,
+    private readonly notTypeSvc: NotificationtypeService
   ) { }
   
   async onModuleInit() {
@@ -28,6 +32,7 @@ export class SeederService implements OnModuleInit {
       await this.createCountries();
       await this.registerUser();
       await this.createStates();
+      await this.createNotificationType();
     } catch (error) {
       console.log(error);
     }
@@ -87,6 +92,15 @@ export class SeederService implements OnModuleInit {
 
   private getStates(data: StateEntity[]) {
     //const stateArray = data.filter(x => x.)
+  }
+
+  public async createNotificationType(): Promise<void> {
+    const hasData = await this.notTypeSvc.findAll();
+    if (!hasData.length) {
+      for (const item of NotificationType_Seed){
+        this.notTypeSvc.create(item);
+      }
+    }
   }
 
 }

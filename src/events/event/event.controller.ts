@@ -86,9 +86,9 @@ export class EventController {
   @ApiOperation({ summary: 'Publish event' })
   @ApiResponse({ status: 200, description: 'Return event successfully published' })
   async publishEvent(@Param('id') id: string, @Req() req: any) : Promise<string> {
-    if(req.user.accountType != 'Admin') {
-      throw new HttpException('Only an admin user can publish event.', HttpStatus.BAD_REQUEST)
-    }
+    // if(req.user.accountType != 'Admin') {
+    //   throw new HttpException('Only an admin user can publish event.', HttpStatus.BAD_REQUEST)
+    // }
     return await this.eventService.publishEvent(id, req.user);
   }
 

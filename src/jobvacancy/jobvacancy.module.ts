@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JobVacancyRepository } from './jobvacancy.repository';
 import { JobVacancyController } from './jobvacancy.controller';
 import { AccountModule } from 'src/account/account.module';
+import { JobSubscriber } from 'src/_common/subscribers/job.subscriber';
 
 @Module({
   imports:[
@@ -12,6 +13,6 @@ import { AccountModule } from 'src/account/account.module';
     AccountModule
   ],
   controllers: [JobVacancyController],
-  providers: [JobVacancyService]
+  providers: [JobVacancyService, JobSubscriber]
 })
 export class JobVacancyModule {}

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 // import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -34,6 +33,8 @@ import { LikeModule } from './user-like/like.module';
 import { AdvertModule } from './advert/advert/advert.module';
 import { AdvertCategoryModule } from './advert/advertcategory/advertcategory.module';
 import { join } from 'path';
+import { NotificationModule } from './notifications/notification/notification.module';
+import { NotificationtypeModule } from './notifications/notificationtype/notificationtype.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -49,9 +50,9 @@ import { join } from 'path';
     SeederModule,
     ScheduleMeetingsModule,
     FlatMeetingModule,
-    ChatModule,
+    //ChatModule,
     ContactModule,
-    GroupchatModule,
+    //GroupchatModule,
     OutletModule,
     ScheduleMeetingGatewayModule,
     ScheduleModule.forRoot(),
@@ -68,6 +69,8 @@ import { join } from 'path';
     LikeModule,
     AdvertModule,
     AdvertCategoryModule,
+    NotificationModule,
+    NotificationtypeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
