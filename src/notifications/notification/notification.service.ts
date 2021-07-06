@@ -15,8 +15,8 @@ export class NotificationService {
     return await this.notificationRepo.findOne(id);
   }
 
-  async findByAccount(id: string) {
-    return await this.notificationRepo.find({where: {accountId: id}});
+  async findByAccount(accountId: string) {
+    return await this.notificationRepo.find({where: {accountId}});
   }
 
 

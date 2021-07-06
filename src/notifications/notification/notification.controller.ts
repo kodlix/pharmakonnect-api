@@ -28,8 +28,8 @@ export class NotificationController {
   @Get('byaccount/:accountId')
   @ApiOperation({ summary: 'Get notifications by account' })
   @ApiResponse({ status: 200, description: 'Return notifications by account' })
-  async findByAccountId(@Param('id') id: string): Promise<NotificationRO[]> {
-    return await this.notificationService.findByAccount(id);
+  async findByAccountId(@Param('accountId') accountId: string): Promise<NotificationRO[]> {
+    return await this.notificationService.findByAccount(accountId);
   }
 
 }
