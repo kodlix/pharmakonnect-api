@@ -41,6 +41,9 @@ export class OutletEntity extends AbstractBaseEntity {
   @Column({ default: false })
   pcnVerified: boolean;
 
+  @Column({ default: false })
+  isHq: boolean;
+
   @Column({ nullable: true })
   organizationName: string;
 
@@ -56,19 +59,19 @@ export class OutletEntity extends AbstractBaseEntity {
   @Column({ nullable: true })
   countryId: string;
 
-  @Column()
+  @Column({ nullable: true })
   countryName: string;
 
   @Column({ nullable: true })
   stateId: string;
 
-  @Column()
+  @Column({ nullable: true })
   stateName: string;
 
   @Column({ nullable: true })
   lgaId: string;
 
-  @Column()
+  @Column({ nullable: true })
   lgaName: string;
 
   // @Column()

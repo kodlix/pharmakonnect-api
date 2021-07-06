@@ -1,3 +1,4 @@
+import { AccountEntity } from "src/account/entities/account.entity";
 import { StateEntity } from "src/state/entities/state.entity";
 import { BaseEntity, Column, Entity, OneToMany } from "typeorm"
 
@@ -15,4 +16,7 @@ export class CountryEntity extends BaseEntity {
 
     @OneToMany(() => StateEntity, s => s.country)
     states: StateEntity[];
+
+    @OneToMany(() => AccountEntity, s => s._country)
+    accounts: AccountEntity[];
 }

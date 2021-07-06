@@ -1,28 +1,26 @@
 import { Column, Entity, ManyToOne } from "typeorm";
 import { AbstractBaseEntity } from "src/_common/base.entity";
-import { AccountEntity } from "src/account/entities/account.entity"
 
 @Entity("Contact")
-export class ContactEnitiy extends AbstractBaseEntity{
+export class ContactEnitiy extends AbstractBaseEntity {
 
-    @ManyToOne(()=> AccountEntity, account => account.id)
-    @Column()
-    creatorId : string
-
-    @ManyToOne(()=> AccountEntity, account => account.id)
-    @Column()
-    accountId : string
 
     @Column()
-    firstName : string
+    creatorId: string
 
     @Column()
-    lastName : string
+    accountId: string
 
     @Column()
-    phoneNo : string
+    firstName: string
 
     @Column()
-    email : string
+    lastName: string
+
+    @Column()
+    phoneNo: string
+
+    @Column()
+    email: string
 
 }

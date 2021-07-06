@@ -1,6 +1,6 @@
 import { IsEmail, IsFQDN, Length } from 'class-validator';
 import { AbstractBaseEntity } from 'src/_common/base.entity';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JobVacancyEntity } from "src/jobvacancy/entities/jobvacancy.entity";
 import { ScheduleMeetingEntity } from "src/video-conferencing/schedule-meetings/entities/schedule-meeting.entity";
@@ -10,6 +10,9 @@ import { PollEntity } from 'src/poll/entities/poll.entity';
 import { FeatureEntity } from 'src/features/entity/feature.entity';
 import { PackageFeatureEntity } from 'src/package/entities/packagefeature.entity';
 import { AdvertEntity } from 'src/advert/entity/advert.entity';
+import { CountryEntity } from 'src/country/entities/country.entity';
+import { StateEntity } from 'src/state/entities/state.entity';
+import { LgaEntity } from 'src/lga/entities/lga.entity';
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
@@ -177,9 +180,18 @@ export class AccountEntity extends AbstractBaseEntity {
   @OneToMany(() => PollEntity, p => p.account)
   polls: PollEntity[];
 
+  @ManyToOne(() => CountryEntity, p => p.accounts)
+  _country: CountryEntity;
+
+  @ManyToOne(() => StateEntity, p => p.accounts)
+  _state: StateEntity;
+
+  @ManyToOne(() => LgaEntity, p => p.accounts)
+  _lga: LgaEntity;
+
   public async validatePassword(password: string): Promise<boolean> {
-      const hash = await bcrypt.hash(password, this.salt);
-      return hash === this.password;
+    const hash = await bcrypt.hash(password, this.salt);
+    return hash === this.password;
   }
-    
+
 }

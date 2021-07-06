@@ -7,6 +7,7 @@ import { UserFromDbRO } from './interfaces/account.interface';
 import { OrganizationRO, UserDataRO } from './interfaces/user.interface';
 import { accountTypes } from './account.constant';
 import { constants } from 'buffer';
+import { OutletEntity } from 'src/outlet/entity/outlet.entity';
 
 @EntityRepository(AccountEntity)
 export class AccountRepository extends Repository<AccountEntity> {
@@ -17,7 +18,8 @@ export class AccountRepository extends Repository<AccountEntity> {
     isRegComplete,
     firstName,
     lastName, 
-    organizationName
+    organizationName,
+    emailVerified
   }: RegisterDTO): Promise<boolean> {
     const isExists = await await this.findOne({ email });
     if (isExists) {
@@ -26,6 +28,7 @@ export class AccountRepository extends Repository<AccountEntity> {
         HttpStatus.BAD_REQUEST,
       );
     }
+    
     const user = new AccountEntity();
     user.email = email;
     user.accountType = accountType;
@@ -35,10 +38,23 @@ export class AccountRepository extends Repository<AccountEntity> {
     user.createdBy = email;
     user.accountPackage = 'Free';
     user.isRegComplete = isRegComplete;
+    user.emailVerified = emailVerified;
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
+    
     try {
       await user.save();
+      if (accountType === accountTypes.CORPORATE){
+
+        const outlet = new OutletEntity()
+        
+        outlet.isHq = true;
+        outlet.name = "Headquarters"
+        outlet.accountId = user.id;
+        outlet.createdBy = user.createdBy;
+        outlet.organizationName = user.organizationName;
+        await outlet.save()
+      }
       return true;
     } catch (error) {
       throw new HttpException(
@@ -46,6 +62,7 @@ export class AccountRepository extends Repository<AccountEntity> {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+    
   }
 
   public async validateUserPassword({

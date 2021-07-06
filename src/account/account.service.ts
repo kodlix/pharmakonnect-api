@@ -7,11 +7,11 @@ import { JwtPayload, OrganizationRO, UserDataRO } from './interfaces/user.interf
 import { JwtService } from '@nestjs/jwt';
 import { AccountRepository } from './account.repository';
 import { FilterDto } from 'src/_common/filter.dto';
-import { Not } from 'typeorm';
-import { default as config } from './config';
+import { getRepository, Not } from 'typeorm';
 import { AccountEntity } from './entities/account.entity';
 import { SendGridService } from 'src/mailer/sendgrid.service';
-import { MailGunService } from 'src/mailer/mailgun.service';
+import { accountTypes } from './account.constant';
+import { ContactEnitiy } from 'src/contact/entities/contact.entity';
 
 
 @Injectable()
@@ -20,7 +20,6 @@ export class AccountService {
     private readonly accountRepository: AccountRepository,
     private jwtService: JwtService,
     private readonly mailService: SendGridService,
-    private readonly mailGunService: MailGunService
   ) { }
 
   public async login(loginDto: LoginDTO): Promise<UserRO> {
@@ -28,13 +27,14 @@ export class AccountService {
     if (!user) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.BAD_REQUEST);
     }
-    const { email, accountPackage, isRegComplete, accountType, accountId, profileImage} = user
+    
+    const { email, accountPackage, isRegComplete, accountType, accountId, profileImage } = user
     if (!email) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.UNAUTHORIZED);
     }
 
     if (!user.verified) {
-      throw new HttpException({ error: `Account has not been verified. Check your email to verify the account.` }, HttpStatus.UNAUTHORIZED);
+      throw new HttpException({ error: `emailNotVerified`, type: 'emailNotVerified' }, HttpStatus.UNAUTHORIZED);
     }
     const payload: JwtPayload = { email };
     const accessToken = await this.jwtService.sign(payload);
@@ -70,6 +70,78 @@ export class AccountService {
     const users = await query.getMany();
     return this.accountRepository.buildUserArrRO(users);
   }
+
+
+  public async getAvailableContactsByAccount(search, page = 1, take = 20, user: any): Promise<UserDataRO[]> {
+    page = +page;
+    take = take && +take || 20;
+
+    const contacts = await getRepository(ContactEnitiy)
+      .createQueryBuilder('contact')
+      .where('contact.creatorId = :id', { id: user.id })
+      .select('contact.accountId')
+      .getMany();
+
+    let contactIds = [user.id, ...contacts.map(c => c.accountId)];
+
+    if (search) {
+      const searchQuery = `
+         account.firstName like :firstName OR 
+         account.lastName like :lastName`;
+
+      //  const searchQuery = `
+      //  account.city like :city OR 
+      //  account.organizationName like :organizationName OR
+      //   account.email like :email OR account.phoneNumber like :phoneNumber OR
+      //   account.pcn like :pcn OR
+      //   account.firstName like :firstName OR 
+      //   account.lastName like :lastName OR
+      //   account.typeOFPractice like :typeOfPractice OR
+      //   account.organizationType like :organizationType OR
+      //   account.companyRegistrationNumber like :companyRegistrationNumber OR
+      //   account.address like :address OR
+      //   account._state.name like :state OR
+      //   account._lga.name like :lga OR
+      //   account._country.name like :country`;
+
+      const accts = await getRepository(AccountEntity)
+        .createQueryBuilder('account')
+        .where('account.isRegComplete = :status', { status: true })
+        .andWhere('account.accountType Not In (:...types)', {
+          types:
+            [accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]
+        })
+        .andWhere('account.id Not In (:...contacts)', { contacts: contactIds })
+        .andWhere(searchQuery, {
+          firstName: `%${search}%`,
+          lastName: `%${search}%`
+        })
+        .skip(take * (page - 1))
+        .take(take)
+        .orderBy('account.createdAt', 'DESC')
+        .getMany();
+
+      return this.accountRepository.buildUserArrRO(accts);
+    }
+
+
+    const accounts = await getRepository(AccountEntity)
+      .createQueryBuilder('account')
+      .where('account.isRegComplete = :status', { status: true })
+      .andWhere('account.accountType Not In (:...types)', {
+        types:
+          [accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]
+      })
+      .andWhere('account.id Not In (:...contacts)', { contacts: contactIds })
+      .skip(take * (page - 1))
+      .take(take)
+      .orderBy('account.createdAt', 'DESC')
+      .getMany();
+    return this.accountRepository.buildUserArrRO(accounts);
+  }
+
+
+
 
   public async findOne(id: string): Promise<UserDataRO> {
     return await this.accountRepository.getById(id);
@@ -150,26 +222,31 @@ export class AccountService {
   public async sendEmailVerification(email: string): Promise<boolean> {
     let model = await this.accountRepository.findOne({ where: { email: email } });
     if (model && model.emailToken) {
-      const envUrl = process.env.NODE_ENV === "development" ? process.env.URL_DEV: process.env.URL_PROD;
+      const envUrl = process.env.NODE_ENV === "development" ? process.env.URL_DEV : process.env.URL_PROD;
       const url = `${envUrl}/account/verify/${model.emailToken}`;
       const to = model.email;
       const subject = 'Email Confirmation';
       const html = `<p> Hello <strong>${model.firstName || model.organizationName}</strong>,</p>
-      <p> Thanks for getting started with <strong>Pharma Konnect!</strong> We need a little more information to complete your registration, including confirmation of your email address. <br>
+      <p> Thanks for getting started with <strong>Kapsuul!</strong> We need a little more information to complete your registration, including confirmation of your email address. <br>
       Click below to confirm your email address: 
-      <a href=${url}>Click here</a></p>
+      <br/> <a href=${url}>Click here</a></p>
       <p> If you have problems, please paste the above URL into the browser. </p> 
-      <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`;
+      <p> Thank you for choosing <strong> Kapsuul. </strong></p>`;
 
       try {
         await this.mailService.sendHtmlMailAsync(to, subject, html);
-      return true;
+        return true;
       } catch (error) {
         throw new HttpException(
           { error: `An error occurred while trying to send verify email ${error}`, status: HttpStatus.INTERNAL_SERVER_ERROR },
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
+    }else{
+      throw new HttpException(
+        { error: `Unable to send verification email. Try again later.`, status: HttpStatus.BAD_REQUEST },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -186,12 +263,12 @@ export class AccountService {
     const subject = 'Forget Password Request';
     const html = `<p> Hello <strong>${model.firstName || model.organizationName}</strong>,</p>
         <p> We're sending you this email because you requested a password reset. Click on this link to create a new password: <br>
-        <a href=${url}>Click here</a></p>
+        <br/> <a href=${url}>Click here</a></p>
         <p> If you didn't request a password reset, you can ignore this email. Your password will not be changed.</p>
-        <p> Thank you for choosing <strong> Pharma Konnect. </strong></p>`;
+        <p> Thank you for choosing <strong> Kapsuul. </strong></p>`;
 
         try {
-          await this.mailGunService.sendMailAsync(to, subject, html);
+          await this.mailService.sendHtmlMailAsync(to, subject, html);
         return true;
         } catch (error) {
           throw new HttpException(
@@ -208,24 +285,6 @@ export class AccountService {
 
   public async changedPassword(changeDto: ChangePasswordDto): Promise<string> {
     return await this.accountRepository.changedPassword(changeDto);
-  }
-
-  private async sendEmailAsync(email: string, from: string, subject: string, html: any) {
-    const messages = [];
-    let msg: any = {};
-
-    msg.to = email;
-    msg.from = from;
-    msg.subject = subject,
-      msg.html = html
-
-    messages.push(msg);
-    msg = {};
-
-    if (messages.length > 0) {
-      // const sent = await SendGrid.send(messages);
-      // return sent;
-    }
   }
 
   public async getOneUserByEmail(email: string): Promise<AccountEntity> {
