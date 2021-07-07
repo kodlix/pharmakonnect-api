@@ -1,4 +1,4 @@
-import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
 import { AccountEntity } from 'src/account/entities/account.entity';
@@ -167,7 +167,7 @@ export class ArticleService {
     
     const result = await this.articleRepo.findOne(articleId);
 
-    const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.BLOG}});
+      const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.BLOG}});
       if(!notType) {
           return;
       }
@@ -186,8 +186,12 @@ export class ArticleService {
         createdBy: "admin@netopng.com"
       }
 
-    await this.notiRepo.save(noti);
+      try {
+        await this.notiRepo.save(noti);
 
+      } catch (err) {
+        Logger.log(err);
+      }
 
     return result;
   }
@@ -204,6 +208,32 @@ export class ArticleService {
     await this.articleRepo.update(articleId, rejectedArticle);
     
     const result = await this.articleRepo.findOne(articleId);
+
+    const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.BLOG}});
+      if(!notType) {
+          return;
+      }
+
+      const {id} = await this.accountService.findByEmail("admin@netopng.com");
+      
+      const noti: NotificationRO = {
+        message: `Hi ${result.author.firstName}, your article has been rejected: Rejection Reason: ${article.rejectMessage}`,
+        senderId: id,
+        entityId: article.id,
+        recieverId: result.author.id,
+        isGeneral: false,
+        accountId: result.author.id,
+        seen: false,
+        notificationType: notType,
+        createdBy: "admin@netopng.com"
+      }
+
+      try {
+        await this.notiRepo.save(noti);
+      } catch (err) {
+        Logger.log(err);
+      }
+
     return result;
   }
 
