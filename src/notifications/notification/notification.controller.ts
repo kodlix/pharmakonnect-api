@@ -1,8 +1,9 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Put, UseGuards } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { NotificationRO } from './interface/notification.interface';
 import { AuthGuard } from '@nestjs/passport';
+import { DeleteResult } from 'typeorm/query-builder/result/DeleteResult';
 
 @Controller('notification')
 @ApiTags('Notification')
@@ -26,10 +27,31 @@ export class NotificationController {
   }
 
   @Get('byaccount/:accountId')
-  @ApiOperation({ summary: 'Get notifications by account' })
-  @ApiResponse({ status: 200, description: 'Return notifications by account' })
+  @ApiOperation({ summary: 'Get unseen notifications by account' })
+  @ApiResponse({ status: 200, description: 'Return unseen notifications by account' })
   async findByAccountId(@Param('accountId') accountId: string): Promise<NotificationRO[]> {
     return await this.notificationService.findByAccount(accountId);
+  }
+
+  @Get('byaccount/all/:accountId')
+  @ApiOperation({ summary: 'Get all seen and unseen notifications by account' })
+  @ApiResponse({ status: 200, description: 'Return all seen and unseen notifications by account' })
+  async findAllByAccount(@Param('accountId') accountId: string): Promise<NotificationRO[]> {
+    return await this.notificationService.findAllByAccount(accountId);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'update a notification' })
+  @ApiResponse({ status: 200, description: 'Return notification updated' })
+  async UpdateNotification(@Param('id') id: string) {
+    return await this.notificationService.update(id);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete notification ' })
+  @ApiResponse({ status: 200, description: 'Notification successfully deleted' })
+  async remove(@Param('id') id: string): Promise<DeleteResult> {
+    return await this.notificationService.remove(id);
   }
 
 }
