@@ -143,16 +143,18 @@ export class AccountRepository extends Repository<AccountEntity> {
   public async verifyStaff(id: string): Promise<UserDataRO> {
     const result = await this.findOne(id)
     result.staffStatus = staffStatus.VERIFIED
+    result.message = "";
     return await this.save(result)
   }
 
   public async rejectStaff(id: string, message: string): Promise<UserDataRO> {
     const result = await this.findOne(id)
+    message = `${message} :By - ${result.organizationName}`;
     result.staffStatus = staffStatus.REJECTED;
     result.organizationName = null;
     result.organizationId = null;
     result.message = message;
-    return await this.save(result)
+    return await this.save(result);
   }
 
   public async updateUser<T>(
