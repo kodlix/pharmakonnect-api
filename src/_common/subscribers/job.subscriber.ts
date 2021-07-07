@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { AccountRepository } from 'src/account/account.repository';
 import { NotificationType } from 'src/enum/enum';
 import { JobVacancyEntity } from 'src/jobvacancy/entities/jobvacancy.entity';
@@ -53,6 +54,14 @@ import {
         createdBy: `${event.entity.createdBy}`
       }
 
-      await this.notiRepo.save(noti);
+      try {
+        await this.notiRepo.save(noti);
+
+      } catch (err) {
+        Logger.log(err.message)
+        console.log(err.message);
+      }
+
+      
     }
   }

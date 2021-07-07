@@ -2,7 +2,7 @@ import { Exclude } from "class-transformer";
 import { AccountEntity } from "src/account/entities/account.entity";
 import { NotificationTypeEntity } from "src/notifications/notificationtype/entities/notificationtype.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 
 @Entity('Notification')
 export class NotificationEntity extends AbstractBaseEntity{
@@ -25,7 +25,7 @@ export class NotificationEntity extends AbstractBaseEntity{
     @Column('uuid')
     accountId: string;
 
-    @Column('uuid')
+    @Column('uuid', {nullable: true})
     entityId: string;
 
     @Column('uuid')
@@ -38,7 +38,7 @@ export class NotificationEntity extends AbstractBaseEntity{
     @Column({ type: 'bool', default: false})
     seen: boolean;
 
-    @OneToOne(() => NotificationTypeEntity, notificationType => notificationType.notification)
+    @ManyToOne(() => NotificationTypeEntity, notificationType => notificationType.notification)
     @JoinColumn()
     notificationType: NotificationTypeEntity
 }
