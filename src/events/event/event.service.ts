@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { AccountRepository } from 'src/account/account.repository';
 import { AccountEntity } from 'src/account/entities/account.entity';
 import { NotificationType } from 'src/enum/enum';
@@ -84,8 +84,8 @@ export class EventService {
   }
 
   async publishEvent(id: string, user: AccountEntity) : Promise<string> {
-    const result =  await this.eventRepo.publishEvent(id, user);
-    const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.EVENT}});
+            const result =  await this.eventRepo.publishEvent(id, user);
+            const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.EVENT}});
             
             const res = await this.acctRepo.findByEmail("admin@netopng.com");
 
@@ -103,12 +103,42 @@ export class EventService {
                 createdBy: "admin@netopng.com"
             }
 
-            await this.notiRepo.save(noti);
+            try {
+              await this.notiRepo.save(noti);
+            } catch (error) {
+              Logger.log(error);
+            }
             return result;
   }
 
   async rejectEvent(id: string, {rejectionMessage}, user: AccountEntity) : Promise<string> {
-    return await this.eventRepo.rejectEvent(id, rejectionMessage, user);
+            const result = await this.eventRepo.rejectEvent(id, rejectionMessage, user);
+
+            const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.EVENT}});
+            
+            const res = await this.acctRepo.findByEmail("admin@netopng.com");
+
+            const ev = await this.eventRepo.findOne(id);
+            
+            const noti: NotificationRO = {
+                message: `Hi ${ev.createdBy}, your event has been rejected: Reason: ${ev.rejectionMessage}`,
+                senderId: res.id,
+                recieverId: ev.accountId,
+                entityId: ev.id,
+                isGeneral: false,
+                accountId: ev.accountId,
+                seen: false,
+                notificationType: notType,
+                createdBy: "admin@netopng.com"
+            }
+
+            try {
+              await this.notiRepo.save(noti);
+            } catch (error) {
+              Logger.log(error);
+            }
+
+            return result;
   }
 
   async addEventRegistration(payload: EventRegistrationDto, user: AccountEntity): Promise<string> {
