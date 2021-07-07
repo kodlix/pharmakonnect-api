@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { AccountRepository } from 'src/account/account.repository';
 import { ArticleEntity } from 'src/blog/article/entities/article.entity';
 import { NotificationType } from 'src/enum/enum';
@@ -48,7 +49,14 @@ import {
         createdBy: `${event.entity.author.firstName} ${event.entity.author.lastName}`
       }
 
-      await this.notiRepo.save(noti);
+      try {
+        await this.notiRepo.save(noti);
+
+      } catch (err) {
+        Logger.log(err.message)
+        console.log(err.message);
+      }
+
 
     }
   }
