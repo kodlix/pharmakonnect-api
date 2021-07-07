@@ -1,6 +1,7 @@
 import { IsEmail, IsFQDN, Length } from 'class-validator';
 import { AbstractBaseEntity } from 'src/_common/base.entity';
-import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { ManyToOne, OneToOne } from 'typeorm';
+import { AfterInsert, Column, Entity, OneToMany, BeforeInsert } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JobVacancyEntity } from "src/jobvacancy/entities/jobvacancy.entity";
 import { ScheduleMeetingEntity } from "src/video-conferencing/schedule-meetings/entities/schedule-meeting.entity";
@@ -13,6 +14,7 @@ import { AdvertEntity } from 'src/advert/entity/advert.entity';
 import { CountryEntity } from 'src/country/entities/country.entity';
 import { StateEntity } from 'src/state/entities/state.entity';
 import { LgaEntity } from 'src/lga/entities/lga.entity';
+import { staffStatus } from '../account.constant';
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
@@ -114,6 +116,16 @@ export class AccountEntity extends AbstractBaseEntity {
   @Length(20)
   @Column({ length: 20, nullable: true })
   public gender: string;
+
+  @Column({ nullable: true })
+  organizationId: string;
+
+ 
+  @Column({ nullable: true, default: staffStatus.PENDING })
+  staffStatus: string;
+
+  @Column({ nullable: true })
+  message: string;
 
   // co-operation
   @Length(256)

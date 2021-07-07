@@ -156,6 +156,23 @@ export class AccountService {
     return await this.accountRepository.updateUser(email, toUpdate);
   }
 
+  public async findUnverifedStaff(id:string, page){
+    return await this.accountRepository.findUnverifedStaff(id,page);
+  }
+
+  public async findVerifiedStaff(id:string,page){
+    return await this.accountRepository.findVerifedStaff(id,page);
+
+  }
+
+  public async verifyStaff(id: string){
+    return await this.accountRepository.verifyStaff(id)
+  }
+
+  public async rejectStaff(id: string,message: string){
+    return await this.accountRepository.rejectStaff(id,message)
+  }
+
   public async updateCorperate(email: string, toUpdate: CorperateDTO): Promise<CorperateRO> {
     toUpdate.isRegComplete = true;
     const orgName = toUpdate.organizationName;
