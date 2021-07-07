@@ -2,7 +2,6 @@ import { Logger } from '@nestjs/common';
 import { AccountRepository } from 'src/account/account.repository';
 import { ArticleEntity } from 'src/blog/article/entities/article.entity';
 import { NotificationType } from 'src/enum/enum';
-import { NotificationEntity } from 'src/notifications/notification/entities/notification.entity';
 import { NotificationRO } from 'src/notifications/notification/interface/notification.interface';
 import { NotificationRepository } from 'src/notifications/notification/notification.repository';
 import { NotificationTypeRepository } from 'src/notifications/notificationtype/notificationtype.repository';
@@ -46,6 +45,7 @@ import {
         accountId: id,
         seen: false,
         notificationType: notType,
+        senderImageUrl: event.entity.author.profileImage ? event.entity.author.profileImage : null,
         createdBy: `${event.entity.author.firstName} ${event.entity.author.lastName}`
       }
 

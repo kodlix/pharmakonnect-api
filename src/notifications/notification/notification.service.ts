@@ -9,19 +9,19 @@ export class NotificationService {
 
 
   async findAll() {
-    return await this.notificationRepo.find();
+    return await this.notificationRepo.find({relations: ['notificationType']});
   }
 
   async findOne(id: string) {
-    return await this.notificationRepo.findOne(id);
+    return await this.notificationRepo.findOne(id, {relations: ['notificationType']});
   }
 
   async findByAccount(accountId: string) {
-    return await this.notificationRepo.find({where: {accountId, seen: false}});
+    return await this.notificationRepo.find({where: {accountId, seen: false}, relations: ['notificationType']});
   }
 
   async findAllByAccount(accountId: string) {
-    return await this.notificationRepo.find({where: {accountId}});
+    return await this.notificationRepo.find({where: {accountId}, relations: ['notificationType']});
   }
 
   async update(id: string): Promise<string> {
@@ -39,7 +39,7 @@ export class NotificationService {
                               .where({id: not.id})
                               .execute();
 
-        return "Successfully update"
+        return "Successfully updated"
     } catch (error) {
       Logger.log(error);
     }

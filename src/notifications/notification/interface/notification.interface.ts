@@ -10,4 +10,5 @@ export interface NotificationRO {
     notificationType: NotificationTypeEntity
     createdBy: string;
     entityId: string;
+    senderImageUrl: string;
 }

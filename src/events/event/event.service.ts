@@ -99,6 +99,7 @@ export class EventService {
                 isGeneral: false,
                 accountId: ev.accountId,
                 seen: false,
+                senderImageUrl: res.profileImage ? res.profileImage : null,
                 notificationType: notType,
                 createdBy: "admin@netopng.com"
             }
@@ -128,6 +129,7 @@ export class EventService {
                 isGeneral: false,
                 accountId: ev.accountId,
                 seen: false,
+                senderImageUrl: res.profileImage ? res.profileImage : null,
                 notificationType: notType,
                 createdBy: "admin@netopng.com"
             }

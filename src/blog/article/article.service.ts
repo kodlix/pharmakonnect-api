@@ -165,14 +165,14 @@ export class ArticleService {
     const published = await article.publishArticle();
     await this.articleRepo.update(articleId, published);
     
-    const result = await this.articleRepo.findOne(articleId);
+    const result = await this.articleRepo.findOne({where:{id: articleId}, relations: ['author']});
 
       const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.BLOG}});
       if(!notType) {
           return;
       }
 
-      const {id} = await this.accountService.findByEmail("admin@netopng.com");
+      const {id, profileImage} = await this.accountService.findByEmail("admin@netopng.com");
       
       const noti: NotificationRO = {
         message: `Hi ${result.author.firstName}, your article has been published`,
@@ -182,6 +182,7 @@ export class ArticleService {
         isGeneral: false,
         accountId: result.author.id,
         seen: false,
+        senderImageUrl: profileImage ? profileImage : null,
         notificationType: notType,
         createdBy: "admin@netopng.com"
       }
@@ -207,14 +208,14 @@ export class ArticleService {
     const rejectedArticle = await article.rejectArticle(message);
     await this.articleRepo.update(articleId, rejectedArticle);
     
-    const result = await this.articleRepo.findOne(articleId);
+    const result = await this.articleRepo.findOne({where:{id: articleId}, relations: ['author']});
 
     const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.BLOG}});
       if(!notType) {
           return;
       }
 
-      const {id} = await this.accountService.findByEmail("admin@netopng.com");
+      const {id, profileImage} = await this.accountService.findByEmail("admin@netopng.com");
       
       const noti: NotificationRO = {
         message: `Hi ${result.author.firstName}, your article has been rejected: Rejection Reason: ${article.rejectMessage}`,
@@ -224,6 +225,7 @@ export class ArticleService {
         isGeneral: false,
         accountId: result.author.id,
         seen: false,
+        senderImageUrl: profileImage ? profileImage : null,
         notificationType: notType,
         createdBy: "admin@netopng.com"
       }

@@ -189,6 +189,9 @@ export class AccountEntity extends AbstractBaseEntity {
   @ManyToOne(() => LgaEntity, p => p.accounts)
   _lga: LgaEntity;
 
+  @Column({ type: 'bool', default: false })
+  public subscribeToJob: boolean;
+
   public async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);
     return hash === this.password;
