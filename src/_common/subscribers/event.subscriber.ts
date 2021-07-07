@@ -39,6 +39,8 @@ import {
 
       const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.EVENT}});
 
+      const posterInfo = await this.acctRepo.findOne(event.entity.accountId);
+
       const noti: NotificationRO = {
         message: `Hi there, ${event.entity.createdBy} posted a new event ${event.entity.name}`,
         senderId: event.entity.accountId,
@@ -48,6 +50,7 @@ import {
         accountId: id,
         seen: false,
         notificationType: notType,
+        senderImageUrl: posterInfo.profileImage ? posterInfo.profileImage : null,
         createdBy: `${event.entity.createdBy}`
       }
 
