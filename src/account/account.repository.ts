@@ -19,7 +19,8 @@ export class AccountRepository extends Repository<AccountEntity> {
     firstName,
     lastName, 
     organizationName,
-    emailVerified
+    emailVerified,
+    subscribeToJobAlert
   }: RegisterDTO): Promise<boolean> {
     const isExists = await await this.findOne({ email });
     if (isExists) {
@@ -41,6 +42,7 @@ export class AccountRepository extends Repository<AccountEntity> {
     user.emailVerified = emailVerified;
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
+    user.subscribeToJobAlert = this.stringToBoolean(subscribeToJobAlert);
     
     try {
       await user.save();
@@ -265,4 +267,14 @@ export class AccountRepository extends Repository<AccountEntity> {
     });
     return userArr;
   }
+
+  stringToBoolean(val: any){
+    if(val === false) return false;
+    if(val === true) return true;
+    switch(val.toLowerCase().trim()){
+        case 'true': return true;
+        case 'false':return false;
+        default: return Boolean(val);
+      }
+    }
 }

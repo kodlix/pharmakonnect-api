@@ -190,7 +190,7 @@ export class AccountEntity extends AbstractBaseEntity {
   _lga: LgaEntity;
 
   @Column({ type: 'bool', default: false })
-  public subscribeToJob: boolean;
+  public subscribeToJobAlert: boolean;
 
   public async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);

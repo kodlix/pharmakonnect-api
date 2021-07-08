@@ -17,6 +17,7 @@ export class RegisterDTO {
     readonly organizationName?: string;
     isRegComplete: boolean;
     emailVerified: boolean;
+    subscribeToJobAlert?: boolean;
 }
 
 export class LoginDTO {
