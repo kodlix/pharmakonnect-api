@@ -8,6 +8,7 @@ import { AdvertService } from "./advert.service";
 import { CreateAdvertDto } from "./dto/create-advert";
 import { RejectAdvertDto, UpdateAdvertDto } from "./dto/update-advert";
 import { diskStorage } from 'multer';
+import { uploadFile } from "src/_utility/upload.util";
 
 
 
@@ -31,8 +32,13 @@ export class AdvertController {
     @ApiOperation({ summary: 'Create Advert Category' })
     @ApiResponse({ status: 403, description: 'Forbidden.' })
     @ApiResponse({ status: 201, description: 'Advert successfully created' })
-    create(@Body()dto: CreateAdvertDto,@Req() req: any, @UploadedFile() file,) {
-        return this.advertservice.create(dto, req.user, file ? file.filename : "" );
+    async create(@Body()dto: CreateAdvertDto,@Req() req: any, @UploadedFile() advertImage: any) {
+        if(advertImage){
+          const imageUrl = await uploadFile(advertImage.path);
+          dto.advertImage = imageUrl;
+          return this.advertservice.create(dto, req.user);
+        }
+        
     }
 
     @Get()

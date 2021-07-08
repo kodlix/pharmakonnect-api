@@ -13,8 +13,7 @@ import { isNotValidDate } from "src/_utility/date-validator.util";
 export class AdvertRepository extends Repository<AdvertEntity>{
    async createEntity(
       dto: CreateAdvertDto,
-      user: AccountEntity,
-      filename: string
+      user: AccountEntity
     ): Promise<AdvertEntity> {
       
       const checkAdvert = await this.findOne({ where: { title: ILike(`%${dto.title}%`), companyName: ILike(`%${dto.companyName}%`) } });
@@ -62,10 +61,9 @@ export class AdvertRepository extends Repository<AdvertEntity>{
         advert.contactPhoneNumber = dto.contactPhoneNumber;
         advert.accountId = user.id;
         advert.createdBy = user.email
+        advert.advertImage = dto.advertImage;
         advert.createdAt = new Date();
-        if(filename) {
-          advert.advertImage = filename;
-      }
+
   
       const errors = await validate(advert);
       if(errors.length > 0) {

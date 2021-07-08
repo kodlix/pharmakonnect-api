@@ -11,11 +11,9 @@ export class AdvertService{
 
     async create(
         dto: CreateAdvertDto,
-        user: AccountEntity,
-        filename: string
-
+        user: AccountEntity
     ): Promise<AdvertRO> {
-        return await this.advertRepository.createEntity(dto, user,filename);
+        return await this.advertRepository.createEntity(dto, user);
     }
 
     async update(id: string, dto: UpdateAdvertDto, user: AccountEntity, filename: string): Promise<AdvertRO> {
