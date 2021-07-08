@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Post, Put, Get, Delete, Param, HttpException, HttpStatus, Controller, UseGuards, Body } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
@@ -53,12 +54,6 @@ export class AdvertCategoryController {
     @ApiResponse({ status: 404, description: 'Not Found.' })
     @ApiOperation({ summary: 'Delete Advert Category' })
     async remove(@Param('id') id: string): Promise<any> {
-        if (id === null) {
-            throw new HttpException(
-                { error: `Advert Category does not exists` },
-                HttpStatus.INTERNAL_SERVER_ERROR,
-            );
-        }
         return await this.advertcategoryservice.remove(id);
     }
 
