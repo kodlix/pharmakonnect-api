@@ -295,12 +295,20 @@ export class AccountRepository extends Repository<AccountEntity> {
     let userArr = [];
     users.forEach((user) => {
       const userRO = {
+        id: user.id,
         pcn: user.pcn,
         latitude: user.latitude,
         longitude: user.longitude,
         organizationName: user.organizationName,
         organizationType: user.organizationType,
         companyRegistrationNumber: user.companyRegistrationNumber,
+        joined: user.createdAt,
+        typeOfPractice: user.typesOfPractice,
+        phoneNumber: user.phoneNumber,
+        email: user.email,
+        logo: user.profileImage,
+        website: user.website,
+        noOfEmployees: user.numberofEmployees
       };
       userArr.push(userRO);
     });
