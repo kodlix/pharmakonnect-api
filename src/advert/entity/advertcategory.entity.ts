@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Exclude } from "class-transformer";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
