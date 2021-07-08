@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import { EQUALS } from 'class-validator';
 import { AccountRepository } from 'src/account/account.repository';
 import { NotificationType } from 'src/enum/enum';
 import { JobVacancyEntity } from 'src/jobvacancy/entities/jobvacancy.entity';
@@ -8,8 +9,10 @@ import { NotificationTypeRepository } from 'src/notifications/notificationtype/n
 import {
     Connection,
     EntitySubscriberInterface,
+    Equal,
     EventSubscriber,
     InsertEvent,
+    Not,
   } from 'typeorm';
   
   @EventSubscriber()
@@ -42,26 +45,36 @@ import {
           return;
       }
 
-      const noti: NotificationRO = {
-        message: `Hi there, ${event.entity.createdBy} posted a new Job vacancy ${event.entity.jobTitle}`,
-        senderId: event.entity.accountId,
-        entityId: event.entity.id,
-        recieverId: id,
-        isGeneral: false,
-        accountId: id,
-        seen: false,
-        notificationType: notType,
-        createdBy: `${event.entity.createdBy}`
+      const userWhoSub = await this.acctRepo.find({where: {subscribeToJobAlert: true, id: Not(Equal(event.entity.accountId))}});
+
+      const notifications = [];
+      const posterInfo = await this.acctRepo.findOne(event.entity.accountId);
+
+
+      if(userWhoSub.length > 0) {
+          for (const u of userWhoSub) {
+                const noti: NotificationRO = {
+                message: `Hi there, ${event.entity.createdBy} posted a new Job vacancy ${event.entity.jobTitle}`,
+                senderId: event.entity.accountId,
+                entityId: event.entity.id,
+                recieverId: u.id,
+                isGeneral: false,
+                accountId: u.id,
+                seen: false,
+                notificationType: notType,
+                senderImageUrl: posterInfo.profileImage ? posterInfo.profileImage : null,
+                createdBy: `${event.entity.createdBy}`
+            }
+
+            notifications.push(noti);
+          }
+
+        try {
+            await this.notiRepo.save(notifications);
+        } catch (err) {
+            Logger.log(err.message)
+            console.log(err.message);
+        }
       }
-
-      try {
-        await this.notiRepo.save(noti);
-
-      } catch (err) {
-        Logger.log(err.message)
-        console.log(err.message);
-      }
-
-      
     }
   }

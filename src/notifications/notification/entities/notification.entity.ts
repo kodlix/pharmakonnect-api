@@ -2,7 +2,7 @@ import { Exclude } from "class-transformer";
 import { AccountEntity } from "src/account/entities/account.entity";
 import { NotificationTypeEntity } from "src/notifications/notificationtype/entities/notificationtype.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 
 @Entity('Notification')
 export class NotificationEntity extends AbstractBaseEntity{
@@ -40,5 +40,8 @@ export class NotificationEntity extends AbstractBaseEntity{
 
     @ManyToOne(() => NotificationTypeEntity, notificationType => notificationType.notification)
     @JoinColumn()
-    notificationType: NotificationTypeEntity
+    notificationType: NotificationTypeEntity;
+
+    @Column({ nullable: true })
+    senderImageUrl: string;
 }
