@@ -1,5 +1,6 @@
+/* eslint-disable prettier/prettier */
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsString, IsNotEmpty, IsInt, IsNumber, IsPositive, IsOptional } from "class-validator";
+import { IsString, IsNotEmpty, IsInt, IsNumber, IsPositive, IsOptional, IsUrl } from "class-validator";
 
 export class CreateAdvertDto{
 
@@ -10,13 +11,9 @@ export class CreateAdvertDto{
 
     @ApiProperty()
     @IsString()
+    @IsUrl()
     @IsNotEmpty()
     url: string;
-
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
-    publishedAt: string;
 
     @ApiProperty()
     @IsNotEmpty()
@@ -48,6 +45,7 @@ export class CreateAdvertDto{
 
     @ApiProperty()
     @IsString()
+    @IsUrl()
     @IsNotEmpty()
     website: string;
 

@@ -45,7 +45,7 @@ import {
           return;
       }
 
-      const userWhoSub = await this.acctRepo.find({where: {subscribeToJob: true, id: Not(Equal(event.entity.accountId))}});
+      const userWhoSub = await this.acctRepo.find({where: {subscribeToJobAlert: true, id: Not(Equal(event.entity.accountId))}});
 
       const notifications = [];
       const posterInfo = await this.acctRepo.findOne(event.entity.accountId);

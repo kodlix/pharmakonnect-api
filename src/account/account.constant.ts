@@ -4,3 +4,10 @@ export enum accountTypes {
   DEVELOPER = "Developer",
   ADMIN = "Admin"
 }
+
+export enum staffStatus{
+  
+  PENDING = 'pending',
+  VERIFIED = 'verified',
+  REJECTED = 'rejected',
+}

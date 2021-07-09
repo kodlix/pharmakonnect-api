@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { AccountEntity } from "src/account/entities/account.entity";
 import { Brackets, DeleteResult, EntityRepository, ILike, LessThanOrEqual, MoreThanOrEqual, Repository } from "typeorm";
@@ -12,8 +13,7 @@ import { isNotValidDate } from "src/_utility/date-validator.util";
 export class AdvertRepository extends Repository<AdvertEntity>{
    async createEntity(
       dto: CreateAdvertDto,
-      user: AccountEntity,
-      filename: string
+      user: AccountEntity
     ): Promise<AdvertEntity> {
       
       const checkAdvert = await this.findOne({ where: { title: ILike(`%${dto.title}%`), companyName: ILike(`%${dto.companyName}%`) } });
@@ -33,12 +33,25 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       if(new Date(dto.endDate).setHours(0,0,0,0) < new Date(dto.startDate).setHours(0,0,0,0)) {
         throw new HttpException(`Start date of advert cannot be greater than End date`, HttpStatus.BAD_REQUEST,);
     }
+
+    // if (dto.url) {
+    //   const isValidUrl = validateUrl(dto.url);
+    //   if (!isValidUrl) {
+    //     throw new HttpException(`The advert url ${dto.url} is not valid`, HttpStatus.BAD_REQUEST)
+    //   }
+    // }
+
+    // if (dto.website) {
+    //   const isValidUrl = validateUrl(dto.website);
+    //   if (!isValidUrl) {
+    //     throw new HttpException(`The company url ${dto.website} is not valid`, HttpStatus.BAD_REQUEST)
+    //   }
+    // }
       
         advert.title = dto.title;
         advert.companyName = dto.companyName;
         advert.contactPerson = dto.contactPerson;
         advert.url = dto.url;        
-        advert.publishedAt = dto.publishedAt;
         advert.startDate = dto.startDate;           
         advert.endDate = dto.endDate;        
         advert.advertiserId = dto.advertiserId;
@@ -48,10 +61,9 @@ export class AdvertRepository extends Repository<AdvertEntity>{
         advert.contactPhoneNumber = dto.contactPhoneNumber;
         advert.accountId = user.id;
         advert.createdBy = user.email
+        advert.advertImage = dto.advertImage;
         advert.createdAt = new Date();
-        if(filename) {
-          advert.advertImage = filename;
-      }
+
   
       const errors = await validate(advert);
       if(errors.length > 0) {
@@ -89,7 +101,6 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       advert.companyName = dto.companyName;
       advert.contactPerson = dto.contactPerson;
       advert.url = dto.url;        
-      advert.publishedAt = dto.publishedAt;   
       advert.startDate = dto.startDate;        
       advert.endDate = dto.endDate;        
       advert.advertiserId = dto.advertiserId;
@@ -228,4 +239,8 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       });
       return advert;
   }
+}
+
+function validateUrl(value) {
+  return /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(value);
 }

@@ -5,7 +5,7 @@ import { RegisterDTO, LoginDTO, LockUserDTO, ChangePasswordDto, ResetPasswordDto
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { UserFromDbRO } from './interfaces/account.interface';
 import { OrganizationRO, UserDataRO } from './interfaces/user.interface';
-import { accountTypes } from './account.constant';
+import { accountTypes, staffStatus } from './account.constant';
 import { constants } from 'buffer';
 import { OutletEntity } from 'src/outlet/entity/outlet.entity';
 
@@ -19,7 +19,9 @@ export class AccountRepository extends Repository<AccountEntity> {
     firstName,
     lastName, 
     organizationName,
-    emailVerified
+    emailVerified,
+    organizationId,
+    subscribeToJobAlert
   }: RegisterDTO): Promise<boolean> {
     const isExists = await await this.findOne({ email });
     if (isExists) {
@@ -35,16 +37,18 @@ export class AccountRepository extends Repository<AccountEntity> {
     user.firstName = firstName;
     user.lastName = lastName;
     user.organizationName = organizationName;
+    user.organizationId = organizationId;
     user.createdBy = email;
     user.accountPackage = 'Free';
     user.isRegComplete = isRegComplete;
     user.emailVerified = emailVerified;
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
+    user.subscribeToJobAlert = this.stringToBoolean(subscribeToJobAlert);
     
     try {
       await user.save();
-      if (accountType === accountTypes.CORPORATE){
+      if (accountType = accountTypes.CORPORATE){
 
         const outlet = new OutletEntity()
         
@@ -99,7 +103,7 @@ export class AccountRepository extends Repository<AccountEntity> {
           status: HttpStatus.NOT_FOUND,
         },
         HttpStatus.NOT_FOUND,
-      );
+      );` `
     }
     return this.buildUserRO(result);
   }
@@ -116,6 +120,43 @@ export class AccountRepository extends Repository<AccountEntity> {
       );
     }
     return this.buildUserRO(result);
+  }
+
+  public async findUnverifedStaff(id:string, page=1 ):Promise<UserDataRO[]>{
+    const result = await this.find({
+      where: {organizationId:id, staffStatus:staffStatus.PENDING},
+      take: 25,
+      skip: 25 * (page - 1)
+    })
+  
+    return this.buildUserArrRO(result);
+  }
+
+  public async findVerifedStaff(id:string, page=1 ):Promise<UserDataRO[]>{
+    const result = await this.find({
+      where: {organizationId:id, staffStatus:staffStatus.VERIFIED},
+      take: 25,
+      skip: 25 * (page - 1)
+    })
+  
+    return this.buildUserArrRO(result);
+  }
+
+  public async verifyStaff(id: string): Promise<UserDataRO> {
+    const result = await this.findOne(id)
+    result.staffStatus = staffStatus.VERIFIED
+    result.message = "";
+    return await this.save(result)
+  }
+
+  public async rejectStaff(id: string, message: string): Promise<UserDataRO> {
+    const result = await this.findOne(id)
+    message = `${message} :By - ${result.organizationName}`;
+    result.staffStatus = staffStatus.REJECTED;
+    result.organizationName = null;
+    result.organizationId = null;
+    result.message = message;
+    return await this.save(result);
   }
 
   public async updateUser<T>(
@@ -224,6 +265,8 @@ export class AccountRepository extends Repository<AccountEntity> {
       accountPackage: user.accountPackage,
       organizationName: user.organizationName,
       organizationType: user.organizationType,
+      organizationId: user.organizationId,
+      staffStatus:user.staffStatus,
       typesOfPractice: user.typesOfPractice,
       isRegComplete: user.isRegComplete,
       accountType: user.accountType,
@@ -254,15 +297,33 @@ export class AccountRepository extends Repository<AccountEntity> {
     let userArr = [];
     users.forEach((user) => {
       const userRO = {
+        id: user.id,
         pcn: user.pcn,
         latitude: user.latitude,
         longitude: user.longitude,
         organizationName: user.organizationName,
         organizationType: user.organizationType,
         companyRegistrationNumber: user.companyRegistrationNumber,
+        joined: user.createdAt,
+        typeOfPractice: user.typesOfPractice,
+        phoneNumber: user.phoneNumber,
+        email: user.email,
+        logo: user.profileImage,
+        website: user.website,
+        noOfEmployees: user.numberofEmployees
       };
       userArr.push(userRO);
     });
     return userArr;
   }
+
+  stringToBoolean(val: any){
+    if(val === false) return false;
+    if(val === true) return true;
+    switch(val.toLowerCase().trim()){
+        case 'true': return true;
+        case 'false':return false;
+        default: return Boolean(val);
+      }
+    }
 }

@@ -1,9 +1,10 @@
 import { Controller, Delete, Get, Param, Put, UseGuards } from '@nestjs/common';
 import { NotificationService } from './notification.service';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { NotificationRO } from './interface/notification.interface';
 import { AuthGuard } from '@nestjs/passport';
 import { DeleteResult } from 'typeorm/query-builder/result/DeleteResult';
+import { Query } from '@nestjs/common';
 
 @Controller('notification')
 @ApiTags('Notification')
@@ -33,11 +34,15 @@ export class NotificationController {
     return await this.notificationService.findByAccount(accountId);
   }
 
-  @Get('byaccount/all/:accountId')
+  @Get('by_account/all')
+  @ApiQuery({ name: 'accountId', type: String })
+  @ApiQuery({ name: 'search', type: String })
+  @ApiQuery({ name: 'page', type:  Number })
+
   @ApiOperation({ summary: 'Get all seen and unseen notifications by account' })
   @ApiResponse({ status: 200, description: 'Return all seen and unseen notifications by account' })
-  async findAllByAccount(@Param('accountId') accountId: string): Promise<NotificationRO[]> {
-    return await this.notificationService.findAllByAccount(accountId);
+  async findAllByAccount(@Query() query: any): Promise<NotificationRO[]> {
+    return await this.notificationService.findAllByAccount(query);
   }
 
   @Put(':id')
