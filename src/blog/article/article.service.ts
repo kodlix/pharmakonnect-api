@@ -168,9 +168,6 @@ export class ArticleService {
     const result = await this.articleRepo.findOne({where:{id: articleId}, relations: ['author']});
 
       const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.BLOG}});
-      if(!notType) {
-          return;
-      }
 
       const {id, profileImage} = await this.accountService.findByEmail("admin@netopng.com");
       
@@ -192,6 +189,7 @@ export class ArticleService {
 
       } catch (err) {
         Logger.log(err);
+        return result;
       }
 
     return result;
@@ -211,10 +209,7 @@ export class ArticleService {
     const result = await this.articleRepo.findOne({where:{id: articleId}, relations: ['author']});
 
     const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.BLOG}});
-      if(!notType) {
-          return;
-      }
-
+      
       const {id, profileImage} = await this.accountService.findByEmail("admin@netopng.com");
       
       const noti: NotificationRO = {
@@ -234,6 +229,7 @@ export class ArticleService {
         await this.notiRepo.save(noti);
       } catch (err) {
         Logger.log(err);
+        return result;
       }
 
     return result;
