@@ -108,6 +108,7 @@ export class EventService {
               await this.notiRepo.save(noti);
             } catch (error) {
               Logger.log(error);
+              return result;
             }
             return result;
   }
@@ -138,6 +139,7 @@ export class EventService {
               await this.notiRepo.save(noti);
             } catch (error) {
               Logger.log(error);
+              return result;
             }
 
             return result;
