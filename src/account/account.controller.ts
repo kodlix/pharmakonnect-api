@@ -11,6 +11,7 @@ import { CorperateRO, IndividualRO, UserRO } from './interfaces/account.interfac
 import { OrganizationRO, UserDataRO } from './interfaces/user.interface';
 import { FilterDto } from 'src/_common/filter.dto';
 import { editFileName, imageFileFilter } from 'src/_utility/fileupload.util';
+import { uploadFile } from 'src/_utility/upload.util';
 
 @ApiTags('account')
 @Controller('account')
@@ -123,7 +124,14 @@ export class AccountController {
       fileFilter: imageFileFilter,
     }),
   )
-  async uploadedFile(@UploadedFile() file, @Req() req) {
+  async uploadedFile(@UploadedFile() file, @Req() req,  @UploadedFile() profileImage: any) {
+
+    let imagePath = "";
+    if (profileImage) {
+      const imageUrl = await uploadFile(profileImage.path);
+      imagePath = imageUrl;
+    }
+
     if (!file) {
       return {
         status: HttpStatus.BAD_REQUEST,
@@ -134,9 +142,10 @@ export class AccountController {
     const response = {
       originalname: file.originalname,
       filename: file.filename,
+      imageUrl: imagePath
     };
 
-    await this.accountService.updateProfileImage(file.filename, req.user.id);
+    await this.accountService.updateProfileImage(imagePath, req.user.id);
 
     return {
       status: HttpStatus.OK,
