@@ -2,7 +2,7 @@ import { Column, Entity, ManyToOne } from "typeorm";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 
 @Entity("Contact")
-export class ContactEnitiy extends AbstractBaseEntity {
+export class ContactEntity extends AbstractBaseEntity {
 
 
     @Column()
