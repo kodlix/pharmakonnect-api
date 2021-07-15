@@ -86,23 +86,19 @@ export class AccountService {
 
     if (search) {
       const searchQuery = `
-         account.firstName like :firstName OR 
-         account.lastName like :lastName`;
-
-      //  const searchQuery = `
-      //  account.city like :city OR 
-      //  account.organizationName like :organizationName OR
-      //   account.email like :email OR account.phoneNumber like :phoneNumber OR
-      //   account.pcn like :pcn OR
-      //   account.firstName like :firstName OR 
-      //   account.lastName like :lastName OR
-      //   account.typeOFPractice like :typeOfPractice OR
-      //   account.organizationType like :organizationType OR
-      //   account.companyRegistrationNumber like :companyRegistrationNumber OR
-      //   account.address like :address OR
-      //   account._state.name like :state OR
-      //   account._lga.name like :lga OR
-      //   account._country.name like :country`;
+         account.firstName ILIKE :search OR 
+         account.lastName ILIKE :search OR
+        account.city ILIKE :search OR 
+        account.organizationName ILIKE :search OR
+        account.email ILIKE :search OR account.phoneNumber ILIKE :search OR
+        account.pcn ILIKE :search OR
+        account.typesOfPractice ILIKE :search OR
+        account.organizationType ILIKE :search OR
+        account.companyRegistrationNumber ILIKE :search OR
+        account.address ILIKE :search `;
+        // account._state.name ILIKE :search OR
+        // account._lga.name ILIKE :search OR
+        // account._country.name ILIKE :search`;
 
       const accts = await getRepository(AccountEntity)
         .createQueryBuilder('account')
@@ -113,8 +109,7 @@ export class AccountService {
         })
         .andWhere('account.id Not In (:...contacts)', { contacts: contactIds })
         .andWhere(searchQuery, {
-          firstName: `%${search}%`,
-          lastName: `%${search}%`
+          search: `%${search}%`
         })
         .skip(take * (page - 1))
         .take(take)
