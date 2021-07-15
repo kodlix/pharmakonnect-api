@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsString, IsNotEmpty, IsInt, IsNumber, IsPositive, IsOptional, IsUrl } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, IsUrl, IsEmail } from "class-validator";
 
 export class CreateAdvertDto{
 
@@ -12,7 +12,6 @@ export class CreateAdvertDto{
     @ApiProperty()
     @IsString()
     @IsUrl()
-    @IsNotEmpty()
     url: string;
 
     @ApiProperty()
@@ -26,6 +25,7 @@ export class CreateAdvertDto{
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
+    @IsEmail({}, { message: 'Incorrect email' })
     advertiserId: string;
 
     @ApiProperty()
@@ -46,7 +46,6 @@ export class CreateAdvertDto{
     @ApiProperty()
     @IsString()
     @IsUrl()
-    @IsNotEmpty()
     website: string;
 
     @ApiProperty()
@@ -59,7 +58,11 @@ export class CreateAdvertDto{
     @IsString()
     @IsNotEmpty()
     contactPhoneNumber: string;
-
+    
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
+    description: string;
 
     @ApiProperty()
     @ApiPropertyOptional()
