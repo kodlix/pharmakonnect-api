@@ -108,9 +108,7 @@ export class AccountService {
             [accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]
         })
         .andWhere('account.id Not In (:...contacts)', { contacts: contactIds })
-        .andWhere(searchQuery, {
-          search: `%${search}%`
-        })
+       
         .skip(take * (page - 1))
         .take(take)
         .orderBy('account.createdAt', 'DESC')
