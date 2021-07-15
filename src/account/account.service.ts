@@ -11,7 +11,7 @@ import { getRepository, Not } from 'typeorm';
 import { AccountEntity } from './entities/account.entity';
 import { SendGridService } from 'src/mailer/sendgrid.service';
 import { accountTypes } from './account.constant';
-import { ContactEnitiy } from 'src/contact/entities/contact.entity';
+import { ContactEntity } from 'src/contact/entities/contact.entity';
 
 
 @Injectable()
@@ -76,7 +76,7 @@ export class AccountService {
     page = +page;
     take = take && +take || 20;
 
-    const contacts = await getRepository(ContactEnitiy)
+    const contacts = await getRepository(ContactEntity)
       .createQueryBuilder('contact')
       .where('contact.creatorId = :id', { id: user.id })
       .select('contact.accountId')

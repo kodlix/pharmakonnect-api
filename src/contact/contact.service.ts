@@ -2,25 +2,24 @@ import { BadRequestException } from '@nestjs/common';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { getRepository, Repository, getConnection } from 'typeorm';
 import { CreateContactDto } from './dto/create-contact.dto';
-import { UpdateContactDto } from './dto/update-contact.dto';
-import { ContactEnitiy } from './entities/contact.entity';
+import { ContactEntity } from './entities/contact.entity';
 
 @Injectable()
-export class ContactService extends Repository<ContactEnitiy> {
+export class ContactService extends Repository<ContactEntity> {
 
 
   async createContact(dto: CreateContactDto[], user: any): Promise<any[]> {
     try {
-      const contactrepository = await getRepository(ContactEnitiy);
+      const contactrepository = await getRepository(ContactEntity);
       let contactArr = []
       let contactExist = [];
       for (let value of dto) {
-        let isExist = await getRepository(ContactEnitiy).findOne({ where: { creatorId: user.id, accountId: value.accountId } })
+        let isExist = await getRepository(ContactEntity).findOne({ where: { creatorId: user.id, accountId: value.accountId } })
 
         if (isExist) {
           contactExist.push(value.firstName + ' ' + value.lastName + ' Already exist in your contact')
         } else {
-          let contact = new ContactEnitiy()
+          let contact = new ContactEntity()
           contact.accountId = value.accountId;
           contact.creatorId = user.id;
           contact.email = value.email;
@@ -46,13 +45,13 @@ export class ContactService extends Repository<ContactEnitiy> {
 
   }
 
-  async findAll(page = 1, take = 20, user: any): Promise<ContactEnitiy[]> {
+  async findAll(page = 1, take = 20, user: any): Promise<ContactEntity[]> {
 
     page = +page;
     take = take && +take || 20;
 
 
-    const conversations = await getRepository(ContactEnitiy)
+    const conversations = await getRepository(ContactEntity)
       .createQueryBuilder('conversation')
       .where('conversation.creatorId = :id', { id: user.id })
       .skip(take * (page - 1))
@@ -62,7 +61,7 @@ export class ContactService extends Repository<ContactEnitiy> {
   }
 
   async getContactbyId(id: string) {
-    const contact = await getRepository(ContactEnitiy).findOne({ where: { id: id } });
+    const contact = await getRepository(ContactEntity).findOne({ where: { id: id } });
     return contact
   }
 
@@ -71,7 +70,7 @@ export class ContactService extends Repository<ContactEnitiy> {
   // }
 
   async removebyId(id: string) {
-    const isDeleted = await getConnection().createQueryBuilder().delete().from(ContactEnitiy)
+    const isDeleted = await getConnection().createQueryBuilder().delete().from(ContactEntity)
       .where("id = :id", { id }).execute();
     return isDeleted
   }

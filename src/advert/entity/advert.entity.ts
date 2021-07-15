@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Exclude } from "class-transformer";
 import { AccountEntity } from "src/account/entities/account.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
@@ -38,6 +39,9 @@ export class AdvertEntity extends AbstractBaseEntity{
 
     @Column({ nullable: true })
     contactPhoneNumber: string;
+
+    @Column({nullable: true})
+    description: string;
 
     @Column('uuid')
     advertCategoryId: string;
