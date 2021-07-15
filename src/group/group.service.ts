@@ -10,35 +10,35 @@ import { GroupEntity } from './entities/group.entity';
 export class GroupService extends Repository<GroupEntity> {
 
   async createGroup(dto: CreateGroupDto, user: AccountEntity): Promise<any> {
-    const exists = await  getRepository(GroupEntity).createQueryBuilder('g')
-    .where('g.name =:name AND g.ownerId =:owner', {name: dto.name, owner: user.id})
-    .getOne();
+    const exists = await getRepository(GroupEntity).createQueryBuilder('g')
+      .where('g.name =:name AND g.ownerId =:owner', { name: dto.name, owner: user.id })
+      .getOne();
 
-    if(exists){
+    if (exists) {
       throw new BadRequestException(`Group ${name} already exists.`);
     }
 
     return await getRepository(GroupEntity).createQueryBuilder('g')
-   .insert()
-   .into(GroupEntity)
-   .values({name: dto.name, description: dto.description, ownerId: user.id})
-   .execute();
+      .insert()
+      .into(GroupEntity)
+      .values({ name: dto.name, description: dto.description, ownerId: user.id })
+      .execute();
   }
 
   async editGroup(id: string, dto: UpdateGroupDto, user: AccountEntity): Promise<boolean> {
-    const exists = await  getRepository(GroupEntity).createQueryBuilder('g')
-    .where('g.name =:name AND g.ownerId =:owner AND id !=:id', {name: dto.name, owner: user.id, id})
-    .getOne();
+    const exists = await getRepository(GroupEntity).createQueryBuilder('g')
+      .where('g.name =:name AND g.ownerId =:owner AND id !=:id', { name: dto.name, owner: user.id, id })
+      .getOne();
 
-    if(exists){
+    if (exists) {
       throw new BadRequestException(`Group ${name} already exists.`);
     }
 
     await getRepository(GroupEntity).createQueryBuilder()
-    .update(GroupEntity)
-    .set({ name: dto.name, description: dto.description })
-    .where("id = :id", { id: dto.id })
-    .execute();
+      .update(GroupEntity)
+      .set({ name: dto.name, description: dto.description })
+      .where("id = :id", { id: dto.id })
+      .execute();
 
     return true;
   }
@@ -72,15 +72,34 @@ export class GroupService extends Repository<GroupEntity> {
     return groups;
   }
 
+
+  async findAllGroupMembers(groupId: string, owner: any, page = 1, take = 20): Promise<GroupEntity[]> {
+
+    page = +page;
+    take = take && +take || 20;
+
+
+    const [groups, total] = await getRepository(GroupEntity)
+      .createQueryBuilder('g')
+      .leftJoinAndSelect("GroupMember", "gm", "gm.groupId = g.id")
+      .leftJoinAndSelect("Account", "a", "a.id = g.ownerId")
+      .where("g.id =:groupId AND g.ownerId =: ownerId", { groupId, ownerId: owner.id })
+      .skip(take * (page - 1))
+      .take(take)
+      .getManyAndCount();
+      
+    return groups;
+  }
+
   async getGroupbyId(id: string) {
     const contact = await getRepository(GroupEntity).findOne({ where: { id: id } });
     return contact
   }
 
 
-  async removebyId(id: string) {
+  async removebyId(id: string, owner: any) {
     const isDeleted = await getConnection().createQueryBuilder().delete().from(GroupEntity)
-      .where("id = :id", { id }).execute();
+      .where("id = :id AND owner =:ownerId", { id, ownerId: owner.id }).execute();
     return isDeleted
   }
 }

@@ -44,7 +44,8 @@ export class GroupController {
   }
 
   @Delete(':id')
- async  remove(@Param('id') id: string) {
-    return await this.groupService.removebyId(id);
+ async  remove(@Param('id') id: string,  @Req() req: any) {
+    const { user } = req;
+    return await this.groupService.removebyId(id, user);
   }
 }

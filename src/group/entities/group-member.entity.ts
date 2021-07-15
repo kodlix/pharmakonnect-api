@@ -10,4 +10,7 @@ export class GroupMemberEntity extends AbstractBaseEntity {
     @Column()
     contactId: string
 
+    @Column()
+    groupId: string
+
 }
