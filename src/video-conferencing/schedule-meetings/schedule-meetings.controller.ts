@@ -53,4 +53,12 @@ export class ScheduleMeetingsController {
   async remove(@Param('id') id: string) {
     return await this.scheduleMeetingsService.remove(id);
   }
+
+  @Get('/token/gettoken')
+  @ApiOperation({ summary: 'Get token' })
+  @ApiResponse({ status: 200, description: 'Return token' })
+  async getToken() : Promise<string>{
+    return await this.scheduleMeetingsService.getToken();
+  }
+
 }
