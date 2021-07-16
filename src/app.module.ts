@@ -35,6 +35,7 @@ import { AdvertCategoryModule } from './advert/advertcategory/advertcategory.mod
 import { join } from 'path';
 import { NotificationModule } from './notifications/notification/notification.module';
 import { NotificationtypeModule } from './notifications/notificationtype/notificationtype.module';
+import { GroupModule } from './group/group.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -52,6 +53,7 @@ import { NotificationtypeModule } from './notifications/notificationtype/notific
     FlatMeetingModule,
     //ChatModule,
     ContactModule,
+    GroupModule,
     //GroupchatModule,
     OutletModule,
     ScheduleMeetingGatewayModule,

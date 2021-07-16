@@ -212,7 +212,8 @@ export class AccountRepository extends Repository<AccountEntity> {
       );
     }   
 
-    user.profileImage = filename;        
+    user.profileImage = filename;    
+    console.log(user);        
     return await user.save();
   }
 
