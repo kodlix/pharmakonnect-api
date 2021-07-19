@@ -58,6 +58,7 @@ import {
                 senderId: event.entity.accountId,
                 entityId: event.entity.id,
                 recieverId: u.id,
+                createdAt: new Date(),
                 isGeneral: false,
                 accountId: u.id,
                 seen: false,

@@ -94,7 +94,7 @@ export class EventRepository extends Repository<EventEntity> {
         if(search) {
 
            const events =  await this.createQueryBuilder("event")
-                    .innerJoinAndSelect("event.eventUsers", "eventUsers")
+                    .leftJoinAndSelect("event.eventUsers", "eventUsers")
                     .where(new Brackets(qb => {
                         qb.where("event.name ILike :name", { name: `%${search}%` })
                         .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
@@ -116,7 +116,7 @@ export class EventRepository extends Repository<EventEntity> {
         if(search) {
 
            const events =  await this.createQueryBuilder("event")
-                    .innerJoinAndSelect("event.eventUsers", "eventUsers")
+                    .leftJoinAndSelect("event.eventUsers", "eventUsers")
                     .where(new Brackets(qb => {
                         qb.where("event.name ILike :name", { name: `%${search}%` })
                         .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
@@ -142,7 +142,7 @@ export class EventRepository extends Repository<EventEntity> {
         if(search) {
 
            const events =  await this.createQueryBuilder("event")
-                    .innerJoinAndSelect("event.eventUsers", "eventUsers")
+                    .leftJoinAndSelect("event.eventUsers", "eventUsers")
                     .where("event.accountId = :accountId", { accountId: user.id })
                     .andWhere(new Brackets(qb => {
                         qb.where("event.name ILike :name", { name: `%${search}%` })

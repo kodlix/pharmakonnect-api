@@ -45,6 +45,7 @@ import {
         message: `Hi there, ${event.entity.createdBy} posted a new event ${event.entity.name}`,
         senderId: event.entity.accountId,
         recieverId: id,
+        createdAt: new Date(),
         isGeneral: false,
         entityId: event.entity.id,
         accountId: id,

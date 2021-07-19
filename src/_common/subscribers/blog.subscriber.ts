@@ -37,16 +37,17 @@ import {
       
 
       const noti: NotificationRO = {
-        message: `Hi there, ${event.entity.author.firstName} posted a new blog ${event.entity.title}`,
+        message: `Hi there, ${event.entity.createdBy} posted a new blog ${event.entity.title}`,
         senderId: event.entity.author.id,
         recieverId: id,
         entityId: event.entity.id,
+        createdAt: new Date(),
         isGeneral: false,
         accountId: id,
         seen: false,
         notificationType: notType,
         senderImageUrl: event.entity.author.profileImage ? event.entity.author.profileImage : null,
-        createdBy: `${event.entity.author.firstName} ${event.entity.author.lastName}`
+        createdBy: `${event.entity.createdBy}`
       }
 
       try {

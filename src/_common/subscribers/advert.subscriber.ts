@@ -47,6 +47,7 @@ import {
         recieverId: id,
         isGeneral: false,
         entityId: event.entity.id,
+        createdAt: new Date(),
         accountId: id,
         seen: false,
         notificationType: notType,

@@ -172,13 +172,14 @@ export class ArticleService {
       const {id, profileImage} = await this.accountService.findByEmail("admin@netopng.com");
       
       const noti: NotificationRO = {
-        message: `Hi ${result.author.firstName}, your article has been published`,
+        message: `Hi ${result.createdBy}, your article has been published`,
         senderId: id,
         entityId: article.id,
         recieverId: result.author.id,
         isGeneral: false,
         accountId: result.author.id,
         seen: false,
+        createdAt: new Date(),
         senderImageUrl: profileImage ? profileImage : null,
         notificationType: notType,
         createdBy: "admin@netopng.com"
@@ -213,12 +214,13 @@ export class ArticleService {
       const {id, profileImage} = await this.accountService.findByEmail("admin@netopng.com");
       
       const noti: NotificationRO = {
-        message: `Hi ${result.author.firstName}, your article has been rejected: Rejection Reason: ${article.rejectMessage}`,
+        message: `Hi ${result.createdBy}, your article has been rejected: Rejection Reason: ${article.rejectMessage}`,
         senderId: id,
         entityId: article.id,
         recieverId: result.author.id,
         isGeneral: false,
         accountId: result.author.id,
+        createdAt: new Date(),
         seen: false,
         senderImageUrl: profileImage ? profileImage : null,
         notificationType: notType,
