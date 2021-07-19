@@ -78,7 +78,7 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       id: string,
       dto: UpdateAdvertDto,
       user: AccountEntity,
-      filename: string
+     
 
     ): Promise<AdvertEntity> {
       const advert = await this.findOne(id);
@@ -110,19 +110,12 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       advert.website = dto.website;
       advert.contactPhoneNumber = dto.contactPhoneNumber;
       advert.description = dto.description;
+      advert.advertImage = dto.advertImage;
       advert.accountId = user.id;
       advert.updatedBy = user.email;
       advert.updatedAt = new Date();
       advert.approved = false;
       advert.rejected = false;
-    
-      if(filename) {
-        advert.advertImage = filename;
-    } else {
-        if(advert.advertImage) {
-            dto.advertImage = advert.advertImage;
-        }
-    }
 
     //   if(filename) {
     //     advert.advertImage = filename;
@@ -130,6 +123,11 @@ export class AdvertRepository extends Repository<AdvertEntity>{
     // else{
     //     advert.advertImage = dto.advertImage;
     // }
+
+      const errors = await validate(advert);
+      if(errors.length > 0) {
+        throw new HttpException(errors, HttpStatus.BAD_REQUEST);
+    }
       
       return await this.save(advert);
     }

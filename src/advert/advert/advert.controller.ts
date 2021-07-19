@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -104,9 +105,14 @@ export class AdvertController {
     @Param('id') id: string,
     @Body() Dto: UpdateAdvertDto,
     @Req() req: any,
-    @UploadedFile() file,
-  ): Promise<AdvertRO> {
-    return await this.advertservice.update(id, Dto, req.user, file ? file.filename : "");
+    @UploadedFile() advertImage: any
+  ){
+    if (advertImage) {
+      const imageUrl = await uploadFile(advertImage.path);
+      Dto.advertImage = imageUrl;
+      return this.advertservice.update(id, Dto, req.user);
+    }
+
   }
 
 
