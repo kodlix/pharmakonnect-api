@@ -10,7 +10,7 @@ export class NotificationService {
 
 
   async findAll() {
-    return await this.notificationRepo.find({relations: ['notificationType']});
+    return await this.notificationRepo.find({relations: ['notificationType'], order: {createdAt: 'DESC'}});
   }
 
   async findOne(id: string) {
@@ -18,7 +18,7 @@ export class NotificationService {
   }
 
   async findByAccount(accountId: string) {
-    return await this.notificationRepo.find({where: {accountId, seen: false}, relations: ['notificationType']});
+    return await this.notificationRepo.find({where: {accountId, seen: false}, order: {createdAt: 'DESC'}, relations: ['notificationType']});
   }
 
   async findAllByAccount({accountId, page, search}) {
@@ -28,7 +28,7 @@ export class NotificationService {
     if(search) {
 
       const nots =  await this.notificationRepo.createQueryBuilder("not")
-               .innerJoinAndSelect("not.notificationType", "notificationType")
+               .leftJoinAndSelect("not.notificationType", "notificationType")
                .where("not.accountId = :accountId", { accountId })
                .andWhere(new Brackets(qb => {
                    qb.where("not.message ILike :message", { message: `%${search}%` })
@@ -57,7 +57,7 @@ export class NotificationService {
       not.seen = true;
       const res = await this.notificationRepo.save(not);
       
-      return await this.notificationRepo.find({where: {accountId: res.accountId, seen: false}, relations: ['notificationType']})
+      return await this.notificationRepo.find({where: {accountId: res.accountId, seen: false}, order: {createdAt: 'DESC'}, relations: ['notificationType']})
     } catch (error) {
       Logger.log(error);
     }

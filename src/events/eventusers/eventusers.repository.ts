@@ -72,7 +72,7 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
         if(search) {
 
            const eventsUsers =  await this.createQueryBuilder("evu")
-                    .innerJoinAndSelect("evu.event", "event")
+                    .leftJoinAndSelect("evu.event", "event")
                     .where(new Brackets(qb => {
                         qb.where("evu.email ILike :email", { email: `%${search}%` })
                         .orWhere("evu.accessCode ILike :accessCode", { accessCode: `%${search}%` })
@@ -98,7 +98,7 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
         if(search) {
 
            const eventsUsers =  await this.createQueryBuilder("evu")
-                    .innerJoinAndSelect("evu.event", "event")
+                    .leftJoinAndSelect("evu.event", "event")
                     .where("event.accountId = :accountId", { accountId: user.id })
                     .andWhere(new Brackets(qb => {
                         qb.where("evu.email ILike :email", { email: `%${search}%` })

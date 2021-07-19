@@ -11,4 +11,5 @@ export interface NotificationRO {
     createdBy: string;
     entityId: string;
     senderImageUrl: string;
+    createdAt : Date;
 }
