@@ -96,7 +96,7 @@ export class SeederService implements OnModuleInit {
 
   public async createNotificationType(): Promise<void> {
     const hasData = await this.notTypeSvc.findAll();
-    if (!hasData.length) {
+    if (!hasData.length || NotificationType_Seed.length > hasData.length) {
       for (const item of NotificationType_Seed){
         this.notTypeSvc.create(item);
       }
