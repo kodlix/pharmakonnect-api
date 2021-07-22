@@ -10,5 +10,25 @@ export class CreateContactDto {
     @ApiProperty()
     readonly accountId: string
 
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    firstName: string
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    lastName: string
+    
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    phoneNo: string
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    email: string
+
     createdBy: string
 }
