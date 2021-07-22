@@ -5,6 +5,5 @@
   "username": "postgres",
   "password": "!Pass4sure",
   "database": "pharmakonnectdb",
-  "entities": ["dist/**/*.entity.js"],
-  "synchronize": true
+  "entities": ["dist/**/*.entity.js"]
 }

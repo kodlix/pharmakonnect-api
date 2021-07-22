@@ -3,37 +3,32 @@ import { ApiProperty } from '@nestjs/swagger';
 
 
 export class CreateContactDto {
-
     creatorId: string
-
 
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
     readonly accountId: string
 
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    firstName: string
 
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    readonly firstName: string
-
+    lastName: string
+    
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    phoneNo: string
 
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    readonly lastName: string
-
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    readonly phoneNo: string
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    readonly email: string
+    email: string
 
     createdBy: string
 }

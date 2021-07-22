@@ -1,12 +1,17 @@
 import { BadRequestException } from '@nestjs/common';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AccountEntity } from 'src/account/entities/account.entity';
 import { getRepository, Repository, getConnection, Brackets } from 'typeorm';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { ContactEntity } from './entities/contact.entity';
 
 @Injectable()
-export class ContactService extends Repository<ContactEntity> {
-
+export class ContactService  {
+  constructor(
+    @InjectRepository(ContactEntity)
+    private readonly repository: Repository<ContactEntity>
+  ) { }
 
   async createContact(dto: CreateContactDto[], user: any): Promise<any[]> {
     try {
@@ -17,16 +22,16 @@ export class ContactService extends Repository<ContactEntity> {
         let isExist = await getRepository(ContactEntity).findOne({ where: { creatorId: user.id, accountId: value.accountId } })
 
         if (isExist) {
-          contactExist.push(value.firstName + ' ' + value.lastName + ' Already exist in your contact')
+          contactExist.push('User already exist in your contact.')
         } else {
           let contact = new ContactEntity()
           contact.accountId = value.accountId;
           contact.creatorId = user.id;
-          contact.email = value.email;
+          contact.createdBy = user.createdBy //use created by
           contact.firstName = value.firstName;
           contact.lastName = value.lastName;
           contact.phoneNo = value.phoneNo;
-          contact.createdBy = user.createdBy //use created by
+          contact.email = value.email;
 
           contactArr.push(contact)
         }
@@ -45,7 +50,7 @@ export class ContactService extends Repository<ContactEntity> {
 
   }
 
-  async findAll(page = 1, take = 20, user: any): Promise<ContactEntity[]> {
+  async findAll(page = 1, take = 20, user: any): Promise<AccountEntity[]> {
 
     page = +page;
     take = take && +take || 20;
@@ -54,10 +59,18 @@ export class ContactService extends Repository<ContactEntity> {
     const conversations = await getRepository(ContactEntity)
       .createQueryBuilder('conversation')
       .where('conversation.creatorId = :id', { id: user.id })
-      .skip(take * (page - 1))
-      .take(take)
       .getMany();
-    return conversations
+
+      const userIds = conversations.map(x => x.accountId);
+
+      if (userIds.length > 0) {
+        return await getRepository(AccountEntity)
+        .createQueryBuilder('a')
+        .where('a.id IN (:...userIds)', {userIds})
+        .skip(take * (page - 1))
+        .take(take)
+        .getMany();
+      }
   }
 
   async getContactbyId(id: string) {
@@ -77,8 +90,7 @@ export class ContactService extends Repository<ContactEntity> {
   // }
 
   async removebyId(id: string) {
-    const isDeleted = await getConnection().createQueryBuilder().delete().from(ContactEntity)
-      .where("id = :id", { id }).execute();
+    const isDeleted =  await this.repository.delete({accountId: id});
     return isDeleted
   }
 
@@ -98,7 +110,7 @@ export class ContactService extends Repository<ContactEntity> {
           return ctcs;
       }
 
-      return this.findAll(1, 20, user);
+      return await this.repository.find({creatorId: user.id});
     }
 
       
