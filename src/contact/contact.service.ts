@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { getRepository, Repository, getConnection } from 'typeorm';
+import { getRepository, Repository, getConnection, Brackets } from 'typeorm';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { ContactEntity } from './entities/contact.entity';
 
@@ -65,6 +65,13 @@ export class ContactService extends Repository<ContactEntity> {
     return contact
   }
 
+  async getContactbyAccountId(id: string) {
+    const contact = await getRepository(ContactEntity).findOne({ where: { accountId: id } });
+    return contact
+  }
+
+  
+
   // update(id: number, updateContactDto: UpdateContactDto) {
   //   return `This action updates a #${id} contact`;
   // }
@@ -74,4 +81,25 @@ export class ContactService extends Repository<ContactEntity> {
       .where("id = :id", { id }).execute();
     return isDeleted
   }
+
+    async loadChatContact(search: string, user: any): Promise<ContactEntity[]> {
+
+      if(search) {
+          const ctcs = await getRepository(ContactEntity)
+          .createQueryBuilder('ctc')
+          .where('ctc.creatorId = :id', { id: user.id })
+          .andWhere(new Brackets(qb => {
+            qb.where("ctc.firstName ILike :fname", { fname: `%${search}%` })
+            .orWhere("ctc.lastName ILike :lname", { lname: `%${search}%` })
+            .orWhere("ctc.email ILike :email", { email: `%${search}%` })
+        }))
+          .getMany();
+          
+          return ctcs;
+      }
+
+      return this.findAll(1, 20, user);
+    }
+
+      
 }
