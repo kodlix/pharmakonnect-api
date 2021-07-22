@@ -17,15 +17,11 @@ export class ContactService extends Repository<ContactEntity> {
         let isExist = await getRepository(ContactEntity).findOne({ where: { creatorId: user.id, accountId: value.accountId } })
 
         if (isExist) {
-          contactExist.push(value.firstName + ' ' + value.lastName + ' Already exist in your contact')
+          contactExist.push('User already exist in your contact.')
         } else {
           let contact = new ContactEntity()
           contact.accountId = value.accountId;
           contact.creatorId = user.id;
-          contact.email = value.email;
-          contact.firstName = value.firstName;
-          contact.lastName = value.lastName;
-          contact.phoneNo = value.phoneNo;
           contact.createdBy = user.createdBy //use created by
 
           contactArr.push(contact)
