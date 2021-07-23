@@ -28,7 +28,7 @@ export class AccountService {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.BAD_REQUEST);
     }
     
-    const { email, accountPackage, isRegComplete, accountType, accountId, profileImage } = user
+    const { email, accountPackage, isRegComplete, accountType, accountId, profileImage, name } = user
     if (!email) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.UNAUTHORIZED);
     }
@@ -40,7 +40,7 @@ export class AccountService {
     const accessToken = await this.jwtService.sign(payload);
     let dataToReturn = {
       email, token: accessToken, expires_in: 86400, accountPackage,
-      isRegComplete, accountType, accountId, profileImage
+      isRegComplete, accountType, accountId, profileImage, name
     };
     return dataToReturn;
   }

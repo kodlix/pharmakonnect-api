@@ -79,8 +79,15 @@ export class ContactService  {
   }
 
   async getContactbyAccountId(id: string) {
-    const contact = await getRepository(ContactEntity).findOne({ where: { accountId: id } });
-    return contact
+    //const contact = await getRepository(ContactEntity).findOne({ where: { accountId: id } });
+
+    const user = await getRepository(AccountEntity)
+            .createQueryBuilder('a')
+            .where("a.id = :id", {id})
+            .getOne();
+
+
+    return user;
   }
 
   

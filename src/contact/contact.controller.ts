@@ -31,8 +31,20 @@ export class ContactController {
     return this.contactService.getContactbyId(id);
   }
 
+  @Get('byaccount/:id')
+  findOneByAccount(@Param('id') id: string) {
+    return this.contactService.getContactbyAccountId(id);
+  }
+
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.contactService.removebyId(id);
+  }
+
+  @Get('all/search')
+  async loadChatContact(@Query('searchParam') searchParam: string, @Req() req: any) {
+    const { user } = req;
+    return await this.contactService.loadChatContact(searchParam , user);
   }
 }
