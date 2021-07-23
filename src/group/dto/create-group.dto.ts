@@ -16,8 +16,6 @@ export class CreateGroupDto {
     @ApiProperty()
     readonly description: string;
 
-    @IsString()
-    @IsNotEmpty()
     @ApiProperty()
     readonly logo: string
 

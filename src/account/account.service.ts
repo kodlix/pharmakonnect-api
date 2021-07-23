@@ -27,7 +27,7 @@ export class AccountService {
     if (!user) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.BAD_REQUEST);
     }
-    
+
     const { email, accountPackage, isRegComplete, accountType, accountId, profileImage } = user
     if (!email) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.UNAUTHORIZED);
@@ -46,10 +46,10 @@ export class AccountService {
   }
 
   public async forgetPassword(email: string): Promise<string> {
-      if (await this.createEmailToken(email)) {
-        await this.sendEmailForgotPassword(email);
-      }
-      return "Forgot password email sent successfully";
+    if (await this.createEmailToken(email)) {
+      await this.sendEmailForgotPassword(email);
+    }
+    return "Forgot password email sent successfully";
   }
 
   public async register(registerDto: RegisterDTO): Promise<string> {
@@ -96,9 +96,9 @@ export class AccountService {
         account.organizationType ILIKE :search OR
         account.companyRegistrationNumber ILIKE :search OR
         account.address ILIKE :search `;
-        // account._state.name ILIKE :search OR
-        // account._lga.name ILIKE :search OR
-        // account._country.name ILIKE :search`;
+      // account._state.name ILIKE :search OR
+      // account._lga.name ILIKE :search OR
+      // account._country.name ILIKE :search`;
 
       const accts = await getRepository(AccountEntity)
         .createQueryBuilder('account')
@@ -108,7 +108,7 @@ export class AccountService {
             [accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]
         })
         .andWhere('account.id Not In (:...contacts)', { contacts: contactIds })
-       
+
         .skip(take * (page - 1))
         .take(take)
         .orderBy('account.createdAt', 'DESC')
@@ -149,21 +149,21 @@ export class AccountService {
     return await this.accountRepository.updateUser(email, toUpdate);
   }
 
-  public async findUnverifedStaff(id:string, page){
-    return await this.accountRepository.findUnverifedStaff(id,page);
+  public async findUnverifedStaff(id: string, page) {
+    return await this.accountRepository.findUnverifedStaff(id, page);
   }
 
-  public async findVerifiedStaff(id:string,page){
-    return await this.accountRepository.findVerifedStaff(id,page);
+  public async findVerifiedStaff(id: string, page) {
+    return await this.accountRepository.findVerifedStaff(id, page);
 
   }
 
-  public async verifyStaff(id: string){
+  public async verifyStaff(id: string) {
     return await this.accountRepository.verifyStaff(id)
   }
 
-  public async rejectStaff(id: string,message: string){
-    return await this.accountRepository.rejectStaff(id,message)
+  public async rejectStaff(id: string, message: string) {
+    return await this.accountRepository.rejectStaff(id, message)
   }
 
   public async updateCorperate(email: string, toUpdate: CorperateDTO): Promise<CorperateRO> {
@@ -252,7 +252,7 @@ export class AccountService {
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
-    }else{
+    } else {
       throw new HttpException(
         { error: `Unable to send verification email. Try again later.`, status: HttpStatus.BAD_REQUEST },
         HttpStatus.BAD_REQUEST,
@@ -266,9 +266,9 @@ export class AccountService {
 
     if (!model.emailToken) throw new HttpException(`Invalid token`, HttpStatus.NOT_FOUND);
 
-    const envUrl = process.env.NODE_ENV === "development" ? process.env.WEB_URL_DEV: process.env.WEB_URL_PROD;
+    const envUrl = process.env.NODE_ENV === "development" ? process.env.WEB_URL_DEV : process.env.WEB_URL_PROD;
     const url = `${envUrl}/reset-password?email=${email}&token=${model.emailToken}`;
-    
+
     const to = model.email;
     const subject = 'Forget Password Request';
     const html = `<p> Hello <strong>${model.firstName || model.organizationName}</strong>,</p>
@@ -277,15 +277,15 @@ export class AccountService {
         <p> If you didn't request a password reset, you can ignore this email. Your password will not be changed.</p>
         <p> Thank you for choosing <strong> Kapsuul. </strong></p>`;
 
-        try {
-          await this.mailService.sendHtmlMailAsync(to, subject, html);
-        return true;
-        } catch (error) {
-          throw new HttpException(
-            { error: `An error occurred while trying to send verify email ${error}`, status: HttpStatus.INTERNAL_SERVER_ERROR },
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-        }
+    try {
+      await this.mailService.sendHtmlMailAsync(to, subject, html);
+      return true;
+    } catch (error) {
+      throw new HttpException(
+        { error: `An error occurred while trying to send verify email ${error}`, status: HttpStatus.INTERNAL_SERVER_ERROR },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
 

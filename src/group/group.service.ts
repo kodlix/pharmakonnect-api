@@ -21,7 +21,7 @@ export class GroupService extends Repository<GroupEntity> {
     return await getRepository(GroupEntity).createQueryBuilder('g')
       .insert()
       .into(GroupEntity)
-      .values({ name: dto.name, description: dto.description, ownerId: user.id })
+      .values({ name: dto.name, createdBy: user.createdBy, description: dto.description, ownerId: user.id })
       .execute();
   }
 
@@ -87,7 +87,7 @@ export class GroupService extends Repository<GroupEntity> {
       .skip(take * (page - 1))
       .take(take)
       .getManyAndCount();
-      
+
     return groups;
   }
 
