@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsString, IsNotEmpty, IsOptional, IsUrl, IsEmail } from "class-validator";
+import { isBoolean } from 'class-validator';
 
 export class CreateAdvertDto{
 
@@ -37,6 +38,10 @@ export class CreateAdvertDto{
     @IsString()
     @IsNotEmpty()
     zone: string;
+
+    @ApiProperty()
+    @IsOptional()
+    autoRenewal: boolean;
 
     @ApiProperty()
     @IsString()

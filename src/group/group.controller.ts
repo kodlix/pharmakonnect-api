@@ -1,9 +1,11 @@
+/* eslint-disable prettier/prettier */
 import { Controller, Get, Post, Body, Put, Param, Delete, Req, UseGuards, Query } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { CreateGroupDto } from './dto/create-group.dto';
-import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateGroupDto } from './dto/update-group.dto';
+import { CreateGroupContactDto } from './dto/create-group-contact.dto';
 
 @Controller('group')
 @ApiBearerAuth()
@@ -20,6 +22,15 @@ export class GroupController {
     return result;
   }
 
+  @Post('addgroupmembrs')
+  @ApiBody({type: [CreateGroupContactDto]})
+  @ApiOperation({ summary: 'Add contact to group' })
+  async createMember(@Body() createGroupMemberDto: CreateGroupContactDto ): Promise<any>{
+    const result = await this.groupService.createGroupContact(createGroupMemberDto)
+    return result;
+
+  }
+  
   @Put(':id')
   @ApiBody({ type: [UpdateGroupDto] })
   async update(@Body() dto: UpdateGroupDto, @Param('id') id: string, @Req() req: any): Promise<boolean> {
@@ -38,6 +49,11 @@ export class GroupController {
     return await this.groupService.findAll(page, take);
   }
 
+  @Get('/groupcontacts')
+  async findGroupContacts(@Query('page') page: number, @Query('take') take: number) {
+    return await this.groupService.findGroupContacts(page, take);
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.groupService.getGroupbyId(id);
@@ -47,5 +63,11 @@ export class GroupController {
  async  remove(@Param('id') id: string,  @Req() req: any) {
     const { user } = req;
     return await this.groupService.removebyId(id, user);
+  }
+
+  @Delete('groupmember/:id')
+  @ApiOperation({ summary: 'Delete contact from group' })
+  async removeContact(@Param('id') id:string){
+   return await this.groupService.removeGoupMemberId(id)
   }
 }
