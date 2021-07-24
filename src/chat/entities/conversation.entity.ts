@@ -6,15 +6,13 @@ import { MessageEntity } from "./message.entity";
 @Entity("Conversation")
 export class ConversationEntity extends AbstractBaseEntity {
 
-    @Column()
+    @Column({nullable: true})
     title : string
-
     
-    @Column()
+    @Column({nullable: true})
     creatorId : string
-
     
-    @Column()
+    @Column({nullable: true})
     channelId : string
 
     @Column({default : false})
@@ -26,19 +24,36 @@ export class ConversationEntity extends AbstractBaseEntity {
     @Column({nullable: true})
     creatorName : string
 
-    
     @Column({nullable: true})
     channelName : string
 
     @Column({nullable: true})
-    initiatorId : string
+    message : string
 
-    @OneToMany(() => ParticipantEntity, participant => participant.conversationid, {eager: true,  cascade: true})
-   // @JoinColumn()
+    @Column()
+    initiatorId : string;
+
+    @Column()
+    counterPartyId : string;
+
+    @Column()
+    initiatorName : string;
+
+    @Column()
+    counterPartyName : string;
+
+    @Column({nullable: true})
+    counterPartyImage : string;
+
+    @Column({nullable: true})
+    initiatorImage : string;
+
+
+    @OneToMany(() => ParticipantEntity, participant => participant.conversation, {eager: true,  cascade: true})
     participants : ParticipantEntity[]
 
-    @OneToMany(() => MessageEntity, message => message.conversationId, {eager: true, cascade: true})
-    //@JoinColumn()
+    @OneToMany(() => MessageEntity, t => t.conversation, {eager: true, cascade: true})
     messages : MessageEntity[]
+
 
 }

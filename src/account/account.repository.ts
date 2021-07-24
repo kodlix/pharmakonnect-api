@@ -44,7 +44,7 @@ export class AccountRepository extends Repository<AccountEntity> {
     user.emailVerified = emailVerified;
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
-    user.subscribeToJobAlert = this.stringToBoolean(subscribeToJobAlert);
+    user.subscribeToJobAlert = this.stringToBoolean(subscribeToJobAlert ? subscribeToJobAlert : false);
     
     try {
       await user.save();
@@ -82,6 +82,7 @@ export class AccountRepository extends Repository<AccountEntity> {
         accountType: user.accountType,
         accountId: user.id,
         verified: user.emailVerified,
+        name: `${user.firstName} ${user.lastName}`,
         profileImage: user.accountType === accountTypes.INDIVIDUAL ? user.profileImage : user.premisesImage
       };
       return data;

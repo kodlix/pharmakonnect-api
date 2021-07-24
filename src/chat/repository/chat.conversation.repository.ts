@@ -4,23 +4,31 @@ import { ConversationEntity } from 'src/chat/entities/conversation.entity'
 import { ConversationRO } from 'src/chat/chat.interface'
 import { ParticipantEntity } from 'src/chat/entities/participant.entity'
 import { CreateConversationDto } from 'src/chat/dto/create-chat.dto';
+import { AccountEntity } from 'src/account/entities/account.entity';
+import { MessageEntity } from '../entities/message.entity';
+import { MessageRepository } from './chat.message.repository';
 
 @EntityRepository(ConversationEntity)
 export class ConversationRepository extends Repository<ConversationEntity>{
 
-    async getConversationById(user: any): Promise<ConversationRO[]> {
-        const getConversationList = await ConversationEntity.find({
-            where: [{ creatorId: user },
-            { channelId: user }]
-        })
-        let conversationList = []
-        for (const item of getConversationList) {
-            item.initiatorId = user
+    constructor(private readonly msgRepo: MessageRepository) {
+        super();
+    }
 
-            conversationList.push(item);            
-        }
-
-        return conversationList.sort(function(a, b){return a.updatedOn - b.updatedOn});
+    async getConversationById(id: any): Promise<ConversationRO[]> {
+        // const getConversationList = await ConversationEntity.find({
+        //     where: [{ initiatorId: id }, { counterPartyId: id }], order: {updatedOn: 'ASC'}, relations: ['messages']
+        // })
+        
+        const getConversationList = await ConversationEntity.createQueryBuilder("c")
+        .where("c.initiatorId = :id", {id})
+        .orWhere("c.counterPartyId = :id", {id})
+        .leftJoinAndSelect("c.messages", "messages")
+        .orderBy("c.updatedOn", "DESC")
+        .addOrderBy("messages.createdAt", "DESC")
+        .getMany();
+        
+        return getConversationList;
     }
 
     async getConversationPaticipantMessage(creatorid: string, channelid: string){
@@ -40,29 +48,49 @@ export class ConversationRepository extends Repository<ConversationEntity>{
 
     }
 
-    async createOrUpdateConversation(dto: CreateConversationDto, user: any): Promise<CreateConversationDto> {
+    async createOrUpdateConversation(dto: CreateConversationDto, user: AccountEntity): Promise<CreateConversationDto> {
 
-        const exist = await this.findOne({
-            where: [{ creatorId: dto.creatorId, channelId: dto.channelId }, { creatorId: dto.channelId, channelId: dto.creatorId }]
-        })
+        try {
+            const exist = await this.findOne({where: { initiatorId: dto.initiatorId, counterPartyId: dto.counterPartyId}})
         if (!exist) {
 
-
             if (!dto.isGroupChat) {
+
                 const convers = await ConversationEntity.create()
                 convers.isGroupChat = dto.isGroupChat;
                 convers.title = dto.title;
                 convers.channelId = dto.channelId;
-                convers.createdBy = dto.creatorName;
+                convers.createdBy = user.createdBy;
                 convers.creatorId = dto.creatorId;
                 convers.updatedOn = new Date();
                 convers.updatedBy = dto.updatedBy;
                 convers.channelName = dto.channelName;
                 convers.creatorName = dto.creatorName;
+                convers.initiatorId = user.id;
+                convers.counterPartyId = dto.counterPartyId;
+                convers.initiatorName = `${user.firstName} ${user.lastName}`;
+                convers.counterPartyName = dto.counterPartyName;
+                convers.initiatorImage = dto.initiatorImage;
+                convers.counterPartyImage = dto.counterPartyImage;
+                convers.createdAt = new Date();
 
-                const result = await ConversationEntity.save(convers);
+                let result = await ConversationEntity.save(convers);
                 //Call create MESSAGE end point
-                return result
+
+                result = await ConversationEntity.findOne(result.id, {relations: ['messages']});
+
+                const msg = new MessageEntity();
+                msg.conversationId = result.id;
+                msg.message = dto.message;
+                msg.postedOn = new Date();
+                msg.createdAt = new Date();
+                msg.createdBy = `${user.firstName} ${user.lastName}`;
+                msg.senderId = user.id;
+                msg.recieverId = dto.counterPartyId;
+
+                await this.msgRepo.save(msg);
+
+                return result;
             } else {
                 let groupchatConversation = [];
                 const getparticipant = await ParticipantEntity.find({ where: { groupChatID: dto.creatorId } });
@@ -107,18 +135,33 @@ export class ConversationRepository extends Repository<ConversationEntity>{
             if (dto.isGroupChat) {
                var result = await ConversationEntity.update({creatorId: exist.creatorId}, {updatedOn: new Date()})
                 //Call create MESSAGE end point
-                return exist
+                return exist;
 
             } else {
                 exist.updatedOn = new Date();
-                const result = await ConversationEntity.save(exist);
+                let result = await ConversationEntity.save(exist);
                 //Call create MESSAGE end point
-                return result
+
+                result = await ConversationEntity.findOne(result.id, {relations: ['messages']});
+
+                const msg = new MessageEntity();
+                msg.conversationId = result.id;
+                msg.message = dto.message;
+                msg.postedOn = new Date();
+                msg.createdAt = new Date();
+                msg.createdBy = `${user.firstName} ${user.lastName}`;
+                msg.senderId = user.id;
+                msg.recieverId = dto.counterPartyId;
+
+                await this.msgRepo.save(msg);
+                return result;
             }
-           
-
         }
-
+    
+        } catch (error) {
+            throw new HttpException(`Error occured: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
     }
 
     async deleteConversation(id: string) {

@@ -15,14 +15,16 @@ export class ParticipantEntity extends AbstractBaseEntity{
     @Column({default : "pharmaceutical"})
     sectorId : string
 
-   @ManyToOne(()=> GroupChatEntity, groupchat => groupchat.id, { onDelete: 'CASCADE'})
+   //@ManyToOne(()=> GroupChatEntity, groupchat => groupchat.id, { onDelete: 'CASCADE'})
     @Column({nullable : true})
     groupChatID : string
 
     @Column({default : true})
     canPost : boolean
 
-    @ManyToOne(()=> ConversationEntity, x=> x.id)
-    @Column({nullable : true})
-    conversationid : string
+    @ManyToOne(() => ConversationEntity, u => u.participants)
+    conversation: ConversationEntity;
+
+    @Column('uuid')
+    conversationId : string
 }

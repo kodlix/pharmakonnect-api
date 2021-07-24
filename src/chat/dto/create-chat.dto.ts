@@ -1,53 +1,73 @@
 import { IsNotEmpty, IsString, IsBoolean, isBoolean } from "class-validator"
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateConversationDto {
-    @IsString()
-    @IsNotEmpty()
+
     @ApiProperty()
+    @ApiPropertyOptional()
     readonly title : string
 
-    @IsString()
-    @IsNotEmpty()
+    @ApiPropertyOptional()
     @ApiProperty()
-    readonly creatorId : string
+    readonly creatorId : string;
+
+    @ApiPropertyOptional()
+    @ApiProperty()
+    readonly initiatorId : string; 
 
     @IsString()
     @IsNotEmpty()
+    @ApiProperty()
+    readonly counterPartyName : string; 
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    readonly message : string; 
+
+    @ApiPropertyOptional()
+    @ApiProperty()
+    readonly counterPartyImage : string; 
+
+    @ApiPropertyOptional()
+    @ApiProperty()
+    readonly initiatorImage : string; 
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    readonly counterPartyId : string;
+
+
+    @ApiPropertyOptional()
     @ApiProperty()
     readonly channelId : string
 
-    @IsBoolean()
-    @IsNotEmpty()
+    @ApiPropertyOptional()
     @ApiProperty()
     readonly isGroupChat : boolean 
 
-    @IsString()
-    @IsNotEmpty()
+    @ApiPropertyOptional()
     @ApiProperty()
     readonly createdBy: string
 
-    @IsString()
-    @IsNotEmpty()
+    @ApiPropertyOptional()
     @ApiProperty()
     readonly updatedBy: string
 
-    @IsString()
-    @IsNotEmpty()
+    @ApiPropertyOptional()
     @ApiProperty()
     readonly creatorName : string
 
     
-    @IsString()
-    @IsNotEmpty()
+    @ApiPropertyOptional()
     @ApiProperty()
     readonly channelName : string
 
 }
 
 export class CreateMessageDto{
-    @IsString()
-    @IsNotEmpty()
+    
     @ApiProperty()
     groupChatID : string
 
@@ -62,33 +82,30 @@ export class CreateMessageDto{
 
     @IsString()
     @IsNotEmpty()
+    recieverId : string
+
+    
     sectorId : string
 
-    @IsString()
-    @IsNotEmpty()
+    
     imageURL : string
     
-    @IsString()
-    @IsNotEmpty()
+    
     audioURL : string
 
-    @IsString()
-    @IsNotEmpty()
+    
     videoURL : string
     
     @IsString()
     @IsNotEmpty()
     message : string
 
-    @IsString()
-    @IsNotEmpty()
+    
     deleteFromSender : boolean
 
-    @IsString()
-    @IsNotEmpty()
+   
     deleteFromAll : boolean
 
-    @IsString()
     @IsNotEmpty()
     postedOn: Date
 
