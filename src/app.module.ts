@@ -37,6 +37,7 @@ import { NotificationModule } from './notifications/notification/notification.mo
 import { NotificationtypeModule } from './notifications/notificationtype/notificationtype.module';
 import { GroupModule } from './group/group.module';
 import { ChatGateway } from './gateway/chat.gateway';
+import { NotificationGateway } from './gateway/notification.gateway';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -76,6 +77,6 @@ import { ChatGateway } from './gateway/chat.gateway';
     NotificationtypeModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ChatGateway],
+  providers: [AppService, ChatGateway, NotificationGateway],
 })
 export class AppModule {}

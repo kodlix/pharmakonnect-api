@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common';
 import { AccountRepository } from 'src/account/account.repository';
 import { ArticleEntity } from 'src/blog/article/entities/article.entity';
 import { NotificationType } from 'src/enum/enum';
+import { NotificationGateway } from 'src/gateway/notification.gateway';
 import { NotificationRO } from 'src/notifications/notification/interface/notification.interface';
 import { NotificationRepository } from 'src/notifications/notification/notification.repository';
 import { NotificationTypeRepository } from 'src/notifications/notificationtype/notificationtype.repository';
@@ -18,7 +19,7 @@ import {
     private  notTypeRepo: NotificationTypeRepository;
     private  notiRepo: NotificationRepository
 
-    constructor(connection: Connection) {
+    constructor(connection: Connection, private readonly notiGateway: NotificationGateway) {
         this.acctRepo = connection.getCustomRepository(AccountRepository);
         this.notTypeRepo = connection.getCustomRepository(NotificationTypeRepository);
         this.notiRepo = connection.getCustomRepository(NotificationRepository);
@@ -37,7 +38,7 @@ import {
       
 
       const noti: NotificationRO = {
-        message: `Hi there, ${event.entity.createdBy} posted a new blog ${event.entity.title}`,
+        message: `Hi there, ${event.entity.createdBy} posted a new blog ${event.entity.title.bold()}`,
         senderId: event.entity.author.id,
         recieverId: id,
         entityId: event.entity.id,
@@ -52,6 +53,8 @@ import {
 
       try {
         await this.notiRepo.save(noti);
+
+        this.notiGateway.sendToUser(noti, id)
 
       } catch (err) {
         Logger.log(err.message)

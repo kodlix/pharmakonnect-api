@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
 import { AccountEntity } from 'src/account/entities/account.entity';
 import { NotificationType } from 'src/enum/enum';
+import { NotificationGateway } from 'src/gateway/notification.gateway';
 import { NotificationRO } from 'src/notifications/notification/interface/notification.interface';
 import { NotificationRepository } from 'src/notifications/notification/notification.repository';
 import { NotificationTypeRepository } from 'src/notifications/notificationtype/notificationtype.repository';
@@ -20,6 +21,7 @@ export class ArticleService {
   private  notTypeRepo: NotificationTypeRepository;
   private  notiRepo: NotificationRepository
   constructor(
+    private readonly notiGateway: NotificationGateway,
     @InjectRepository(ArticleEntity) private readonly articleRepo: Repository<ArticleEntity>,
     private readonly catService: CategoryService,
     @Inject(forwardRef(() => AccountService)) private readonly accountService: AccountService,
@@ -187,7 +189,7 @@ export class ArticleService {
 
       try {
         await this.notiRepo.save(noti);
-
+        this.notiGateway.sendToUser(noti, result.author.id);
       } catch (err) {
         Logger.log(err);
         return result;
@@ -229,6 +231,7 @@ export class ArticleService {
 
       try {
         await this.notiRepo.save(noti);
+        this.notiGateway.sendToUser(noti, result.author.id);
       } catch (err) {
         Logger.log(err);
         return result;

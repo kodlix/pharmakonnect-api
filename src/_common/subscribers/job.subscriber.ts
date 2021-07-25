@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common';
 import { EQUALS } from 'class-validator';
 import { AccountRepository } from 'src/account/account.repository';
 import { NotificationType } from 'src/enum/enum';
+import { NotificationGateway } from 'src/gateway/notification.gateway';
 import { JobVacancyEntity } from 'src/jobvacancy/entities/jobvacancy.entity';
 import { NotificationRO } from 'src/notifications/notification/interface/notification.interface';
 import { NotificationRepository } from 'src/notifications/notification/notification.repository';
@@ -21,7 +22,7 @@ import {
     private  notTypeRepo: NotificationTypeRepository;
     private  notiRepo: NotificationRepository
 
-    constructor(connection: Connection) {
+    constructor(connection: Connection, private readonly notiGateway: NotificationGateway) {
         this.acctRepo = connection.getCustomRepository(AccountRepository);
         this.notTypeRepo = connection.getCustomRepository(NotificationTypeRepository);
         this.notiRepo = connection.getCustomRepository(NotificationRepository);
@@ -54,7 +55,7 @@ import {
       if(userWhoSub.length > 0) {
           for (const u of userWhoSub) {
                 const noti: NotificationRO = {
-                message: `Hi there, ${event.entity.createdBy} posted a new Job vacancy ${event.entity.jobTitle}`,
+                message: `Hi there, ${event.entity.createdBy} posted a new Job vacancy ${event.entity.jobTitle.bold()}`,
                 senderId: event.entity.accountId,
                 entityId: event.entity.id,
                 recieverId: u.id,
@@ -72,6 +73,22 @@ import {
 
         try {
             await this.notiRepo.save(notifications);
+            for (const u of userWhoSub) {
+              const dataToSend = {
+                message: `Hi there, ${event.entity.createdBy} posted a new Job vacancy ${event.entity.jobTitle.bold()}`,
+                senderId: event.entity.accountId,
+                entityId: event.entity.id,
+                recieverId: u.id,
+                createdAt: new Date(),
+                isGeneral: false,
+                accountId: u.id,
+                seen: false,
+                notificationType: notType,
+                senderImageUrl: posterInfo.profileImage ? posterInfo.profileImage : null,
+                createdBy: `${event.entity.createdBy}`
+              }
+              this.notiGateway.sendToUser(dataToSend, u.id);
+            }
         } catch (err) {
             Logger.log(err.message)
             console.log(err.message);
