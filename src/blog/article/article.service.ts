@@ -1,3 +1,4 @@
+import { Equal } from 'typeorm';
 import { BadRequestException, forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
@@ -7,7 +8,7 @@ import { NotificationRO } from 'src/notifications/notification/interface/notific
 import { NotificationRepository } from 'src/notifications/notification/notification.repository';
 import { NotificationTypeRepository } from 'src/notifications/notificationtype/notificationtype.repository';
 import { UserLikeService } from 'src/user-like/like.service';
-import { Brackets, Connection, Repository } from 'typeorm';
+import { Brackets, Connection, Repository, Not } from 'typeorm';
 import { CategoryService } from '../category/category.service';
 import { CategoryEntity } from '../category/entities/category.entity';
 import { CommentService } from '../comment/comment.service';
@@ -103,9 +104,18 @@ export class ArticleService {
     return articles;
   }
 
+  public async getPubArticlesByAuthor(author: AccountEntity, currentBlogId): Promise<ArticleEntity[]> {
+    return this.articleRepo.find( { 
+      where: { author, published : true, id: Not(Equal(currentBlogId))}, 
+      relations: ['comments', 'categories', 'author'],
+      take : 3,
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   public findOne(articleId: string): Promise<ArticleEntity> {
     return this.articleRepo.findOneOrFail(articleId, {
-      relations: ['comments', 'categories', 'author'],
+      relations: ['comments', 'categories', 'author'], 
     });
   }
 
