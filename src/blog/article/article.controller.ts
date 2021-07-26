@@ -193,6 +193,17 @@ export class ArticleController {
     }
   }
 
+  @Get('user/published/:userId/:currentBlogId')
+  async getByAuthorPublsihed(
+    @Param('userId') userId: string, @Param('currentBlogId') currentBlogId: string) {
+    try {
+      const author = await this.userService.getOneUserById(userId);
+      return await this.articleService.getPubArticlesByAuthor(author, currentBlogId);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.NO_CONTENT);
+    }
+  }
+
   @Put('/like/:articleId')
   @ApiResponse({ status: 201, description: 'liked article successfully.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })

@@ -8,19 +8,24 @@ import { text } from "express";
 @Entity("Message")
 export class MessageEntity extends AbstractBaseEntity{
 
-   @ManyToOne(()=> GroupChatEntity, groupchat => groupchat.id, { onDelete: 'CASCADE'})
+   //@ManyToOne(()=> GroupChatEntity, groupchat => groupchat.id, { onDelete: 'CASCADE'})
    
     @Column({nullable : true})
     groupChatID : string
 
+    @ManyToOne(() => ConversationEntity, u => u.messages)
+    conversation: ConversationEntity;
 
-    @ManyToOne(()=> ConversationEntity, conversationid => conversationid.id)
-    @Column({nullable : true})
+    @Column('uuid')
     conversationId : string
 
     @ManyToOne(()=> AccountEntity, account => account.id)
     @Column()
     senderId : string
+
+    @ManyToOne(()=> AccountEntity, account => account.id)
+    @Column()
+    recieverId : string
 
     @Column({default : "pharmaceutical"})
     sectorId : string

@@ -5,6 +5,7 @@ import { CreateConversationDto } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { ChatGateway } from 'src/gateway/chat.gateway';
 //import { ChatGroupChatService } from './services/chat.groupChatService';
 
 @ApiBearerAuth()
@@ -12,12 +13,14 @@ import { AuthGuard } from '@nestjs/passport';
 @ApiTags('chat')
 @UseGuards(AuthGuard())
 export class ChatController {
-  constructor(private readonly chatService: ChatConverationService, private readonly alertgatway: AlertGateway) {}
+  constructor(private readonly chatService: ChatConverationService, private readonly chatgatway: ChatGateway, private readonly alertgatway: AlertGateway) {}
 
   @Post('conversation')
-  create(@Body() createChatDto: CreateConversationDto, @Req() req: any) {
-    const { user } = req.user;
-    return this.chatService.create(createChatDto, user); 
+  async create(@Body() createChatDto: CreateConversationDto, @Req() req: any) {
+    const { user } = req;
+    const result =  await this.chatService.create(createChatDto, user); 
+    this.chatgatway.sendToUser(result, req.user);
+    return result;
   }
 
   @Post('gateway')
@@ -32,6 +35,11 @@ export class ChatController {
     const { user } = req;
     const creatorid = user.id
     return this.chatService.findConversation(creatorid, channelid)
+  }
+
+  @Get('conversation/:id')
+  findConversationById( @Param('id') id: string,  @Req() req: any) {
+    return this.chatService.findConversationById(id, req.user)
   }
 
   @Get()

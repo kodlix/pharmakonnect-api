@@ -2,7 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountEntity } from 'src/account/entities/account.entity';
-import { getRepository, Repository, getConnection } from 'typeorm';
+import { getRepository, Repository, getConnection, Brackets } from 'typeorm';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { ContactEntity } from './entities/contact.entity';
 
@@ -78,6 +78,20 @@ export class ContactService  {
     return contact
   }
 
+  async getContactbyAccountId(id: string) {
+    //const contact = await getRepository(ContactEntity).findOne({ where: { accountId: id } });
+
+    const user = await getRepository(AccountEntity)
+            .createQueryBuilder('a')
+            .where("a.id = :id", {id})
+            .getOne();
+
+
+    return user;
+  }
+
+  
+
   // update(id: number, updateContactDto: UpdateContactDto) {
   //   return `This action updates a #${id} contact`;
   // }
@@ -86,4 +100,25 @@ export class ContactService  {
     const isDeleted =  await this.repository.delete({accountId: id});
     return isDeleted
   }
+
+    async loadChatContact(search: string, user: any): Promise<ContactEntity[]> {
+
+      if(search) {
+          const ctcs = await getRepository(ContactEntity)
+          .createQueryBuilder('ctc')
+          .where('ctc.creatorId = :id', { id: user.id })
+          .andWhere(new Brackets(qb => {
+            qb.where("ctc.firstName ILike :fname", { fname: `%${search}%` })
+            .orWhere("ctc.lastName ILike :lname", { lname: `%${search}%` })
+            .orWhere("ctc.email ILike :email", { email: `%${search}%` })
+        }))
+          .getMany();
+          
+          return ctcs;
+      }
+
+      return await this.repository.find({creatorId: user.id});
+    }
+
+      
 }

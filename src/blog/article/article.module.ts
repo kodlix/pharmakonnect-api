@@ -11,6 +11,7 @@ import { BlogSubscriber } from 'src/_common/subscribers/blog.subscriber';
 import { NotificationRepository } from 'src/notifications/notification/notification.repository';
 import { AccountRepository } from 'src/account/account.repository';
 import { NotificationTypeRepository } from 'src/notifications/notificationtype/notificationtype.repository';
+import { NotificationGateway } from 'src/gateway/notification.gateway';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { NotificationTypeRepository } from 'src/notifications/notificationtype/n
     forwardRef(() => LikeModule),
   ],
   controllers: [ArticleController],
-  providers: [ArticleService, BlogSubscriber, NotificationRepository, AccountRepository, NotificationTypeRepository],
+  providers: [ArticleService, BlogSubscriber, NotificationRepository, AccountRepository, NotificationTypeRepository, NotificationGateway],
   exports: [ArticleService],
 })
 export class ArticleModule {}

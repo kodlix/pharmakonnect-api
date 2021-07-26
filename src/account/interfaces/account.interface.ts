@@ -17,6 +17,7 @@ export interface UserFromDbRO {
     accountId: string;
     verified: boolean;
     profileImage: string;
+    name: string
 }
 
 export interface IndividualRO {

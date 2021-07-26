@@ -2,6 +2,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { AccountRepository } from "src/account/account.repository";
 import { AccountEntity } from "src/account/entities/account.entity";
 import { NotificationType } from "src/enum/enum";
+import { NotificationGateway } from "src/gateway/notification.gateway";
 import { NotificationRO } from "src/notifications/notification/interface/notification.interface";
 import { NotificationRepository } from "src/notifications/notification/notification.repository";
 import { NotificationTypeRepository } from "src/notifications/notificationtype/notificationtype.repository";
@@ -17,7 +18,7 @@ export class AdvertService{
     private  notiRepo: NotificationRepository;
     private  acctRepo: AccountRepository;
 
-    constructor(private readonly advertRepository: AdvertRepository, connection: Connection) {
+    constructor(private readonly advertRepository: AdvertRepository, connection: Connection, private readonly notiGateway: NotificationGateway) {
         this.notTypeRepo = connection.getCustomRepository(NotificationTypeRepository);
       this.notiRepo = connection.getCustomRepository(NotificationRepository);
       this.acctRepo = connection.getCustomRepository(AccountRepository);
@@ -61,7 +62,7 @@ export class AdvertService{
   
         try {
           await this.notiRepo.save(noti);
-  
+          this.notiGateway.sendToUser(noti, result.accountId);
         } catch (err) {
           Logger.log(err);
           return result;
@@ -98,7 +99,7 @@ export class AdvertService{
   
         try {
           await this.notiRepo.save(noti);
-  
+          this.notiGateway.sendToUser(noti, result.accountId);
         } catch (err) {
           Logger.log(err);
           return result;

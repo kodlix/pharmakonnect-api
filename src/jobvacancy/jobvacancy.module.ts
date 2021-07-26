@@ -6,6 +6,7 @@ import { JobVacancyRepository } from './jobvacancy.repository';
 import { JobVacancyController } from './jobvacancy.controller';
 import { AccountModule } from 'src/account/account.module';
 import { JobSubscriber } from 'src/_common/subscribers/job.subscriber';
+import { NotificationGateway } from 'src/gateway/notification.gateway';
 
 @Module({
   imports:[
@@ -13,6 +14,6 @@ import { JobSubscriber } from 'src/_common/subscribers/job.subscriber';
     AccountModule
   ],
   controllers: [JobVacancyController],
-  providers: [JobVacancyService, JobSubscriber]
+  providers: [JobVacancyService, JobSubscriber, NotificationGateway]
 })
 export class JobVacancyModule {}

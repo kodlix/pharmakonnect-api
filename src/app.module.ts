@@ -36,6 +36,8 @@ import { join } from 'path';
 import { NotificationModule } from './notifications/notification/notification.module';
 import { NotificationtypeModule } from './notifications/notificationtype/notificationtype.module';
 import { GroupModule } from './group/group.module';
+import { ChatGateway } from './gateway/chat.gateway';
+import { NotificationGateway } from './gateway/notification.gateway';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -51,7 +53,7 @@ import { GroupModule } from './group/group.module';
     SeederModule,
     ScheduleMeetingsModule,
     FlatMeetingModule,
-    //ChatModule,
+    ChatModule,
     ContactModule,
     GroupModule,
     //GroupchatModule,
@@ -75,6 +77,6 @@ import { GroupModule } from './group/group.module';
     NotificationtypeModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ChatGateway, NotificationGateway],
 })
 export class AppModule {}

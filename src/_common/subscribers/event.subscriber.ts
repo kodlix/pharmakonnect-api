@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common';
 import { AccountRepository } from 'src/account/account.repository';
 import { NotificationType } from 'src/enum/enum';
 import { EventEntity } from 'src/events/event/entities/event.entity';
+import { NotificationGateway } from 'src/gateway/notification.gateway';
 import { NotificationRO } from 'src/notifications/notification/interface/notification.interface';
 import { NotificationRepository } from 'src/notifications/notification/notification.repository';
 import { NotificationTypeRepository } from 'src/notifications/notificationtype/notificationtype.repository';
@@ -19,7 +20,7 @@ import {
         private  notTypeRepo: NotificationTypeRepository;
         private  notiRepo: NotificationRepository
     
-        constructor(connection: Connection) {
+        constructor(connection: Connection, private readonly notiGateway: NotificationGateway) {
             this.acctRepo = connection.getCustomRepository(AccountRepository);
             this.notTypeRepo = connection.getCustomRepository(NotificationTypeRepository);
             this.notiRepo = connection.getCustomRepository(NotificationRepository);
@@ -42,7 +43,7 @@ import {
       const posterInfo = await this.acctRepo.findOne(event.entity.accountId);
 
       const noti: NotificationRO = {
-        message: `Hi there, ${event.entity.createdBy} posted a new event ${event.entity.name}`,
+        message: `Hi there, ${event.entity.createdBy} posted a new event ${event.entity.name.bold()}`,
         senderId: event.entity.accountId,
         recieverId: id,
         createdAt: new Date(),
@@ -57,7 +58,7 @@ import {
 
       try {
         await this.notiRepo.save(noti);
-
+        this.notiGateway.sendToUser(noti, id);
       } catch (err) {
         Logger.log(err.message)
         console.log(err.message);

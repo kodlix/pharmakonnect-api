@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { AccountRepository } from 'src/account/account.repository';
 import { AccountEntity } from 'src/account/entities/account.entity';
 import { NotificationType } from 'src/enum/enum';
+import { NotificationGateway } from 'src/gateway/notification.gateway';
 import { NotificationRO } from 'src/notifications/notification/interface/notification.interface';
 import { NotificationRepository } from 'src/notifications/notification/notification.repository';
 import { NotificationTypeRepository } from 'src/notifications/notificationtype/notificationtype.repository';
@@ -21,7 +22,7 @@ export class EventService {
   private  notTypeRepo: NotificationTypeRepository;
   private  notiRepo: NotificationRepository
 
-  constructor(private readonly eventRepo: EventRepository, connection: Connection) {
+  constructor(private readonly eventRepo: EventRepository, connection: Connection, private readonly notiGateway: NotificationGateway) {
       this.acctRepo = connection.getCustomRepository(AccountRepository);
       this.notTypeRepo = connection.getCustomRepository(NotificationTypeRepository);
       this.notiRepo = connection.getCustomRepository(NotificationRepository);
@@ -107,6 +108,7 @@ export class EventService {
 
             try {
               await this.notiRepo.save(noti);
+              this.notiGateway.sendToUser(noti, ev.accountId);
             } catch (error) {
               Logger.log(error);
               return result;
@@ -139,6 +141,7 @@ export class EventService {
 
             try {
               await this.notiRepo.save(noti);
+              this.notiGateway.sendToUser(noti, ev.accountId);
             } catch (error) {
               Logger.log(error);
               return result;

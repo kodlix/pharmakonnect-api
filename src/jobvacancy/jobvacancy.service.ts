@@ -1,8 +1,14 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { AccountRepository } from 'src/account/account.repository';
 import { AccountEntity } from 'src/account/entities/account.entity';
+import { NotificationType } from 'src/enum/enum';
+import { NotificationGateway } from 'src/gateway/notification.gateway';
+import { NotificationRO } from 'src/notifications/notification/interface/notification.interface';
+import { NotificationRepository } from 'src/notifications/notification/notification.repository';
+import { NotificationTypeRepository } from 'src/notifications/notificationtype/notificationtype.repository';
 import { FilterDto } from 'src/_common/filter.dto';
-import { DeleteResult } from 'typeorm';
+import { Connection, DeleteResult } from 'typeorm';
 import { ApproveJobVacancyDto } from './dto/approve-jobvacancy';
 import { CreateJobVacancyDto } from './dto/create-jobvacancy.dto';
 import { RejectJobVacancyDto } from './dto/reject-jobvacancy';
@@ -12,7 +18,16 @@ import { JobVacancyRepository } from './jobvacancy.repository';
 
 @Injectable()
 export class JobVacancyService {
-  constructor(private readonly jobvacancyRepository: JobVacancyRepository) {}
+  private  notTypeRepo: NotificationTypeRepository;
+  private  notiRepo: NotificationRepository;
+  private  acctRepo: AccountRepository;
+
+  constructor(private readonly jobvacancyRepository: JobVacancyRepository, connection: Connection, private readonly notiGateway: NotificationGateway) {
+    this.notTypeRepo = connection.getCustomRepository(NotificationTypeRepository);
+    this.notiRepo = connection.getCustomRepository(NotificationRepository);
+    this.acctRepo = connection.getCustomRepository(AccountRepository);
+
+  }
 
   async create(
     dto: CreateJobVacancyDto,
@@ -45,14 +60,71 @@ export class JobVacancyService {
     id: string,
     dto: ApproveJobVacancyDto,
   ): Promise<JobVacancyRO> {
-    return await this.jobvacancyRepository.updateApprove(id, dto);
+    const result = await this.jobvacancyRepository.updateApprove(id, dto);
+    
+    const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.ADVERT}});
+        
+    const {id: adminId, profileImage} = await this.acctRepo.findByEmail("admin@netopng.com");
+    
+    const noti: NotificationRO = {
+      message: `Hi ${result.createdBy}, the job you posted has been approved`,
+      senderId: adminId,
+      entityId: result.id,
+      recieverId: result.accountId,
+      isGeneral: false,
+      accountId: result.accountId,
+      createdAt: new Date(),
+      seen: false,
+      senderImageUrl: profileImage ? profileImage : null,
+      notificationType: notType,
+      createdBy: "admin@netopng.com"
+    }
+
+    try {
+      await this.notiRepo.save(noti);
+      this.notiGateway.sendToUser(noti, result.accountId);
+    } catch (err) {
+      Logger.log(err);
+      return result;
+    }
+
+    return result;
   }
 
   async updateReject(
     id: string,
     dto: RejectJobVacancyDto,
   ): Promise<JobVacancyRO> {
-    return await this.jobvacancyRepository.updateReject(id, dto);
+    const result = await this.jobvacancyRepository.updateReject(id, dto);
+
+    const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.JOB}});
+       
+    const {id: adminId, profileImage} = await this.acctRepo.findByEmail("admin@netopng.com");
+    
+    const noti: NotificationRO = {
+      message: `Hi ${result.createdBy}, the job you posted has been rejected`,
+      senderId: adminId,
+      entityId: result.id,
+      recieverId: result.accountId,
+      isGeneral: false,
+      accountId: result.accountId,
+      createdAt: new Date(),
+      seen: false,
+      senderImageUrl: profileImage ? profileImage : null,
+      notificationType: notType,
+      createdBy: "admin@netopng.com"
+    }
+
+    try {
+      await this.notiRepo.save(noti);
+      this.notiGateway.sendToUser(noti, result.accountId);
+    } catch (err) {
+      Logger.log(err);
+      return result;
+    }
+
+    return result;
+
   }
 
   async remove(id: string) {

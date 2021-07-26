@@ -50,7 +50,7 @@ export class EventEntity extends AbstractBaseEntity{
     @Column({type: "varchar", nullable: true, length: 128})
     url: string;
 
-    @Column({type: "varchar", nullable: true, length: 128})
+    @Column({type: "varchar", nullable: true, length: 256})
     rejectionMessage: string;
 
     @Column({type: "varchar", length: 128})
