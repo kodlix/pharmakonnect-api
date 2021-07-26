@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { BadRequestException } from '@nestjs/common';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AccountEntity } from 'src/account/entities/account.entity';
@@ -5,6 +6,8 @@ import { getRepository, Repository, getConnection } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { GroupEntity } from './entities/group.entity';
+import { CreateGroupContactDto } from './dto/create-group-contact.dto';
+import { GroupMemberEntity } from './entities/group-member.entity';
 
 @Injectable()
 export class GroupService extends Repository<GroupEntity> {
@@ -23,6 +26,22 @@ export class GroupService extends Repository<GroupEntity> {
       .into(GroupEntity)
       .values({ name: dto.name, description: dto.description, ownerId: user.id })
       .execute();
+  }
+
+  async createGroupContact(dto: CreateGroupContactDto): Promise<any> {
+    const exists = await getRepository(GroupMemberEntity).createQueryBuilder('g')
+    .where (' g.groupId =: group AND contactId =: contact')
+    .getOne();
+
+    if (exists) {
+      throw new BadRequestException(`Contact ${dto.contactId} already exists in this group.`);
+    }
+    
+    return await getRepository(GroupMemberEntity).createQueryBuilder('g')
+    .insert()
+    .into(GroupMemberEntity)
+    .values({ownerId: dto.ownerId, groupId: dto.groupId, contactId: dto.contactId, })
+    .execute();
   }
 
   async editGroup(id: string, dto: UpdateGroupDto, user: AccountEntity): Promise<boolean> {
@@ -72,6 +91,21 @@ export class GroupService extends Repository<GroupEntity> {
     return groups;
   }
 
+  async findGroupContacts(page = 1, take = 20): Promise<GroupMemberEntity[]> {
+    page = +page;
+    take = take && +take || 20;
+
+    const [contacts, total] = await getRepository(GroupMemberEntity)
+    .createQueryBuilder('g')
+    .where('g.Id =: id AND g.groupId=: groupId AND g.ownerId =: ownerId')
+    .skip(take * (page - 1))
+    .take(take)
+    .getManyAndCount();
+    
+  return contacts;
+
+  }
+
 
   async findAllGroupMembers(groupId: string, owner: any, page = 1, take = 20): Promise<GroupEntity[]> {
 
@@ -101,5 +135,12 @@ export class GroupService extends Repository<GroupEntity> {
     const isDeleted = await getConnection().createQueryBuilder().delete().from(GroupEntity)
       .where("id = :id AND owner =:ownerId", { id, ownerId: owner.id }).execute();
     return isDeleted
+  }
+
+  async removeGoupMemberId(id: string) {
+    const isDeleted = await getConnection().createQueryBuilder().delete().from(GroupMemberEntity)
+    .where("id =:id AND contact =: contactId", {id} )
+
+    return isDeleted;
   }
 }

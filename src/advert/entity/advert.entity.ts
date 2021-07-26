@@ -43,6 +43,9 @@ export class AdvertEntity extends AbstractBaseEntity{
     @Column({nullable: true})
     description: string;
 
+    @Column({default: false})
+    autoRenewal: boolean;
+
     @Column('uuid')
     advertCategoryId: string;
 

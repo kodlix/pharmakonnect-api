@@ -60,6 +60,7 @@ export class AdvertRepository extends Repository<AdvertEntity>{
         advert.website = dto.website;
         advert.contactPhoneNumber = dto.contactPhoneNumber;
         advert.description = dto.description;
+        advert.autoRenewal = dto.autoRenewal;
         advert.accountId = user.id;
         advert.createdBy = user.email
         advert.advertImage = dto.advertImage;
@@ -111,6 +112,7 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       advert.contactPhoneNumber = dto.contactPhoneNumber;
       advert.description = dto.description;
       advert.advertImage = dto.advertImage;
+      advert.autoRenewal = dto.autoRenewal;
       advert.accountId = user.id;
       advert.updatedBy = user.email;
       advert.updatedAt = new Date();
