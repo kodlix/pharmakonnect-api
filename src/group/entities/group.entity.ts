@@ -13,7 +13,7 @@ export class GroupEntity extends AbstractBaseEntity {
     @Column()
     description: string
 
-    @Column()
+    @Column({ nullable: true })
     logo: string
 
 }

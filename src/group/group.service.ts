@@ -8,6 +8,8 @@ import { UpdateGroupDto } from './dto/update-group.dto';
 import { GroupEntity } from './entities/group.entity';
 import { CreateGroupContactDto } from './dto/create-group-contact.dto';
 import { GroupMemberEntity } from './entities/group-member.entity';
+import { GroupMemeberView } from './entities/group.view';
+import { getManager } from 'typeorm';
 
 @Injectable()
 export class GroupService extends Repository<GroupEntity> {
@@ -24,24 +26,39 @@ export class GroupService extends Repository<GroupEntity> {
     return await getRepository(GroupEntity).createQueryBuilder('g')
       .insert()
       .into(GroupEntity)
-      .values({ name: dto.name, description: dto.description, ownerId: user.id })
+      .values({ name: dto.name, createdBy: user.createdBy, description: dto.description, ownerId: user.id })
       .execute();
   }
 
-  async createGroupContact(dto: CreateGroupContactDto): Promise<any> {
-    const exists = await getRepository(GroupMemberEntity).createQueryBuilder('g')
-    .where (' g.groupId =: group AND contactId =: contact')
-    .getOne();
+  async createGroupContact(dto: CreateGroupContactDto, user: any): Promise<any> {
+    const groupMember = await getRepository(GroupMemberEntity).createQueryBuilder('g')
+      .where(' g.groupId =:group AND g.contactId IN (:...members)', { group: dto.groupId, members: dto.members })
+      .getOne();
 
-    if (exists) {
-      throw new BadRequestException(`Contact ${dto.contactId} already exists in this group.`);
+
+    if (groupMember) {
+      const contact = await getRepository(AccountEntity).createQueryBuilder('c')
+        .where('c.id =:id', { id: groupMember.contactId })
+        .getOne();
+
+      if (contact) {
+        throw new BadRequestException(`Contact '${contact.email}' already exists in this group.`);
+      }
     }
-    
+
+    const groupMembers: any[] = [];
+    for (const member of dto.members) {
+      const groupMember = { groupId: dto.groupId, contactId: member, ownerId: user.id, createdBy: user.email };
+      groupMembers.push(groupMember);
+    }
+
+
     return await getRepository(GroupMemberEntity).createQueryBuilder('g')
-    .insert()
-    .into(GroupMemberEntity)
-    .values({ownerId: dto.ownerId, groupId: dto.groupId, contactId: dto.contactId, })
-    .execute();
+      .insert()
+      .into(GroupMemberEntity)
+      .values(groupMembers)
+      .execute();
+    return;
   }
 
   async editGroup(id: string, dto: UpdateGroupDto, user: AccountEntity): Promise<boolean> {
@@ -91,19 +108,15 @@ export class GroupService extends Repository<GroupEntity> {
     return groups;
   }
 
-  async findGroupContacts(page = 1, take = 20): Promise<GroupMemberEntity[]> {
+  async findGroupContacts(groupId: string, page: number, take: number, user: any): Promise<GroupMemeberView[]> {
     page = +page;
     take = take && +take || 20;
 
-    const [contacts, total] = await getRepository(GroupMemberEntity)
-    .createQueryBuilder('g')
-    .where('g.Id =: id AND g.groupId=: groupId AND g.ownerId =: ownerId')
-    .skip(take * (page - 1))
-    .take(take)
-    .getManyAndCount();
-    
-  return contacts;
+    const entityManager = getManager();
 
+    const contacts = await entityManager.find(GroupMemeberView, {
+      where: { ownerId: user.id }, skip: take * (page - 1), take: take});
+    return contacts;
   }
 
 
@@ -121,7 +134,7 @@ export class GroupService extends Repository<GroupEntity> {
       .skip(take * (page - 1))
       .take(take)
       .getManyAndCount();
-      
+
     return groups;
   }
 
@@ -139,7 +152,7 @@ export class GroupService extends Repository<GroupEntity> {
 
   async removeGoupMemberId(id: string) {
     const isDeleted = await getConnection().createQueryBuilder().delete().from(GroupMemberEntity)
-    .where("id =:id AND contact =: contactId", {id} )
+      .where("id =:id AND contact =: contactId", { id })
 
     return isDeleted;
   }

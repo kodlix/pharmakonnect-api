@@ -2,9 +2,13 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Req, UseGuards, Query } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { CreateGroupDto } from './dto/create-group.dto';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateGroupDto } from './dto/update-group.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { editFileName, imageFileFilter } from 'src/_utility/fileupload.util';
+import { diskStorage } from 'multer';
+import { UseInterceptors } from '@nestjs/common';
 import { CreateGroupContactDto } from './dto/create-group-contact.dto';
 
 @Controller('group')
@@ -15,18 +19,42 @@ export class GroupController {
   constructor(private readonly groupService: GroupService) { }
 
   @Post()
-  @ApiBody({ type: [CreateGroupDto] })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        logo: {
+          type: 'string',
+          format: 'binary',
+        },
+        name: {
+          type: 'string'},
+        description: {
+          type: 'string'},
+      },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('logo', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
   async create(@Body() createGroupDto: CreateGroupDto, @Req() req: any): Promise<any[]> {
     const user = req.user;
     const result = await this.groupService.createGroup(createGroupDto, user);
     return result;
   }
 
-  @Post('addgroupmembrs')
-  @ApiBody({type: [CreateGroupContactDto]})
+  @Post('members')
+  @ApiBody({type: CreateGroupContactDto})
   @ApiOperation({ summary: 'Add contact to group' })
-  async createMember(@Body() createGroupMemberDto: CreateGroupContactDto ): Promise<any>{
-    const result = await this.groupService.createGroupContact(createGroupMemberDto)
+  async createMember(@Body() createGroupMemberDto: CreateGroupContactDto, @Req() req: any ): Promise<any>{
+    const result = await this.groupService.createGroupContact(createGroupMemberDto, req.user);
     return result;
 
   }
@@ -49,9 +77,9 @@ export class GroupController {
     return await this.groupService.findAll(page, take);
   }
 
-  @Get('/groupcontacts')
-  async findGroupContacts(@Query('page') page: number, @Query('take') take: number) {
-    return await this.groupService.findGroupContacts(page, take);
+  @Get('/groupcontacts/:groupId')
+  async findGroupContacts(@Param('groupId') groupId: string, @Query('page') page: number, @Query('take') take: number, @Req() req: any) {
+    return await this.groupService.findGroupContacts(groupId, page, take, req.user);
   }
 
   @Get(':id')
@@ -60,7 +88,7 @@ export class GroupController {
   }
 
   @Delete(':id')
- async  remove(@Param('id') id: string,  @Req() req: any) {
+  async remove(@Param('id') id: string, @Req() req: any) {
     const { user } = req;
     return await this.groupService.removebyId(id, user);
   }
