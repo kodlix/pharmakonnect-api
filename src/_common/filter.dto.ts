@@ -10,4 +10,8 @@ export class FilterDto {
     @ApiProperty()
     @ApiPropertyOptional()
     page: number;
+
+    @ApiProperty()
+    @ApiPropertyOptional()
+    take: number;
 }

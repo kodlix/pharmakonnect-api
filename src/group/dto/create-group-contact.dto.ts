@@ -1,20 +1,15 @@
-import { IsNotEmpty, IsString, IsBoolean, isBoolean } from "class-validator"
+import { IsNotEmpty, IsArray } from "class-validator"
 import { ApiProperty } from '@nestjs/swagger';
 
 
 export class CreateGroupContactDto {
-
-    ownerId: string;
-
-    @IsString()
+   
     @IsNotEmpty()
     @ApiProperty()
-    readonly groupId: string;
+    groupId: string;
 
-    @IsString()
+    @IsArray()
     @IsNotEmpty()
     @ApiProperty()
-    readonly contactId: string
-
-    createdBy: string
+    readonly members : string[]
 }
