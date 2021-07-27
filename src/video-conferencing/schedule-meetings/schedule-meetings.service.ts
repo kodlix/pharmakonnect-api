@@ -39,7 +39,7 @@ export class ScheduleMeetingsService {
     
     const payload = {
       apikey: API_KEY,
-      permissions: ["allow_join", "allow_mod"], // Trigger permission.
+      permissions: ["allow_join", "allow_mod", "ask_join"], // Trigger permission.
     };
 
     const token = sign(payload, SECRET_KEY, { algorithm: 'HS256', expiresIn: '24h' });
