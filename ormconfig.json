@@ -1,0 +1,13 @@
+{
+    "type": "postgres",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "username": "postgres",
+    "password": "!pass4sure",
+    "database": "pharmaKonnectdb",
+    "entities": [
+        "dist/**/*.entity.js",
+        "dist/**/*.view.js"
+    ],
+    "synchronize": true
+}
