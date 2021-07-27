@@ -27,7 +27,6 @@ export class AccountService {
     if (!user) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.BAD_REQUEST);
     }
-    
     const { email, accountPackage, isRegComplete, accountType, accountId, profileImage, name } = user
     if (!email) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.UNAUTHORIZED);

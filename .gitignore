@@ -3,7 +3,7 @@
 /node_modules
 .env
 uploads
-# ormconfig.json
+ormconfig.json
 # Logs
 logs
 *.log
