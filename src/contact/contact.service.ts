@@ -101,7 +101,7 @@ export class ContactService  {
     return isDeleted
   }
 
-    async loadChatContact(search: string, user: any): Promise<ContactEntity[]> {
+    async loadChatContact(search: string, user: any): Promise<AccountEntity[]> {
 
       if(search) {
           const ctcs = await getRepository(ContactEntity)
@@ -113,11 +113,21 @@ export class ContactService  {
             .orWhere("ctc.email ILike :email", { email: `%${search}%` })
         }))
           .getMany();
+
           
-          return ctcs;
+      const userIds = ctcs.map(x => x.accountId);
+
+      if (userIds.length > 0) {
+        return await getRepository(AccountEntity)
+        .createQueryBuilder('a')
+        .where('a.id IN (:...userIds)', {userIds})
+        .getMany();
+      }
+          
+          //return ctcs;
       }
 
-      return await this.repository.find({creatorId: user.id});
+      //return await this.repository.find({creatorId: user.id});
     }
 
       
