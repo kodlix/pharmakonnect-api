@@ -106,12 +106,13 @@ export class AdvertController {
     @Body() Dto: UpdateAdvertDto,
     @Req() req: any,
     @UploadedFile() advertImage: any
-  ){
+  ) {
+    let imageUrl = "";
     if (advertImage) {
-      const imageUrl = await uploadFile(advertImage.path);
+      imageUrl = await uploadFile(advertImage.path);
       Dto.advertImage = imageUrl;
-      return this.advertservice.update(id, Dto, req.user);
     }
+    return this.advertservice.update(id, Dto, req.user);
 
   }
 
