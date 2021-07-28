@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { BadRequestException } from '@nestjs/common';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AccountEntity } from 'src/account/entities/account.entity';
 import { getRepository, Repository, getConnection } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
@@ -8,8 +8,9 @@ import { UpdateGroupDto } from './dto/update-group.dto';
 import { GroupEntity } from './entities/group.entity';
 import { CreateGroupContactDto } from './dto/create-group-contact.dto';
 import { GroupMemberEntity } from './entities/group-member.entity';
-import { GroupMemeberView } from './entities/group.view';
+import { GroupMemeberView } from './entities/group-member.view';
 import { getManager } from 'typeorm';
+import { GroupView } from './entities/group.view';
 
 @Injectable()
 export class GroupService extends Repository<GroupEntity> {
@@ -26,7 +27,7 @@ export class GroupService extends Repository<GroupEntity> {
     return await getRepository(GroupEntity).createQueryBuilder('g')
       .insert()
       .into(GroupEntity)
-      .values({ name: dto.name, createdBy: user.createdBy, description: dto.description, ownerId: user.id })
+      .values({logo: dto.logo,  name: dto.name, createdBy: user.createdBy, description: dto.description, ownerId: user.id })
       .execute();
   }
 
@@ -42,7 +43,7 @@ export class GroupService extends Repository<GroupEntity> {
         .getOne();
 
       if (contact) {
-        throw new BadRequestException(`Contact '${contact.email}' already exists in this group.`);
+        throw new BadRequestException(`Contact '${contact.firstName} ${contact.lastName}' already exists in this group.`);
       }
     }
 
@@ -67,13 +68,13 @@ export class GroupService extends Repository<GroupEntity> {
       .getOne();
 
     if (exists) {
-      throw new BadRequestException(`Group ${name} already exists.`);
+      throw new BadRequestException(`Group '${exists.name}' already exists.`);
     }
 
     await getRepository(GroupEntity).createQueryBuilder()
       .update(GroupEntity)
-      .set({ name: dto.name, description: dto.description })
-      .where("id = :id", { id: dto.id })
+      .set({ name: dto.name, description: dto.description, logo: dto.logo })
+      .where("id = :id", { id })
       .execute();
 
     return true;
@@ -94,17 +95,14 @@ export class GroupService extends Repository<GroupEntity> {
     return groups;
   }
 
-  async findAll(page = 1, take = 20): Promise<GroupEntity[]> {
+  async findAll(page = 1, take = 50, user: any): Promise<any[]> {
 
     page = +page;
-    take = take && +take || 20;
+    take = take && +take || 50;
 
-
-    const [groups, total] = await getRepository(GroupEntity)
-      .createQueryBuilder('g')
-      .skip(take * (page - 1))
-      .take(take)
-      .getManyAndCount();
+    const entityManager = getManager();
+    const groups = await entityManager.find(GroupView, {
+      where: { ownerId: user.id }, skip: take * (page - 1), take: take});
     return groups;
   }
 

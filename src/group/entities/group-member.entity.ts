@@ -6,10 +6,10 @@ export class GroupMemberEntity extends AbstractBaseEntity {
     @Column({type: "uuid"})
     ownerId: string
 
-    @Column()
+    @Column({type: "uuid"})
     contactId: string
 
-    @Column()
+    @Column({type: "uuid"})
     groupId: string
 
 }

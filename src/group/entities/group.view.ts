@@ -2,43 +2,37 @@ import { ViewEntity, ViewColumn } from "typeorm";
 
 @ViewEntity({
   expression: `
-    SELECT "account"."id" as "id", "account"."email" as "email", "account"."accountType" as "accountType", "account"."firstName" as "firstName",
-    "account"."lastName" as "lastName", "account"."profileImage" as "profileImage",  "account"."organizationName" as "organizationName",
-    "account"."address" as "address", "account"."city" as "city", "group"."ownerId" as "ownerId" FROM "Account" "account"
-    LEFT JOIN "GroupMember" "group" ON "account"."id" = "group"."ownerId"
+  SELECT 
+     "group"."name" as "name", "group"."description" as "description", 
+	   "group"."id" as "id", "group"."createdAt" as "createdAt", 
+    "group"."logo" as "logo", COUNT("groupMember"."groupId" ) as "memberCount",
+    "group"."ownerId" as "ownerId" FROM "Group" "group"
+    LEFT JOIN "GroupMember" "groupMember" ON "group"."id" = "groupMember"."groupId"
+	  GROUP BY "group"."name",  "group"."description","group"."id",
+	  "group"."ownerId", "group"."createdAt", "group"."logo"
      `
 })
 
-export class GroupMemeberView
-{
-    @ViewColumn()
-    id: string
+export class GroupView {
+  @ViewColumn()
+  name: string
 
-    @ViewColumn()
-    ownerId: string
+  @ViewColumn()
+  description: string
 
-    @ViewColumn()
-    email: string;
+  @ViewColumn()
+  id: string;
 
-    @ViewColumn()
-    accountType: string;
+  @ViewColumn()
+  ownerId: string;
 
-    @ViewColumn()
-    firstName: string;
+  @ViewColumn()
+  memberCount: number;
 
-    @ViewColumn()
-    lastName: string;
+  @ViewColumn()
+  logo: string;
 
-    @ViewColumn()
-    profileImage: string;
+  @ViewColumn()
+  createdAt: Date;
 
-    @ViewColumn()
-    organizationName: string;
-
-    @ViewColumn()
-    address: string;
-
-    @ViewColumn()
-    city: string;
-    
 }

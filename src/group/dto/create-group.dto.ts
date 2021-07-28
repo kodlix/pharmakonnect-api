@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString, IsBoolean, isBoolean } from "class-validator"
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 
 export class CreateGroupDto {
@@ -17,7 +17,8 @@ export class CreateGroupDto {
     readonly description: string;
 
     @ApiProperty()
-    readonly logo: string
+    @ApiPropertyOptional()
+    logo: string
 
     createdBy: string
 }

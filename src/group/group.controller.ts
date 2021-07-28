@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Put, Param, Delete, Req, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Req, UseGuards, Query, UploadedFile } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -10,6 +10,7 @@ import { editFileName, imageFileFilter } from 'src/_utility/fileupload.util';
 import { diskStorage } from 'multer';
 import { UseInterceptors } from '@nestjs/common';
 import { CreateGroupContactDto } from './dto/create-group-contact.dto';
+import { uploadFile } from 'src/_utility/upload.util';
 
 @Controller('group')
 @ApiBearerAuth()
@@ -44,9 +45,13 @@ export class GroupController {
       fileFilter: imageFileFilter,
     }),
   )
-  async create(@Body() createGroupDto: CreateGroupDto, @Req() req: any): Promise<any[]> {
+  async create(@Body() dto: CreateGroupDto, @UploadedFile() logo: any, @Req() req: any,): Promise<any[]> {
     const user = req.user;
-    const result = await this.groupService.createGroup(createGroupDto, user);
+    if (logo) {
+      const imageUrl = await uploadFile(logo.path);
+      dto.logo = imageUrl;
+    }
+    const result = await this.groupService.createGroup(dto, user);
     return result;
   }
 
@@ -60,9 +65,37 @@ export class GroupController {
   }
   
   @Put(':id')
-  @ApiBody({ type: [UpdateGroupDto] })
-  async update(@Body() dto: UpdateGroupDto, @Param('id') id: string, @Req() req: any): Promise<boolean> {
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        logo: {
+          type: 'string',
+          format: 'binary',
+        },
+        name: {
+          type: 'string'},
+        description: {
+          type: 'string'},
+      },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('logo', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async update(@Body() dto: UpdateGroupDto, @Param('id') id: string, @UploadedFile() logo: any, @Req() req: any): Promise<boolean> {
     const user = req.user;
+    if (logo) {
+      const imageUrl = await uploadFile(logo.path);
+      dto.logo = imageUrl;
+    }
     return await this.groupService.editGroup(id, dto, user);
   }
 
@@ -73,8 +106,9 @@ export class GroupController {
   }
 
   @Get()
-  async findAll(@Query('page') page: number, @Query('take') take: number) {
-    return await this.groupService.findAll(page, take);
+  async findAll(@Query('page') page: number, @Query('take') take: number, @Req() req: any) {
+    const { user } = req;
+    return await this.groupService.findAll(page, take, user);
   }
 
   @Get('/groupcontacts/:groupId')
