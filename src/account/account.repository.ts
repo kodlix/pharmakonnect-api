@@ -1,4 +1,4 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository, ILike, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { AccountEntity } from './entities/account.entity';
 import { RegisterDTO, LoginDTO, LockUserDTO, ChangePasswordDto, ResetPasswordDto } from './dto/credential.dto';
@@ -8,6 +8,7 @@ import { OrganizationRO, UserDataRO } from './interfaces/user.interface';
 import { accountTypes, staffStatus } from './account.constant';
 import { constants } from 'buffer';
 import { OutletEntity } from 'src/outlet/entity/outlet.entity';
+import { FilterDto } from 'src/_common/filter.dto';
 
 @EntityRepository(AccountEntity)
 export class AccountRepository extends Repository<AccountEntity> {
@@ -123,22 +124,60 @@ export class AccountRepository extends Repository<AccountEntity> {
     return this.buildUserRO(result);
   }
 
-  public async findUnverifedStaff(id:string, page=1 ):Promise<UserDataRO[]>{
-    const result = await this.find({
-      where: {organizationId:id, staffStatus:staffStatus.PENDING},
-      take: 25,
-      skip: 25 * (page - 1)
+  public async findUnverifedStaff(id:string, dto: FilterDto ):Promise<UserDataRO[]>{
+    dto.page = dto.page && +dto.page || 1;
+    dto.take = dto.take && +dto.take || 50;
+    let result = await this.find({
+      where: {organizationId:id, staffStatus:staffStatus.PENDING,},
+      take: dto.take,
+      skip: dto.page * (dto.page - 1)
     })
+
+    if(dto.search){
+      result = await this.find({
+        where: [
+          { organizationId:id, staffStatus:staffStatus.PENDING, firstName: ILike(`%${dto.search}%`)},
+          { organizationId:id, staffStatus:staffStatus.PENDING, lastName: ILike(`%${dto.search}%`)},
+          { organizationId:id, staffStatus:staffStatus.PENDING, address: ILike(`%${dto.search}%`)},
+          { organizationId:id, staffStatus:staffStatus.PENDING, phoneNumber: ILike(`%${dto.search}%`)},
+          { organizationId:id, staffStatus:staffStatus.PENDING, email: ILike(`%${dto.search}%`)},
+          { organizationId:id, staffStatus:staffStatus.PENDING, organizationName: ILike(`%${dto.search}%`)},
+          { organizationId:id, staffStatus:staffStatus.PENDING, city: ILike(`%${dto.search}%`)},
+          { organizationId:id, staffStatus:staffStatus.PENDING, pcn: ILike(`%${dto.search}%`)}
+        ],
+        take: dto.take,
+        skip: 25 * (dto.page - 1)
+      })
+    }
   
     return this.buildUserArrRO(result);
   }
 
-  public async findVerifedStaff(id:string, page=1 ):Promise<UserDataRO[]>{
-    const result = await this.find({
-      where: {organizationId:id, staffStatus:staffStatus.VERIFIED},
-      take: 25,
-      skip: 25 * (page - 1)
+  public async findVerifedStaff(id:string, dto: FilterDto):Promise<UserDataRO[]>{
+    dto.page = dto.page && +dto.page || 1;
+    dto.take = dto.take && +dto.take || 50;
+    let result = await this.find({
+      where: {organizationId:id, staffStatus:staffStatus.VERIFIED,},
+      take: dto.take,
+      skip: dto.page * (dto.page - 1)
     })
+
+    if(dto.search){
+      result = await this.find({
+        where: [
+          { organizationId:id, staffStatus:staffStatus.VERIFIED, firstName: ILike(`%${dto.search}%`)},
+          { organizationId:id, staffStatus:staffStatus.VERIFIED, lastName: ILike(`%${dto.search}%`)},
+          { organizationId:id, staffStatus:staffStatus.VERIFIED, address: ILike(`%${dto.search}%`)},
+          { organizationId:id, staffStatus:staffStatus.VERIFIED, phoneNumber: ILike(`%${dto.search}%`)},
+          { organizationId:id, staffStatus:staffStatus.VERIFIED, email: ILike(`%${dto.search}%`)},
+          { organizationId:id, staffStatus:staffStatus.VERIFIED, organizationName: ILike(`%${dto.search}%`)},
+          { organizationId:id, staffStatus:staffStatus.VERIFIED, city: ILike(`%${dto.search}%`)},
+          { organizationId:id, staffStatus:staffStatus.VERIFIED, pcn: ILike(`%${dto.search}%`)}
+        ],
+        take: dto.take,
+        skip: dto.take * (dto.page - 1)
+      })
+    }
   
     return this.buildUserArrRO(result);
   }

@@ -215,8 +215,8 @@ export class AccountController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiResponse({ status: 200, description: 'Email verified successfully' })
   @ApiQuery({ name: 'page', required: false})
-  public async findUnverifedStaff(@Param('id') id: string,@Query('page') page?: number,){
-    return await this.accountService.findUnverifedStaff(id,page)
+  public async findUnverifedStaff(@Param('id') id:string, @Query() dto?: FilterDto){
+    return await this.accountService.findUnverifedStaff(id,dto)
   }
 
   @Get('/staff/verified/:id')
@@ -224,8 +224,8 @@ export class AccountController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiResponse({ status: 200, description: 'Staff verified successfully' })
   @ApiQuery({ name: 'page', required: false})
-  public async findverifedStaff(@Param('id') id:string,@Query('page') page?: number,){
-    return await this.accountService.findVerifiedStaff(id,page)
+  public async findverifedStaff(@Param('id') id:string, @Query() dto?: FilterDto){
+    return await this.accountService.findVerifiedStaff(id, dto)
   }
 
   @Put('verify/:id')

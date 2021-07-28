@@ -148,12 +148,12 @@ export class AccountService {
     return await this.accountRepository.updateUser(email, toUpdate);
   }
 
-  public async findUnverifedStaff(id: string, page) {
-    return await this.accountRepository.findUnverifedStaff(id, page);
+  public async findUnverifedStaff(id: string, dto: FilterDto) {
+    return await this.accountRepository.findUnverifedStaff(id, dto);
   }
 
-  public async findVerifiedStaff(id: string, page) {
-    return await this.accountRepository.findVerifedStaff(id, page);
+  public async findVerifiedStaff(id: string, dto: FilterDto) {
+    return await this.accountRepository.findVerifedStaff(id, dto);
 
   }
 
