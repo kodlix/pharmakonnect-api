@@ -11,6 +11,7 @@ import { diskStorage } from 'multer';
 import { UseInterceptors } from '@nestjs/common';
 import { CreateGroupContactDto } from './dto/create-group-contact.dto';
 import { uploadFile } from 'src/_utility/upload.util';
+import { group } from 'console';
 
 @Controller('group')
 @ApiBearerAuth()
@@ -121,15 +122,16 @@ export class GroupController {
     return await this.groupService.getGroupbyId(id);
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string, @Req() req: any) {
+  @Delete(':groupId')
+  async remove(@Param('groupId') groupId: string, @Req() req: any) {
     const { user } = req;
-    return await this.groupService.removebyId(id, user);
+    return await this.groupService.removebyId(groupId, user);
   }
 
-  @Delete('groupmember/:id')
+  @Delete('groupmember/:contactId/:groupId')
   @ApiOperation({ summary: 'Delete contact from group' })
-  async removeContact(@Param('id') id:string){
-   return await this.groupService.removeGoupMemberId(id)
+  async removeContact(@Param('contactId') contactId:string, @Param('groupId') groupId:string, @Req() req: any) {
+    const { user } = req;
+   return await this.groupService.removeGoupMemberId(contactId, groupId, user)
   }
 }

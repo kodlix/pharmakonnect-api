@@ -24,6 +24,9 @@ export class GroupMemeberView
     ownerId: string
 
     @ViewColumn()
+    groupId: string
+
+    @ViewColumn()
     email: string;
 
     @ViewColumn()

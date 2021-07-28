@@ -27,7 +27,7 @@ export class GroupService extends Repository<GroupEntity> {
     return await getRepository(GroupEntity).createQueryBuilder('g')
       .insert()
       .into(GroupEntity)
-      .values({logo: dto.logo,  name: dto.name, createdBy: user.createdBy, description: dto.description, ownerId: user.id })
+      .values({ logo: dto.logo, name: dto.name, createdBy: user.createdBy, description: dto.description, ownerId: user.id })
       .execute();
   }
 
@@ -102,7 +102,8 @@ export class GroupService extends Repository<GroupEntity> {
 
     const entityManager = getManager();
     const groups = await entityManager.find(GroupView, {
-      where: { ownerId: user.id }, skip: take * (page - 1), take: take});
+      where: { ownerId: user.id }, skip: take * (page - 1), take: take
+    });
     return groups;
   }
 
@@ -113,45 +114,43 @@ export class GroupService extends Repository<GroupEntity> {
     const entityManager = getManager();
 
     const contacts = await entityManager.find(GroupMemeberView, {
-      where: { ownerId: user.id }, skip: take * (page - 1), take: take});
+      where: { ownerId: user.id }, skip: take * (page - 1), take: take
+    });
     return contacts;
   }
 
-
-  async findAllGroupMembers(groupId: string, owner: any, page = 1, take = 20): Promise<GroupEntity[]> {
-
-    page = +page;
-    take = take && +take || 20;
-
-
-    const [groups, total] = await getRepository(GroupEntity)
-      .createQueryBuilder('g')
-      .leftJoinAndSelect("GroupMember", "gm", "gm.groupId = g.id")
-      .leftJoinAndSelect("Account", "a", "a.id = g.ownerId")
-      .where("g.id =:groupId AND g.ownerId =: ownerId", { groupId, ownerId: owner.id })
-      .skip(take * (page - 1))
-      .take(take)
-      .getManyAndCount();
-
-    return groups;
-  }
-
   async getGroupbyId(id: string) {
-    const contact = await getRepository(GroupEntity).findOne({ where: { id: id } });
-    return contact
+    const group = await getRepository(GroupEntity).findOne({ where: { id: id } });
+
+    const entityManager = getManager();
+    const groups = await entityManager.find(GroupMemeberView, {
+      where: { groupId: id }
+    });
+    return {
+      name: group.name,
+      description: group.description,
+      logo: group.logo,
+      createdAt: group.createdAt,
+      members: groups
+    };
   }
 
 
-  async removebyId(id: string, owner: any) {
-    const isDeleted = await getConnection().createQueryBuilder().delete().from(GroupEntity)
-      .where("id = :id AND owner =:ownerId", { id, ownerId: owner.id }).execute();
-    return isDeleted
+  async removebyId(id: string, owner: any): Promise<boolean> {
+    await getConnection().createQueryBuilder().delete().from(GroupMemberEntity)
+      .where("groupId = :id AND ownerId =:ownerId", { id, ownerId: owner.id }).execute();
+
+    await getConnection().createQueryBuilder().delete().from(GroupEntity)
+      .where("id = :id AND ownerId =:ownerId", { id, ownerId: owner.id }).execute();
+    return true;
+
   }
 
-  async removeGoupMemberId(id: string) {
-    const isDeleted = await getConnection().createQueryBuilder().delete().from(GroupMemberEntity)
-      .where("id =:id AND contact =: contactId", { id })
+  async removeGoupMemberId(id: string, groupId: string,  user: any): Promise<boolean> {
+    await getConnection().createQueryBuilder().delete().from(GroupMemberEntity)
+      .where("contactId =:id AND ownerId =:ownerId AND groupId =:groupId", 
+      { id, groupId, ownerId:user.id }).execute()
 
-    return isDeleted;
+    return true;
   }
 }
