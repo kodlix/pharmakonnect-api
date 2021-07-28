@@ -82,8 +82,8 @@ export class AccountRepository extends Repository<AccountEntity> {
         accountType: user.accountType,
         accountId: user.id,
         verified: user.emailVerified,
-        name: `${user.firstName} ${user.lastName}`,
-        profileImage: user.accountType === accountTypes.INDIVIDUAL ? user.profileImage : user.premisesImage
+        name:  user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : `${user.organizationName}`,
+        profileImage: user.accountType === accountTypes.INDIVIDUAL ? user.profileImage : user.premisesImage ? user.premisesImage : user.profileImage
       };
       return data;
     } else {

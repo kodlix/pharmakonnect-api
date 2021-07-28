@@ -4,11 +4,12 @@ import { UpdateChatDto } from '../dto/update-chat.dto';
 import { ConversationRepository } from '../repository/chat.conversation.repository';
 import { ConversationRO } from '../chat.interface'
 import { AccountEntity } from 'src/account/entities/account.entity';
+import { MessageRepository } from '../repository/chat.message.repository';
 
 @Injectable()
 export class ChatConverationService {
   constructor(
-    private readonly conversationrepo: ConversationRepository
+    private readonly conversationrepo: ConversationRepository, private readonly msgRepo: MessageRepository
     ){}
 
   async create(dto: CreateConversationDto, user: any): Promise<CreateConversationDto> {
@@ -20,7 +21,7 @@ export class ChatConverationService {
     return await this.conversationrepo.getConversationPaticipantMessage(creatorid, channelid);
   }
   async findConversationById(id: string, user: AccountEntity){
-    //await this.conversationrepo.findOne(id, {relations: ['messages']});
+    const messages = await this.msgRepo.find({where: {conversationId: id}, order: {createdAt: 'DESC'}});
 
     const res = await this.conversationrepo.createQueryBuilder("q")
                     .where("q.id = :id", {id})
@@ -29,6 +30,14 @@ export class ChatConverationService {
                     .orderBy("q.updatedOn", "DESC")
                     .addOrderBy("messages.createdAt", "ASC")
                     .getOne();
+
+    if(messages.length > 0) {
+       const msg = messages[0];
+       if(!msg.read) {
+        msg.read = true;
+        await this.msgRepo.save(msg);
+       }
+    }
     return res;
   }
 

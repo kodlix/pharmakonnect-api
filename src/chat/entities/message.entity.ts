@@ -42,6 +42,9 @@ export class MessageEntity extends AbstractBaseEntity{
     @Column("text")
     message : string
 
+    @Column({type: 'bool', default: false})
+    read : boolean;
+
     @Column({default: false})
     deleteFromSender : boolean
 

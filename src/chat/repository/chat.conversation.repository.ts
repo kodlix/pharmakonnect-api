@@ -68,7 +68,7 @@ export class ConversationRepository extends Repository<ConversationEntity>{
                 convers.creatorName = dto.creatorName;
                 convers.initiatorId = user.id;
                 convers.counterPartyId = dto.counterPartyId;
-                convers.initiatorName = `${user.firstName} ${user.lastName}`;
+                convers.initiatorName =  user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.organizationName;
                 convers.counterPartyName = dto.counterPartyName;
                 convers.initiatorImage = dto.initiatorImage;
                 convers.counterPartyImage = dto.counterPartyImage;
