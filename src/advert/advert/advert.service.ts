@@ -6,7 +6,7 @@ import { NotificationGateway } from "src/gateway/notification.gateway";
 import { NotificationRO } from "src/notifications/notification/interface/notification.interface";
 import { NotificationRepository } from "src/notifications/notification/notification.repository";
 import { NotificationTypeRepository } from "src/notifications/notificationtype/notificationtype.repository";
-import { Connection } from "typeorm";
+import { Connection, UpdateResult } from "typeorm";
 import { AdvertRO } from "./advert.interface";
 import { AdvertRepository } from "./advert.repository";
 import { CreateAdvertDto } from "./dto/create-advert";
@@ -32,7 +32,7 @@ export class AdvertService{
         return await this.advertRepository.createEntity(dto, user);
     }
 
-    async update(id: string, dto: UpdateAdvertDto, user: AccountEntity): Promise<AdvertRO> {
+    async update(id: string, dto: UpdateAdvertDto, user: AccountEntity): Promise<UpdateResult> {
         return await this.advertRepository.updateEntity(id, dto, user);
     }
 

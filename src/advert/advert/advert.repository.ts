@@ -7,6 +7,7 @@ import { CreateAdvertDto } from "./dto/create-advert";
 import { RejectAdvertDto, UpdateAdvertDto } from "./dto/update-advert";
 import {validate} from 'class-validator';
 import { isNotValidDate } from "src/_utility/date-validator.util";
+import { UpdateResult } from 'typeorm';
 
 
 @EntityRepository(AdvertEntity)
@@ -81,7 +82,7 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       user: AccountEntity,
      
 
-    ): Promise<AdvertEntity> {
+    ): Promise<UpdateResult> {
       const advert = await this.findOne(id);
       
       const checkAdvert = await this.findOne({ where: { title: ILike(`%${dto.title}%`), companyName: ILike(`%${dto.companyName}%`) } });
@@ -111,8 +112,8 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       advert.website = dto.website;
       advert.contactPhoneNumber = dto.contactPhoneNumber;
       advert.description = dto.description;
-      advert.advertImage = dto.advertImage;
-      advert.autoRenewal = dto.autoRenewal;
+      advert.advertImage = dto.advertImage || advert.advertImage ;
+      // advert.autoRenewal = dto.autoRenewal;
       advert.accountId = user.id;
       advert.updatedBy = user.email;
       advert.updatedAt = new Date();
@@ -131,7 +132,7 @@ export class AdvertRepository extends Repository<AdvertEntity>{
         throw new HttpException(errors, HttpStatus.BAD_REQUEST);
     }
       
-      return await this.save(advert);
+      return await this.update(id, advert);
     }
 
     async updateApprove(
