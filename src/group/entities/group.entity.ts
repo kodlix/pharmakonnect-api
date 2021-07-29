@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Column, Entity } from "typeorm";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 
 @Entity("Group")

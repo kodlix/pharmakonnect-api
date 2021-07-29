@@ -130,10 +130,28 @@ export class GroupService extends Repository<GroupEntity> {
       name: group.name,
       description: group.description,
       logo: group.logo,
+
       createdAt: group.createdAt,
       members: groups
     };
   }
+
+  // async getGroupByOwner(id: string) {
+  //   const group = await getRepository(GroupEntity).findAndCount({ where: { ownerId: id } });
+
+  //   const entityManager = getManager();
+  //   const groups = await entityManager.find(GroupMemeberView, {
+  //     where: { groupId: id }
+  //   });
+  //   return {
+  //     name: group.name,
+  //     description: group.description,
+  //     logo: group.logo,
+      
+  //     createdAt: group.createdAt,
+  //     members: groups
+  //   };
+  // }
 
 
   async removebyId(id: string, owner: any): Promise<boolean> {

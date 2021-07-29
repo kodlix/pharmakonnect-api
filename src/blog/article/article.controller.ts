@@ -8,6 +8,7 @@ import { CategoryService } from '../category/category.service';
 import { ArticleService } from './article.service';
 import { ArticleDto, RejectArticleDto } from './dto/article.dto';
 import { editFileName, imageFileFilter } from 'src/_utility/fileupload.util';
+import { uploadFile } from 'src/_utility/upload.util';
 
 @ApiTags('article')
 @Controller('article')
@@ -75,12 +76,16 @@ export class ArticleController {
       fileFilter: imageFileFilter,
     }),
   )
-  async create(@UploadedFile() file, @Body() articleDto: ArticleDto, @Req() req: any) {
+  async create(@UploadedFile() file, @Body() articleDto: ArticleDto, @Req() req: any, @UploadedFile() postImage: any) {
     console.log(file);
     try {
+      let imageUrl = "";
+      if (postImage) {
+        imageUrl = await uploadFile(postImage.path);
+        articleDto.coverImage = imageUrl;
+      }
       const catIds = articleDto.categoryIds.split(',');
       articleDto.createdBy = req.user.createdBy;
-      articleDto.coverImage = file && file.filename;
       articleDto.categoryIds = catIds;
       return await this.articleService.create(articleDto, req.user.email);
     } catch (err) {
@@ -100,15 +105,19 @@ export class ArticleController {
       fileFilter: imageFileFilter,
     }),
   )
-  async update(@UploadedFile() file, @Param('articleId') articleId: string, @Body() articleDto: ArticleDto) {
+  async update(@UploadedFile() file, @Param('articleId') articleId: string, @Body() articleDto: ArticleDto, @UploadedFile() postImage: any) {
     try {
-
       if(!articleDto.categoryIds){
         throw new BadRequestException("Category is missing.");
       }
 
+      let imageUrl = "";
+      if (postImage) {
+        imageUrl = await uploadFile(postImage.path);
+        articleDto.coverImage = imageUrl;
+      }
+
       const catIds = articleDto.categoryIds.split(',');
-      articleDto.coverImage = file && file.filename ? file.filename : articleDto.coverImage;
       articleDto.categoryIds = catIds;
       return await this.articleService.update(articleId, articleDto);
     } catch (err) {

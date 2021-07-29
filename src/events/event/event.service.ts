@@ -30,7 +30,7 @@ export class EventService {
   
  
 
-  async create(filename, request: CreateEventDto, user: AccountEntity) : Promise<string> {
+  async create(request: CreateEventDto, user: AccountEntity) : Promise<string> {
     if(request.cost) {
       request.cost = parseInt(request.cost);
     } else {
@@ -46,7 +46,7 @@ export class EventService {
     request.online = this.stringToBoolean(request.online);
     request.free = this.stringToBoolean(request.free);
 
-    return await this.eventRepo.saveEvent(filename, request, user);
+    return await this.eventRepo.saveEvent(request.coverImage, request, user);
   }
 
   async findAllPublishEvents(queryParam: FilterDto): Promise<EventRO[]> {
@@ -66,7 +66,7 @@ export class EventService {
     return await this.eventRepo.findEventById(id);
   }
 
-  async update(id: string, filename, updateEventDto: UpdateEventDto, user: AccountEntity) : Promise<string> {
+  async update(id: string, updateEventDto: UpdateEventDto, user: AccountEntity) : Promise<string> {
     if(updateEventDto.cost) {
       updateEventDto.cost = parseInt(updateEventDto.cost);
     } else {
@@ -81,7 +81,7 @@ export class EventService {
 
     updateEventDto.online = this.stringToBoolean(updateEventDto.online);
     updateEventDto.free = this.stringToBoolean(updateEventDto.free);
-    return await this.eventRepo.updateEvent(id, filename, updateEventDto, user);
+    return await this.eventRepo.updateEvent(id, updateEventDto.coverImage, updateEventDto, user);
   }
 
   async publishEvent(id: string, user: AccountEntity) : Promise<string> {

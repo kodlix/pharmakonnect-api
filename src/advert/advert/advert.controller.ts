@@ -34,12 +34,12 @@ export class AdvertController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 201, description: 'Advert successfully created' })
   async create(@Body() dto: CreateAdvertDto, @Req() req: any, @UploadedFile() advertImage: any) {
+    let imageUrl = "";
     if (advertImage) {
-      const imageUrl = await uploadFile(advertImage.path);
+      imageUrl = await uploadFile(advertImage.path);
       dto.advertImage = imageUrl;
-      return this.advertservice.create(dto, req.user);
     }
-
+      return this.advertservice.create(dto, req.user);
   }
 
   @Get()
