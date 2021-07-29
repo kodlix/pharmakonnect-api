@@ -7,7 +7,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 @Entity('Notification')
 export class NotificationEntity extends AbstractBaseEntity{
 
-    @Column({type: "varchar", length: 128})
+    @Column({type: "varchar", length: 512})
     message: string;
 
     @Column({type: "varchar", nullable: true, length: 128})

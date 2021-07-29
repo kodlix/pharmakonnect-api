@@ -62,31 +62,31 @@ export class JobVacancyService {
   ): Promise<JobVacancyRO> {
     const result = await this.jobvacancyRepository.updateApprove(id, dto);
     
-    const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.ADVERT}});
+    // const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.ADVERT}});
         
-    const {id: adminId, profileImage} = await this.acctRepo.findByEmail("admin@netopng.com");
+    // const {id: adminId, profileImage} = await this.acctRepo.findByEmail("admin@netopng.com");
     
-    const noti: NotificationRO = {
-      message: `Hi ${result.createdBy}, the job you posted has been approved`,
-      senderId: adminId,
-      entityId: result.id,
-      recieverId: result.accountId,
-      isGeneral: false,
-      accountId: result.accountId,
-      createdAt: new Date(),
-      seen: false,
-      senderImageUrl: profileImage ? profileImage : null,
-      notificationType: notType,
-      createdBy: "admin@netopng.com"
-    }
+    // const noti: NotificationRO = {
+    //   message: `Hi ${result.createdBy}, the job you posted has been approved`,
+    //   senderId: adminId,
+    //   entityId: result.id,
+    //   recieverId: result.accountId,
+    //   isGeneral: false,
+    //   accountId: result.accountId,
+    //   createdAt: new Date(),
+    //   seen: false,
+    //   senderImageUrl: profileImage ? profileImage : null,
+    //   notificationType: notType,
+    //   createdBy: "admin@netopng.com"
+    // }
 
-    try {
-      await this.notiRepo.save(noti);
-      this.notiGateway.sendToUser(noti, result.accountId);
-    } catch (err) {
-      Logger.log(err);
-      return result;
-    }
+    // try {
+    //   await this.notiRepo.save(noti);
+    //   this.notiGateway.sendToUser(noti, result.accountId);
+    // } catch (err) {
+    //   Logger.log(err);
+    //   return result;
+    // }
 
     return result;
   }
@@ -97,31 +97,31 @@ export class JobVacancyService {
   ): Promise<JobVacancyRO> {
     const result = await this.jobvacancyRepository.updateReject(id, dto);
 
-    const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.JOB}});
+    // const notType = await this.notTypeRepo.findOne({where: {name: NotificationType.JOB}});
        
-    const {id: adminId, profileImage} = await this.acctRepo.findByEmail("admin@netopng.com");
+    // const {id: adminId, profileImage} = await this.acctRepo.findByEmail("admin@netopng.com");
     
-    const noti: NotificationRO = {
-      message: `Hi ${result.createdBy}, the job you posted has been rejected`,
-      senderId: adminId,
-      entityId: result.id,
-      recieverId: result.accountId,
-      isGeneral: false,
-      accountId: result.accountId,
-      createdAt: new Date(),
-      seen: false,
-      senderImageUrl: profileImage ? profileImage : null,
-      notificationType: notType,
-      createdBy: "admin@netopng.com"
-    }
+    // const noti: NotificationRO = {
+    //   message: `Hi ${result.createdBy}, the job you posted has been rejected`,
+    //   senderId: adminId,
+    //   entityId: result.id,
+    //   recieverId: result.accountId,
+    //   isGeneral: false,
+    //   accountId: result.accountId,
+    //   createdAt: new Date(),
+    //   seen: false,
+    //   senderImageUrl: profileImage ? profileImage : null,
+    //   notificationType: notType,
+    //   createdBy: "admin@netopng.com"
+    // }
 
-    try {
-      await this.notiRepo.save(noti);
-      this.notiGateway.sendToUser(noti, result.accountId);
-    } catch (err) {
-      Logger.log(err);
-      return result;
-    }
+    // try {
+    //   await this.notiRepo.save(noti);
+    //   this.notiGateway.sendToUser(noti, result.accountId);
+    // } catch (err) {
+    //   Logger.log(err);
+    //   return result;
+    // }
 
     return result;
 
