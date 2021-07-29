@@ -12,6 +12,7 @@ import { AccountEntity } from './entities/account.entity';
 import { SendGridService } from 'src/mailer/sendgrid.service';
 import { accountTypes } from './account.constant';
 import { ContactEntity } from 'src/contact/entities/contact.entity';
+import { NodeMailerService } from 'src/mailer/node-mailer.service';
 
 
 @Injectable()
@@ -19,7 +20,7 @@ export class AccountService {
   constructor(
     private readonly accountRepository: AccountRepository,
     private jwtService: JwtService,
-    private readonly mailService: SendGridService,
+    private readonly mailService: NodeMailerService,
   ) { }
 
   public async login(loginDto: LoginDTO): Promise<UserRO> {
