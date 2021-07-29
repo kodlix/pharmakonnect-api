@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { AccountRepository } from 'src/account/account.repository';
 import { AdvertEntity } from 'src/advert/entity/advert.entity';
 import { NotificationType } from 'src/enum/enum';
@@ -63,6 +63,7 @@ import {
       } catch (err) {
         Logger.log(err.message)
         console.log(err.message);
+        throw new HttpException(`Could not send notification. Error: ${err.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
       }
 
     
