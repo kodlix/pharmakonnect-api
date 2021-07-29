@@ -11,6 +11,8 @@ import { GroupMemberEntity } from './entities/group-member.entity';
 import { GroupMemeberView } from './entities/group-member.view';
 import { getManager } from 'typeorm';
 import { GroupView } from './entities/group.view';
+import { GroupDto, MemberDto } from './dto/group-view.dto';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class GroupService extends Repository<GroupEntity> {
@@ -136,22 +138,34 @@ export class GroupService extends Repository<GroupEntity> {
     };
   }
 
-  // async getGroupByOwner(id: string) {
-  //   const group = await getRepository(GroupEntity).findAndCount({ where: { ownerId: id } });
+  async getGroupByOwner(user: any) {
+    const entityManager = getManager();
+    const groups = await entityManager.find(GroupMemeberView, {
+      where: { ownerId: user.id }
+    });
 
-  //   const entityManager = getManager();
-  //   const groups = await entityManager.find(GroupMemeberView, {
-  //     where: { groupId: id }
-  //   });
-  //   return {
-  //     name: group.name,
-  //     description: group.description,
-  //     logo: group.logo,
-      
-  //     createdAt: group.createdAt,
-  //     members: groups
-  //   };
-  // }
+    let allGroups: GroupDto[] = [];
+    for (let index = 0; index < groups.length; index++) {
+      let groupItem: GroupDto = null;
+      // let memberItem: MemberDto;
+      // let members: MemberDto[];
+
+      const group = groups[index];
+      const exists = allGroups?.find(x => x.groupId === group.groupId);
+
+      if (exists) {
+        continue;
+      }
+
+      const selectedMembers = groups.filter(x => x.groupId === group.groupId);
+      groupItem = plainToClass(GroupDto, group, {excludeExtraneousValues: true});
+      groupItem.members = plainToClass(MemberDto, selectedMembers, {excludeExtraneousValues: true});
+
+      allGroups.push(groupItem);
+    }
+
+    return allGroups;
+  }
 
 
   async removebyId(id: string, owner: any): Promise<boolean> {
@@ -164,10 +178,10 @@ export class GroupService extends Repository<GroupEntity> {
 
   }
 
-  async removeGoupMemberId(id: string, groupId: string,  user: any): Promise<boolean> {
+  async removeGoupMemberId(id: string, groupId: string, user: any): Promise<boolean> {
     await getConnection().createQueryBuilder().delete().from(GroupMemberEntity)
-      .where("contactId =:id AND ownerId =:ownerId AND groupId =:groupId", 
-      { id, groupId, ownerId:user.id }).execute()
+      .where("contactId =:id AND ownerId =:ownerId AND groupId =:groupId",
+        { id, groupId, ownerId: user.id }).execute()
 
     return true;
   }

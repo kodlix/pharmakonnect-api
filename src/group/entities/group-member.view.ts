@@ -27,6 +27,12 @@ export class GroupMemeberView
     groupId: string
 
     @ViewColumn()
+    groupName: string
+
+    @ViewColumn()
+    groupDescription: string
+
+    @ViewColumn()
     email: string;
 
     @ViewColumn()

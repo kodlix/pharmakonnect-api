@@ -93,7 +93,7 @@ export class GroupController {
   )
   async update(@Body() dto: UpdateGroupDto, @Param('id') id: string, @UploadedFile() logo: any, @Req() req: any): Promise<boolean> {
     const user = req.user;
-    if (logo) {
+    if (logo && dto.logo) {
       const imageUrl = await uploadFile(logo.path);
       dto.logo = imageUrl;
     }
@@ -120,6 +120,11 @@ export class GroupController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.groupService.getGroupbyId(id);
+  }
+
+  @Get('owner/members')
+  async findGroupsByOwner(@Req() req: any) {
+    return await this.groupService.getGroupByOwner(req.user);
   }
 
   @Delete(':groupId')
