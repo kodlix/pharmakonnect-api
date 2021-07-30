@@ -17,11 +17,11 @@ export class OutletEntity extends AbstractBaseEntity {
   @Column({ nullable: true })
   contactPersonPhonenumber: string;
 
-  @Column({ nullable: true })
-  latitude: Number
+  // @Column({ nullable: true })
+  // latitude: Number
 
-  @Column({ nullable: true })
-  longitude: Number;
+  // @Column({ nullable: true })
+  // longitude: Number;
 
   @Column({ nullable: true })
   city: string;

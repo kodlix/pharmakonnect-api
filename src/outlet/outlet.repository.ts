@@ -26,8 +26,8 @@ export class OutletRepository extends Repository<OutletEntity>{
     outlet.createdBy = user.createdBy;
     outlet.accountId = user.id;
     outlet.city = dto.city;
-    outlet.longitude = dto.longitude;
-    outlet.latitude = dto.latitude;
+    // outlet.longitude = dto.longitude;
+    // outlet.latitude = dto.latitude;
     outlet.countryName = dto.countryName;
     outlet.countryName = dto.countryName;
     outlet.countryId = dto.countryId;
@@ -58,8 +58,8 @@ export class OutletRepository extends Repository<OutletEntity>{
     outlet.openingTime = dto.openingTime;
     outlet.closingTime = dto.closingTime;
     outlet.city = dto.city;
-    outlet.longitude = dto.longitude;
-    outlet.latitude = dto.latitude;
+    // outlet.longitude = dto.longitude;
+    // outlet.latitude = dto.latitude;
     outlet.countryName = dto.countryName;
     outlet.countryId = dto.countryId;
     outlet.zipCode = dto.zipCode

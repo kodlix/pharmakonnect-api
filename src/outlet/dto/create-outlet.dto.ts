@@ -49,13 +49,13 @@ export class CreateOutletDto{
     city: string;
 
     
-    @ApiProperty()
-    @IsNumber()
-    longitude: Number;
+    // @ApiProperty()
+    // @IsNumber()
+    // longitude: Number;
     
-    @ApiProperty()
-    @IsNumber()
-    latitude: Number;
+    // @ApiProperty()
+    // @IsNumber()
+    // latitude: Number;
 
     @ApiProperty()
     @IsNumber()
