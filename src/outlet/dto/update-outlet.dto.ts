@@ -57,6 +57,10 @@ export class UpdateOutletDto{
     latitude: Number;
 
     @ApiProperty()
+    @IsNumber()
+    zipCode: Number;
+
+    @ApiProperty()
     @IsString()
     @IsNotEmpty()
     countryId: string;

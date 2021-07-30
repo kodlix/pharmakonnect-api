@@ -26,6 +26,9 @@ export class OutletEntity extends AbstractBaseEntity {
   @Column({ nullable: true })
   city: string;
 
+  @Column({nullable:true})
+  zipCode: Number
+
   @Column({ nullable: true })
   pcn: string;
 

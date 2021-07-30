@@ -31,6 +31,7 @@ export class OutletRepository extends Repository<OutletEntity>{
     outlet.countryName = dto.countryName;
     outlet.countryName = dto.countryName;
     outlet.countryId = dto.countryId;
+    outlet.zipCode = dto.zipCode
     outlet.stateName = dto.stateName;
     outlet.stateId = dto.stateId;
     outlet.lgaName = dto.lgaName;
@@ -61,6 +62,7 @@ export class OutletRepository extends Repository<OutletEntity>{
     outlet.latitude = dto.latitude;
     outlet.countryName = dto.countryName;
     outlet.countryId = dto.countryId;
+    outlet.zipCode = dto.zipCode
     outlet.stateName = dto.stateName;
     outlet.stateId = dto.stateId;
     outlet.lgaName = dto.lgaName;
@@ -81,8 +83,35 @@ export class OutletRepository extends Repository<OutletEntity>{
     return outlet;
   }
 
-  async findByAccountId(accountId: string, page = 1): Promise<OutletEntity[]> {
+  async findByAccountId(accountId: string, page = 1 , searchParam: string): Promise<OutletEntity[]> {
+
+    if (searchParam) {
+      const param = `%${searchParam}%`
+      const searchResult = await this.find({
+
+        where: [  
+          
+          { name: ILike(param),accountId},
+          { contactPerson: ILike(param),accountId },
+          { contactPersonEmail: ILike(param),accountId },
+          { contactPersonPhonenumber: ILike(param),accountId },
+          { pcn: ILike(param),accountId },
+          { address: ILike(param),accountId },
+          { organizationName: ILike(param),accountId }
+          
+          
+        ],
+        order: { createdAt: 'DESC' },
+        take: 25,
+  
+        skip: 25 * (page - 1),
+      })
+
+      return searchResult;
+    }
+
     const outlet = await this.find({
+      
       where: { accountId: accountId },
       order: { createdAt: 'DESC' },
       take: 25,

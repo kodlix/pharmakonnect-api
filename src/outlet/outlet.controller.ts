@@ -1,6 +1,6 @@
 import { Controller, UseGuards, Post, Body, Req, Get, Query, Param, Put, Delete, HttpStatus, HttpException } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiQuery } from "@nestjs/swagger";
 import { CreateOutletDto } from "./dto/create-outlet.dto";
 import { UpdateOutletDto } from "./dto/update-outlet.dto";
 import { OutletRO } from "./outlet.interface";
@@ -25,6 +25,8 @@ export class OutletController {
     @ApiOperation({ summary: 'Get all Outlet' })
     @ApiResponse({ status: 201, description: 'Success.' })
     @ApiResponse({ status: 404, description: 'Not Found.' })
+    @ApiQuery({ name: 'page', required: false })
+    @ApiQuery({ name: 'search', required: false })
     async findAll(@Req() req: any, @Query('page') page?: number, @Query('search') searchParam?: string): Promise<OutletRO[]> {
         return await this.outletService.findAll(page, searchParam);
     }
@@ -41,11 +43,13 @@ export class OutletController {
     @ApiResponse({ status: 201, description: 'Success.' })
     @ApiResponse({ status: 404, description: 'Not Found.' })
     @ApiOperation({ summary: 'Get outlet by AccountId' })
-    async findByAccountId(@Query('page') page: number, @Req() req
+    @ApiQuery({ name: 'page', required: false })
+    @ApiQuery({ name: 'search', required: false })
+    async findByAccountId(@Req() req,@Query('page') page: number,@Query('search') searchParam?: string
     ): Promise<OutletRO[]> {
         const { user } = req;
 
-        return await this.outletService.findByAccountId(user.id, page);
+        return await this.outletService.findByAccountId(user.id, page,searchParam);
     }
 
     @Put(':id')

@@ -27,8 +27,8 @@ export class OutletService {
         return await this.outletRepository.findById(id);
     }
 
-    async findByAccountId(accountId: string, page): Promise<OutletRO[]> {
-        return await this.outletRepository.findByAccountId(accountId, page);
+    async findByAccountId(accountId: string, page,searchParam): Promise<OutletRO[]> {
+        return await this.outletRepository.findByAccountId(accountId, page,searchParam);
     }
 
     async update(id: string, dto: UpdateOutletDto, user: AccountEntity): Promise<OutletRO> {

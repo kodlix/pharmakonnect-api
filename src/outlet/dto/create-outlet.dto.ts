@@ -58,6 +58,10 @@ export class CreateOutletDto{
     latitude: Number;
 
     @ApiProperty()
+    @IsNumber()
+    zipCode: Number;
+
+    @ApiProperty()
     @IsString()
     @IsNotEmpty()
     countryId: string;
