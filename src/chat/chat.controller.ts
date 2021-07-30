@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, HttpCode, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, HttpCode, UseGuards, Req, Query } from '@nestjs/common';
 import { ChatConverationService } from './services/chat.conversation.service';
 import { AlertGateway } from './chat.chatservice';
 import { CreateConversationDto } from './dto/create-chat.dto';
@@ -46,6 +46,13 @@ export class ChatController {
   async findOne( @Req() req: any) {
     const { user } = req;
     return await this.chatService.findOne(user.id);
+  }
+
+
+  @Get('search')
+  async findBySearch(@Query('searchParam') searchParam: string, @Req() req: any) {
+    const { user } = req;
+    return await this.chatService.findBySearch(searchParam , user);
   }
 
   // @Put(':id')

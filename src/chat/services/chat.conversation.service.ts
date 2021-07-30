@@ -5,6 +5,7 @@ import { ConversationRepository } from '../repository/chat.conversation.reposito
 import { ConversationRO } from '../chat.interface'
 import { AccountEntity } from 'src/account/entities/account.entity';
 import { MessageRepository } from '../repository/chat.message.repository';
+import { Brackets } from 'typeorm';
 
 @Injectable()
 export class ChatConverationService {
@@ -57,5 +58,24 @@ export class ChatConverationService {
 
   async remove(id: string) {
     return await this.conversationrepo.deleteConversation(id)
+  }
+
+  async findBySearch(search, user) {
+    if(search) {
+        return await this.conversationrepo
+        .createQueryBuilder('c')
+        .where("c.initiatorId = :id", {id: user.id})
+        //.where("c.counterPartyId = :id", {id: user.id})
+        .leftJoinAndSelect("c.messages", "messages")
+        .andWhere(new Brackets(qb => {
+          qb.where("c.counterPartyName ILike :cname", { cname: `%${search}%` })
+          .orWhere("c.initiatorName ILike :iname", { iname: `%${search}%` })
+          // .orWhere("messages.message ILike :m", { m: `%${search}%` })
+          .orWhere("c.channelName ILike :cn", { cn: `%${search}%` })
+      }))
+      .orderBy("c.updatedOn", "DESC")
+      .addOrderBy("messages.createdAt", "DESC")
+      .getMany();
+    }
   }
 }

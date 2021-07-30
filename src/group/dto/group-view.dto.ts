@@ -11,7 +11,10 @@ export class GroupDto {
     groupName: string
 
     @Expose()
-    groupDescription: string
+    groupDescription: string;
+
+    @Expose()
+    logo: string;
 
     @Expose()
     members:  MemberDto[];

@@ -343,7 +343,7 @@ export class EventRepository extends Repository<EventEntity> {
             if(!eventRegistringFor.accessCode) {
                 throw new HttpException(`This event does not have an access code.`, HttpStatus.BAD_REQUEST);
             }
-            payload.accessCode = (Math.floor(Math.random() * (9000000)) + 1000000).toString();
+            payload.accessCode = `${eventRegistringFor.accessCode}-${(Math.floor(Math.random() * (9000000)) + 1000000).toString()}`;
         }
 
         const userRegisteredForSameEvent = await eventUsersRepository.findByEmailAndEventId(payload.eventId, payload.email);

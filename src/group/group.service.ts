@@ -132,7 +132,7 @@ export class GroupService extends Repository<GroupEntity> {
       name: group.name,
       description: group.description,
       logo: group.logo,
-
+      groupId: group.id,
       createdAt: group.createdAt,
       members: groups
     };

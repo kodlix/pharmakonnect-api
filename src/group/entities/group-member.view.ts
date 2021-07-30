@@ -7,7 +7,7 @@ import { ViewEntity, ViewColumn } from "typeorm";
      "account"."lastName" as "lastName", "account"."profileImage" as "profileImage",  
      "account"."organizationName" as "organizationName", "account"."address" as "address",
      "groupMember"."contactId" as "contactId", "groupMember"."groupId" as "groupId",
-     "group"."name" as "groupName", "group"."description" as "groupDescription",
+     "group"."name" as "groupName", "group"."description" as "groupDescription", "group"."logo" as "logo",
      "account"."city" as "city", "groupMember"."ownerId" as "ownerId" FROM "Account" "account"
     LEFT JOIN "GroupMember" "groupMember" ON "account"."id" = "groupMember"."contactId"
     LEFT JOIN "Group" "group" ON "group"."id" = "groupMember"."groupId"
@@ -30,7 +30,10 @@ export class GroupMemeberView
     groupName: string
 
     @ViewColumn()
-    groupDescription: string
+    groupDescription: string;
+
+    @ViewColumn()
+    logo: string
 
     @ViewColumn()
     email: string;

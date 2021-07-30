@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountEntity } from 'src/account/entities/account.entity';
+import { GroupService } from 'src/group/group.service';
 import { getRepository, Repository, getConnection, Brackets } from 'typeorm';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { ContactEntity } from './entities/contact.entity';
@@ -10,7 +11,8 @@ import { ContactEntity } from './entities/contact.entity';
 export class ContactService  {
   constructor(
     @InjectRepository(ContactEntity)
-    private readonly repository: Repository<ContactEntity>
+    private readonly repository: Repository<ContactEntity>,
+    private readonly groupSvc: GroupService
   ) { }
 
   async createContact(dto: CreateContactDto[], user: any): Promise<any[]> {
@@ -64,12 +66,36 @@ export class ContactService  {
       const userIds = conversations.map(x => x.accountId);
 
       if (userIds.length > 0) {
-        return await getRepository(AccountEntity)
-        .createQueryBuilder('a')
-        .where('a.id IN (:...userIds)', {userIds})
-        .skip(take * (page - 1))
-        .take(take)
-        .getMany();
+        const result = await getRepository(AccountEntity)
+            .createQueryBuilder('a')
+            .where('a.id IN (:...userIds)', {userIds})
+            .skip(take * (page - 1))
+            .take(take)
+            .getMany();
+
+        
+          const myGroups = await this.groupSvc.getGroupByOwner(user);
+          const shapedData = [];
+          if(myGroups.length > 0) {
+
+            for (const g of myGroups) {
+              let data = {
+                id: g.groupId,
+                profileImage: g.logo,
+                firstName: g.groupName,
+                isGroupChat: true,
+                groupDescription: g.groupDescription
+              }
+
+              shapedData.push(data);
+              data = {} as any;
+            }
+
+            result.push(...shapedData);
+
+            return result;
+          }
+          return result;
       }
   }
 
@@ -86,8 +112,22 @@ export class ContactService  {
             .where("a.id = :id", {id})
             .getOne();
 
+    if(user) {
+      return user;
+    }
+    
+    const group = await this.groupSvc.getGroupbyId(id);
+    const data = {
+      id: group.groupId,
+      profileImage: group.logo,
+      firstName: group.name,
+      groupDescription: group.description,
+      members: group.members,
+      isGroupChat: true
+    }
 
-    return user;
+    return data;
+
   }
 
   
