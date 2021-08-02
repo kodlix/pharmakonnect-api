@@ -115,7 +115,7 @@ export class ArticleController {
       if (postImage) {
         imageUrl = await uploadFile(postImage.path);
         articleDto.coverImage = imageUrl;
-      }
+      } 
 
       const catIds = articleDto.categoryIds.split(',');
       articleDto.categoryIds = catIds;

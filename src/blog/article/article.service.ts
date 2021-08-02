@@ -1,5 +1,5 @@
 import { Equal } from 'typeorm';
-import { BadRequestException, forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
 import { AccountEntity } from 'src/account/entities/account.entity';
@@ -127,6 +127,12 @@ export class ArticleService {
     if (author && !author.isRegComplete) {
       throw new Error("Complete your profile registration to be able to create blogs.");      
     }
+
+    const existingTitle = await this.articleRepo.findOne({where: {author, title: articleDto.title}});
+
+    if(existingTitle) {
+      throw new HttpException('You already have a blog with this title, please choose a different title', HttpStatus.BAD_REQUEST);
+    }
     const articleToCreate: ArticleEntity = { ...articleDto };
     articleToCreate.author = await this.accountService.getOneUserByEmail(userEmail);
     articleToCreate.categories = await this.categoryIdsToEntities(articleDto.categoryIds);
@@ -134,7 +140,10 @@ export class ArticleService {
   }
 
   public async update(articleId: string, articleDto: ArticleDto): Promise<ArticleEntity> {
-    await this.articleRepo.findOneOrFail(articleId);
+    const res = await this.articleRepo.findOneOrFail(articleId);
+    if(!articleDto.coverImage) {
+      articleDto.coverImage =  res.coverImage;
+    }
     const categoryIds = [...articleDto.categoryIds];
     delete articleDto.categoryIds;
 

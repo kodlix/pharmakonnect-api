@@ -19,6 +19,9 @@ export class CommentEntity {
   message?: string;
 
   @Column({ nullable: true })
+  authorImage?: string;
+
+  @Column({ nullable: true })
   editedAt?: Date;
 
   @Column({ default: false })

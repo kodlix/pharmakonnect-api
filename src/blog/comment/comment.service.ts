@@ -33,13 +33,15 @@ export class CommentService {
   public async create(
     articleId: string,
     commentDto: CommentDto,
-    userEmail: string
+    userEmail: string,
+    image: string
   ): Promise<CommentEntity> {
     const article = await this.articleService.findOne(articleId);
     const comment = new CommentEntity();
     comment.article = article;
     comment.message = commentDto.message;
     comment.createdBy = commentDto.createdBy;
+    comment.authorImage = image;
     comment.author = (await this.accountService.getOneUserByEmail(userEmail)).email;
     const createdComment = await this.commentRepo.save(comment);
     return this.findOne(createdComment.id);

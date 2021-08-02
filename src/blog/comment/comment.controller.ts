@@ -33,7 +33,7 @@ export class CommentController {
   async create(@Param('articleId') articleId: string, @Body() commentDto: CommentDto, @Req() req: any) {
     try {
       commentDto.createdBy = req.user.createdBy;
-      return await this.commentService.create(articleId, commentDto, req.user.email);
+      return await this.commentService.create(articleId, commentDto, req.user.email, req.user.profileImage);
     } catch (err) {
       throw new HttpException(err, HttpStatus.NOT_ACCEPTABLE);
     }
