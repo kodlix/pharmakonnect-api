@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AccountModule } from 'src/account/account.module';
-import { GroupController } from './dashboard.controller';
-import { GroupService } from './dashboard.service';
+import { DashboardController } from './dashboard.controller';
+import { DashboardService } from './dashboard.service';
 
 @Module({
   imports:[AccountModule],
-  controllers: [GroupController],
-  providers: [GroupService]
+  controllers: [DashboardController],
+  providers: [DashboardService]
 })
-export class GroupModule {}
+export class DashboardModule {}
