@@ -48,6 +48,8 @@ import {
     @Column({ length: 512,  nullable: true })
     rejectMessage?: string;
 
+    @Column({ type: 'bool', default: false })
+    disabled?: boolean = false;
     
     @Column({ default: 0 })
     claps?: number;

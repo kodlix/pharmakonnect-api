@@ -20,7 +20,7 @@ export class DashboardService {
   async getIndividualStats(user: AccountEntity): Promise<any> {
     const totalContacts = await this.getContactCount(user.id);
     const totalGroups = await this.getGroupCount(user.id);
-    const totalBlogs = await this.getBlogCount(user.id);
+    const totalBlogs = await this.getBlogCount(user.email);
     return {
       stat: {
         contact: totalContacts,
@@ -34,7 +34,7 @@ export class DashboardService {
   async getCorporateStats(user: any): Promise<any> {
     const totalContacts = await this.getContactCount(user.id);
     const totalGroups = await this.getGroupCount(user.id);
-    const totalBlogs = await this.getBlogCount(user.id);
+    const totalBlogs = await this.getBlogCount(user.email);
     const totalAdverts = await this.getAdvertCount(user.id);
     const totalEvents = await this.getEventCount(user.id);
     const totalStaff = await this.getStaffCount(user.id);
@@ -100,7 +100,7 @@ export class DashboardService {
   // get pending Blogs for admin approval
   async getBlogs(): Promise<ArticleEntity[]> {
     const blogs = await getRepository(ArticleEntity).createQueryBuilder('b')
-      .where(`b.published = false AND b.disabled = false AND b.endDate >= NOW()`)
+      .where(`b.published = false AND b.disabled = false`)
       .orderBy('b.createdBy', 'ASC')
       .take(10)
       .getMany()
@@ -120,8 +120,8 @@ export class DashboardService {
   // get pending jobs for admin approval
   async getJobs(): Promise<JobVacancyEntity[]> {
     const jobs = await getRepository(JobVacancyEntity).createQueryBuilder('job')
-    .where(`job.published = false AND job.disabled = false AND job.endDate >= NOW()`)
-    .orderBy('ad.createdBy', 'ASC')
+    .where(`job.approved = false AND job.disabled = false AND job.endDate >= NOW()`)
+    .orderBy('job.createdBy', 'ASC')
     .take(10)
     .getMany()
   return plainToClass(JobVacancyEntity, jobs);
@@ -129,7 +129,7 @@ export class DashboardService {
 
   // get upcomming events a  user registered for
   async getFutureEventsByUser(user: AccountEntity): Promise<EventEntity[]> {
-    const events = await getRepository(AccountEntity).createQueryBuilder('e')
+    const events = await getRepository(EventEntity).createQueryBuilder('e')
     .where(`e.published = true AND e.disabled = false AND e.endDate >= NOW()`)
     .orderBy('e.createdBy', 'ASC')
     .take(10)
@@ -141,7 +141,7 @@ export class DashboardService {
   async getLatestBlogs(): Promise<ArticleEntity[]> {
     const blogs = await getRepository(ArticleEntity).createQueryBuilder('b')
     .where(`b.published = true AND b.disabled = false`)
-    .orderBy('e.createdBy', 'ASC')
+    .orderBy('b.createdBy', 'ASC')
     .take(10)
     .getMany()
 
@@ -151,7 +151,7 @@ export class DashboardService {
   // get current jobs
   async getCurrentJobs(): Promise<JobVacancyEntity[]> {
     const jobs = await getRepository(JobVacancyEntity).createQueryBuilder('e')
-    .where(`e.published = true AND e.disabled = false AND e.endDate >= NOW()`)
+    .where(`e.approved = true AND e.disabled = false AND e.endDate >= NOW()`)
     .orderBy('e.createdBy', 'ASC')
     .take(10)
     .getMany()
@@ -162,11 +162,11 @@ export class DashboardService {
   // get current jobs
   async getUnverifiedStaff(user: AccountEntity): Promise<AccountEntity[]> {
     const staff = await getRepository(AccountEntity).createQueryBuilder('acc')
-    .where(`acc.staffStatus = 'pending' AND acc.disabled = false AND a.organizationId =:userId`, 
+    .where(`acc.staffStatus = 'pending' AND acc.disabled = false AND acc.organizationId =:userId`, 
     {
       userId: user.id
     })
-    .orderBy('e.firstName', 'ASC')
+    .orderBy('acc.firstName', 'ASC')
     .take(10)
     .getMany()
 
@@ -193,18 +193,20 @@ export class DashboardService {
     if (userId) {
       total = await repo.where(`g.ownerId =:userId AND g.disabled = false`, { userId })
         .getCount();
+        return total;
     }
     total = await repo.where(`g.disabled = false`)
       .getCount();
     return total;
   }
 
-  private async getBlogCount(userId?: string): Promise<Number> {
+  private async getBlogCount(email?: string): Promise<Number> {
     let total = 0;
     const repo = getRepository(ArticleEntity).createQueryBuilder('b');
-    if (userId) {
-      total = await repo.where(`b.accountId =:userId AND b.published = true AND b.disabled = false`, { userId })
+    if (email) {
+      total = await repo.where(`b.createdBy =:email AND b.published = true AND b.disabled = false`, { email })
         .getCount();
+        return total;
     }
     total = await repo.where(`b.published = true AND b.disabled = false`)
       .getCount();
@@ -232,25 +234,34 @@ export class DashboardService {
         .getCount();
       return total;
     }
-    total = await repo.where(`ad.published = true AND ad.disabled = false`)
+    total = await repo.where(`ad.approved = true AND ad.disabled = false`)
       .getCount();
     return total;
   }
 
   private async getStaffCount(userId?: string): Promise<Number> {
+
+    if (userId) {
+      const total = await getRepository(AccountEntity).createQueryBuilder('a')
+      .where(`a.organizationId =:userId AND a.accountType = 'individual' 
+      AND a.disabled = false  AND a.staffStatus = 'verified'`, { userId })
+      .getCount();
+      return total;
+    }
     const total = await getRepository(AccountEntity).createQueryBuilder('a')
-      .where(`a.organizationId =:userId 
-      AND a.accountType = 'individual' AND a.disabled = false' 
-      AND a.statffStatus = 'verified'`, { userId })
+      .where(`a.accountType = 'individual' AND a.disabled = false 
+       AND a.staffStatus = 'verified'`)
       .getCount();
     return total;
+    
   }
 
   private async getPollsCount(userId?: string): Promise<Number> {
     let total = 0;
     const repo = await getRepository(PollEntity).createQueryBuilder('poll');
     if (userId) {
-      total = await repo.where(`poll.accountId =:userId AND poll.published = true AND poll.disabled = false`, { userId })
+      total = await repo.where(`poll.accountId =:userId AND poll.published = true
+       AND poll.disabled = false`, { userId })
         .getCount();
       return total;
     }
@@ -263,23 +274,29 @@ export class DashboardService {
     let total = 0;
     const repo = await getRepository(OutletEntity).createQueryBuilder('out');
     if (userId) {
-      total = await repo.where(`out.accountId =:userId AND out.disabled = true AND out.disabled = false`, { userId })
+      total = await repo.where(`out.accountId =:userId AND out.disabled = false`, { userId })
         .getCount();
+        return total;
     }
-    total = await repo.where(`out.disabled = true AND out.disabled = false`)
+    total = await repo.where(`out.disabled = false`)
       .getCount();
+      
     return total;
   }
 
   private async getCorporateTotal() {
     const total = await getRepository(AccountEntity).createQueryBuilder('a')
-      .where(`a.accountType = 'corporate' AND a.disabled = false' 
-      AND a.statffStatus = 'verified'`)
+      .where(`a.accountType = 'corporate' AND a.disabled = false
+      AND a.isRegComplete = true`)
       .getCount();
     return total;
   }
   private async getIndividualTotal() {
-    throw new Error('Method not implemented.');
+    const total = await getRepository(AccountEntity).createQueryBuilder('a')
+      .where(`a.accountType = 'individual' AND a.disabled = false
+      AND a.isRegComplete = true`)
+      .getCount();
+    return total;
   }
 
 }

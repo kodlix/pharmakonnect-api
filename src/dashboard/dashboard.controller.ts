@@ -74,7 +74,7 @@ export class DashboardController {
   }
 
   @Get('/staff/unverified')
-  @ApiOperation({description: 'get current jobs'})
+  @ApiOperation({description: 'get unverified staff by account'})
   async getUnverifiedStaff(@Req() req: any) {
     return await this.dashboardService.getUnverifiedStaff(req.user);
   }
