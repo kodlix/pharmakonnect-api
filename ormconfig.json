@@ -1,9 +1,10 @@
 {
   "type": "postgres",
-  "host": "localhost",
+  "host": "pharmaconnectdb.cnc0jskuhfs1.us-east-1.rds.amazonaws.com",
   "port": 5432,
   "username": "postgres",
   "password": "!Pass4sure",
   "database": "pharmakonnectdb",
-  "entities": ["dist/**/*.entity.js", "dist/**/*.view.js"]
+  "entities": ["dist/**/*.entity.js", "dist/**/*.view.js"],
+  "synchronize": true
 }
