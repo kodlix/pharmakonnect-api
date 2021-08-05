@@ -27,6 +27,13 @@ import { AccountEntity } from 'src/account/entities/account.entity';
     this.server.to(user.id === data.initiatorId ? data.counterPartyId : data.initiatorId).emit('msgToClient', data);
   }
 
+  sendToGroupChatUser(data: any, user: AccountEntity) {
+    const usersToMsg = data.participants.filter(x => x.accountId != user.id);
+    for(const us of usersToMsg){
+      this.server.to(us.accountId).emit('msgToClient', data); 
+    }
+  }
+
   afterInit(server: Server) {
    this.logger.log('Init');
   }

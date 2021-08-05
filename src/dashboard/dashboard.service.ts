@@ -40,6 +40,8 @@ export class DashboardService {
     const totalStaff = await this.getStaffCount(user.id);
     const totalPoll = await this.getPollsCount(user.id);
     const totalOutlet = await this.getOutletsCount(user.id);
+    const totalJobs = await this.getJobsCount(user.id);
+
 
 
     return {
@@ -51,7 +53,8 @@ export class DashboardService {
         event: totalEvents,
         staff: totalStaff,
         poll: totalPoll,
-        outlet: totalOutlet
+        outlet: totalOutlet,
+        job: totalJobs
       }
     }
   }
@@ -66,6 +69,7 @@ export class DashboardService {
     const totalStaff = await this.getStaffCount();
     const totalPoll = await this.getPollsCount();
     const totalOutlet = await this.getOutletsCount();
+    const totalJobs = await this.getJobsCount();
     const totalIndividualAccount = await this.getIndividualTotal();
     const totalCorporateAccount = await this.getCorporateTotal()
 
@@ -79,6 +83,7 @@ export class DashboardService {
         staff: totalStaff,
         poll: totalPoll,
         outlet: totalOutlet,
+        job: totalJobs,
         account: {
           indivdual: totalIndividualAccount,
           corporate: totalCorporateAccount
@@ -279,6 +284,22 @@ export class DashboardService {
         return total;
     }
     total = await repo.where(`out.disabled = false`)
+      .getCount();
+      
+    return total;
+  }
+
+  private async getJobsCount(userId?: string): Promise<Number> {
+    let total = 0;
+    const repo = await getRepository(JobVacancyEntity
+      ).createQueryBuilder('job');
+    if (userId) {
+      total = await repo.where(`job
+      .accountId =:userId AND job.disabled = false AND job.approved = true`, { userId })
+        .getCount();
+        return total;
+    }
+    total = await repo.where(`job.disabled = false`)
       .getCount();
       
     return total;

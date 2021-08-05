@@ -78,7 +78,8 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
              return "Successfully registered for the event.";
         } catch(error)  {
             Logger.log("Reg + mail", error);
-            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+            return "Successfully registered for the event.";
+            //throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

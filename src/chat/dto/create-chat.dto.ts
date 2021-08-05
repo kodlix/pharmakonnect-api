@@ -15,13 +15,11 @@ export class CreateConversationDto {
     @ApiProperty()
     readonly initiatorId : string; 
 
-    @IsString()
-    @IsNotEmpty()
+    @ApiPropertyOptional()
     @ApiProperty()
     readonly counterPartyName : string; 
 
-    @IsString()
-    @IsNotEmpty()
+    @ApiPropertyOptional()
     @ApiProperty()
     readonly message : string; 
 
@@ -33,8 +31,7 @@ export class CreateConversationDto {
     @ApiProperty()
     readonly initiatorImage : string; 
 
-    @IsString()
-    @IsNotEmpty()
+    @ApiPropertyOptional()
     @ApiProperty()
     readonly counterPartyId : string;
 
@@ -63,6 +60,14 @@ export class CreateConversationDto {
     @ApiPropertyOptional()
     @ApiProperty()
     readonly channelName : string
+
+    @ApiPropertyOptional()
+    @ApiProperty()
+    readonly channelLogo : string
+    
+    @ApiPropertyOptional()
+    @ApiProperty()
+    groupMembers? : any;
 
 }
 

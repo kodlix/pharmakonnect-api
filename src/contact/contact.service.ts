@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AccountService } from 'src/account/account.service';
 import { AccountEntity } from 'src/account/entities/account.entity';
 import { GroupService } from 'src/group/group.service';
 import { getRepository, Repository, getConnection, Brackets } from 'typeorm';
@@ -12,7 +13,8 @@ export class ContactService  {
   constructor(
     @InjectRepository(ContactEntity)
     private readonly repository: Repository<ContactEntity>,
-    private readonly groupSvc: GroupService
+    private readonly groupSvc: GroupService,
+    private acctSvc: AccountService
   ) { }
 
   async createContact(dto: CreateContactDto[], user: any): Promise<any[]> {
@@ -52,7 +54,7 @@ export class ContactService  {
 
   }
 
-  async findAll(page = 1, take = 20, user: any): Promise<AccountEntity[]> {
+  async findAll(page = 1, take = 20, user: any, from: string): Promise<AccountEntity[]> {
 
     page = +page;
     take = take && +take || 20;
@@ -73,28 +75,37 @@ export class ContactService  {
             .take(take)
             .getMany();
 
-        
-          const myGroups = await this.groupSvc.getGroupByOwner(user);
-          const shapedData = [];
-          if(myGroups.length > 0) {
+          
+          if(from === 'chat') {
+            const myGroups = await this.groupSvc.getGroupByOwner(user);
+            const groupWithMembers = myGroups.filter(x => x.members.length > 0);
+            const shapedData = [];
+            if(groupWithMembers.length > 0) {
 
-            for (const g of myGroups) {
-              let data = {
-                id: g.groupId,
-                profileImage: g.logo,
-                firstName: g.groupName,
-                isGroupChat: true,
-                groupDescription: g.groupDescription
+              for (const g of groupWithMembers) {
+
+                    let data = {
+                      id: g.groupId,
+                      profileImage: g.logo,
+                      firstName: g.groupName,
+                      isGroupChat: true,
+                      groupDescription: g.groupDescription,
+                      ownerId: g.ownerId,
+                      ownerName: g.ownerName
+                    }
+    
+                    shapedData.push(data);
+                    data = {} as any;
+                  
               }
 
-              shapedData.push(data);
-              data = {} as any;
+              if(shapedData.length > 0) {
+                result.push(...shapedData);
+              }
+              return result;
             }
-
-            result.push(...shapedData);
-
-            return result;
           }
+          
           return result;
       }
   }
@@ -123,7 +134,9 @@ export class ContactService  {
       firstName: group.name,
       groupDescription: group.description,
       members: group.members,
-      isGroupChat: true
+      isGroupChat: true,
+      ownerId: group.ownerId,
+      ownerName:group.ownerName
     }
 
     return data;
@@ -170,5 +183,33 @@ export class ContactService  {
       //return await this.repository.find({creatorId: user.id});
     }
 
+    async addToContacts(id: string, user: AccountEntity): Promise<any>{
+      const userToAdd = await this.acctSvc.findOne(id);
+      if(!user) {
+        throw new HttpException('User does not exist', HttpStatus.BAD_REQUEST);
+      }
+
+      const isExist = await getRepository(ContactEntity).findOne({ where: { creatorId: user.id, accountId: id } })
       
+      if (isExist) {
+        throw new HttpException('User already exist in your contact.', HttpStatus.BAD_REQUEST);
+      } else {
+        const contact = new ContactEntity()
+        contact.accountId = userToAdd.id;
+        contact.creatorId = user.id;
+        contact.createdBy = user.createdBy;
+        contact.firstName = userToAdd.firstName;
+        contact.lastName = userToAdd.lastName;
+        contact.phoneNo = userToAdd.phoneNumber;
+        contact.email = userToAdd.email;
+
+        try {
+          return await this.repository.save(contact);
+
+        } catch (error) {
+          throw new HttpException(`Unable to add to contacts. Error: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+      }
+
+    }
 }

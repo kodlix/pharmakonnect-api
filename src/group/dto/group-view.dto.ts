@@ -8,6 +8,9 @@ export class GroupDto {
     ownerId: string
 
     @Expose()
+    ownerName: string
+
+    @Expose()
     groupName: string
 
     @Expose()

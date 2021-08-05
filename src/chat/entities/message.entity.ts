@@ -24,7 +24,7 @@ export class MessageEntity extends AbstractBaseEntity{
     senderId : string
 
     @ManyToOne(()=> AccountEntity, account => account.id)
-    @Column()
+    @Column({nullable: true})
     recieverId : string
 
     @Column({default : "pharmaceutical"})
@@ -53,6 +53,9 @@ export class MessageEntity extends AbstractBaseEntity{
 
     @CreateDateColumn({ name: 'postedOn', default: new Date() })
     postedOn: Date
+
+    @Column("simple-array", {nullable: true})
+    groupMembersId : string[]
 
 
 }

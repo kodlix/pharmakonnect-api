@@ -20,9 +20,9 @@ export class ContactController {
   }
 
   @Get()
-  async findAll(@Query('page') page: number, @Query('take') take: number, @Req() req: any) {
+  async findAll(@Query('page') page: number, @Query('take') take: number, @Query('from') from: string, @Req() req: any) {
     const { user } = req;
-    return await this.contactService.findAll(page, take, user);
+    return await this.contactService.findAll(page, take, user, from);
   }
 
   @Get(':id')
@@ -46,4 +46,12 @@ export class ContactController {
     const { user } = req;
     return await this.contactService.loadChatContact(searchParam , user);
   }
+
+  @Post('/addToContacts/:id')
+  addToContacts(@Param('id') id: string, @Req() req: any): Promise<any[]> {
+    const user = req.user;
+    const result = this.contactService.addToContacts(id, user);
+    return result;
+  }
+
 }
