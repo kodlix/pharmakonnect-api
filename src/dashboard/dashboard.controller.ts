@@ -19,7 +19,7 @@ export class DashboardController {
   }
 
   @Get('/corp/stat')
-  @ApiOperation({description: 'get corporate  account statistics: blogs, events, adverts, staff, polls and outlets'})
+  @ApiOperation({description: 'get corporate  account statistics: blogs, events, adverts, staff, polls, jobs and outlets'})
   async getCorporateStats(@Req() req: any) {
     const { user } = req;
     return await this.dashboardService.getCorporateStats(user);
