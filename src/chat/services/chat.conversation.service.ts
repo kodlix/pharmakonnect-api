@@ -27,7 +27,9 @@ export class ChatConverationService {
     const res = await this.conversationrepo.createQueryBuilder("q")
                     .where("q.id = :id", {id})
                     .orWhere("q.counterPartyId = :id", {id})
+                    .orWhere("q.channelId = :id", {id})
                     .leftJoinAndSelect("q.messages", "messages")
+                    .leftJoinAndSelect("q.participants", "participants")
                     .orderBy("q.updatedOn", "DESC")
                     .addOrderBy("messages.createdAt", "ASC")
                     .getOne();

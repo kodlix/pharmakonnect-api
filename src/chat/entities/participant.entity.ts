@@ -15,6 +15,12 @@ export class ParticipantEntity extends AbstractBaseEntity{
     @Column({default : "pharmaceutical"})
     sectorId : string
 
+    @Column({nullable: true})
+    accountName : string
+
+    @Column({nullable: true})
+    accountImage : string
+
    //@ManyToOne(()=> GroupChatEntity, groupchat => groupchat.id, { onDelete: 'CASCADE'})
     @Column({nullable : true})
     groupChatID : string

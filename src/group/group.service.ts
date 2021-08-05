@@ -13,6 +13,8 @@ import { getManager } from 'typeorm';
 import { GroupView } from './entities/group.view';
 import { GroupDto, MemberDto } from './dto/group-view.dto';
 import { plainToClass } from 'class-transformer';
+import { ConversationEntity } from 'src/chat/entities/conversation.entity';
+import { ParticipantEntity } from 'src/chat/entities/participant.entity';
 
 @Injectable()
 export class GroupService extends Repository<GroupEntity> {
@@ -26,11 +28,26 @@ export class GroupService extends Repository<GroupEntity> {
       throw new BadRequestException(`Group ${name} already exists.`);
     }
 
-    return await getRepository(GroupEntity).createQueryBuilder('g')
+    const result = await getRepository(GroupEntity).createQueryBuilder('g')
       .insert()
       .into(GroupEntity)
-      .values({ logo: dto.logo, name: dto.name, createdBy: user.createdBy, description: dto.description, ownerId: user.id })
+      .values({ logo: dto.logo, name: dto.name, createdBy: user.createdBy, description: dto.description, ownerName: user.firstName ? `${user.firstName} ${user.lastName}` : user.organizationName, ownerId: user.id })
       .execute();
+
+      // save group creator as the first group member
+      if(result.raw[0].id) {
+        const groupMember = { groupId: result.raw[0].id, contactId: user.id, ownerId: user.id, createdBy: user.email };
+
+        await getRepository(GroupMemberEntity).createQueryBuilder('g')
+          .insert()
+          .into(GroupMemberEntity)
+          .values(groupMember)
+          .execute();  
+      }
+
+      return result;
+
+
   }
 
   async createGroupContact(dto: CreateGroupContactDto, user: any): Promise<any> {
@@ -56,12 +73,42 @@ export class GroupService extends Repository<GroupEntity> {
     }
 
 
-    return await getRepository(GroupMemberEntity).createQueryBuilder('g')
+    const result = await getRepository(GroupMemberEntity).createQueryBuilder('g')
       .insert()
       .into(GroupMemberEntity)
       .values(groupMembers)
       .execute();
-    return;
+
+      const groupHasConversation = await ConversationEntity.findOne({where: {channelId: dto.groupId}});
+
+      const groupParticipantsFromUi = [];
+
+
+      if(groupHasConversation) {
+        
+        for (const m of groupMembers){
+          const userInfo = await AccountEntity.findOne(m.contactId);
+
+          let obj = {
+            conversationId: groupHasConversation.id,
+            groupChatID: dto.groupId,
+            accountId: m.contactId,
+            accountName: userInfo.firstName ? `${userInfo.firstName} ${userInfo.lastName}` : userInfo.organizationName,
+            createdAt:  new Date(),
+            createdBy: m.createdBy,
+            accountImage: userInfo.profileImage ? userInfo.profileImage : userInfo.premisesImage,
+          }
+
+          groupParticipantsFromUi.push(obj);
+          obj = {} as any;
+      }
+
+      await ParticipantEntity.save(groupParticipantsFromUi);
+
+      }
+
+      return result;
+    
   }
 
   async editGroup(id: string, dto: UpdateGroupDto, user: AccountEntity): Promise<boolean> {
@@ -134,7 +181,9 @@ export class GroupService extends Repository<GroupEntity> {
       logo: group.logo,
       groupId: group.id,
       createdAt: group.createdAt,
-      members: groups
+      members: groups,
+      ownerId: group.ownerId,
+      ownerName: group.ownerName
     };
   }
 

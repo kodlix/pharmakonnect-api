@@ -18,9 +18,14 @@ export class ChatController {
   @Post('conversation')
   async create(@Body() createChatDto: CreateConversationDto, @Req() req: any) {
     const { user } = req;
-    const result =  await this.chatService.create(createChatDto, user); 
-    this.chatgatway.sendToUser(result, req.user);
-    return result;
+    const result =  await this.chatService.create(createChatDto, user);
+    if(result.isGroupChat) {
+      this.chatgatway.sendToGroupChatUser(result, req.user);
+      return result;
+    }  else {
+      this.chatgatway.sendToUser(result, req.user);
+      return result;
+    }
   }
 
   @Post('gateway')

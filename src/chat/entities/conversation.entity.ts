@@ -27,19 +27,22 @@ export class ConversationEntity extends AbstractBaseEntity {
     @Column({nullable: true})
     channelName : string
 
+    @Column({ nullable: true })
+    channelLogo: string
+
     @Column({nullable: true})
     message : string
 
     @Column()
     initiatorId : string;
 
-    @Column()
+    @Column({nullable: true})
     counterPartyId : string;
 
     @Column()
     initiatorName : string;
 
-    @Column()
+    @Column({nullable: true})
     counterPartyName : string;
 
     @Column({nullable: true})
@@ -54,6 +57,11 @@ export class ConversationEntity extends AbstractBaseEntity {
 
     @OneToMany(() => MessageEntity, t => t.conversation, {eager: true, cascade: true})
     messages : MessageEntity[]
+
+    
+    @Column("simple-array", {nullable: true})
+    groupMembersId : string[]
+
 
 
 }

@@ -7,6 +7,9 @@ export class GroupEntity extends AbstractBaseEntity {
     @Column()
     ownerId: string
 
+    @Column({nullable: true})
+    ownerName: string
+
     @Column()
     name: string
 
