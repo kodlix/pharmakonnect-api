@@ -294,8 +294,8 @@ export class DashboardService {
     const repo = await getRepository(JobVacancyEntity
       ).createQueryBuilder('job');
     if (userId) {
-      total = await repo.where(`job
-      .accountId =:userId AND job.disabled = false AND job.approved = true`, { userId })
+      total = await repo.where(`job.accountId =:userId AND job.disabled = false 
+      AND job.approved = true`, { userId })
         .getCount();
         return total;
     }
