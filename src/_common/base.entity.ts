@@ -21,5 +21,8 @@ export abstract class AbstractBaseEntity extends BaseEntity {
     isDeleted: boolean = false;
 
     @Column({ type: 'bool', default: false })
+    disabled: boolean = false;
+
+    @Column({ type: 'bool', default: false })
     isSystemDefined: boolean = false;
 }

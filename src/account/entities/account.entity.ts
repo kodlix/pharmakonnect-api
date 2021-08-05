@@ -149,10 +149,10 @@ export class AccountEntity extends AbstractBaseEntity {
   @Column({ type: 'int', default: 0 })
   public yearofEstablishment: number;
 
-  @Column('time', { default: (): string => 'LOCALTIMESTAMP' })
+  @Column('time', { default: (): string => 'LOCALTIMESTAMP',nullable:true })
   public openingTime: Date;
 
-  @Column('time', { default: (): string => 'LOCALTIMESTAMP' })
+  @Column('time', { default: (): string => 'LOCALTIMESTAMP', nullable:true })
   public closingTime: Date;
 
   @IsFQDN()

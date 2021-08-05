@@ -38,6 +38,7 @@ import { NotificationtypeModule } from './notifications/notificationtype/notific
 import { GroupModule } from './group/group.module';
 import { ChatGateway } from './gateway/chat.gateway';
 import { NotificationGateway } from './gateway/notification.gateway';
+import { DashboardModule } from './dashboard/dashboard.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -75,6 +76,7 @@ import { NotificationGateway } from './gateway/notification.gateway';
     AdvertCategoryModule,
     NotificationModule,
     NotificationtypeModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService, ChatGateway, NotificationGateway],
