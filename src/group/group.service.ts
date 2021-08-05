@@ -120,9 +120,17 @@ export class GroupService extends Repository<GroupEntity> {
       throw new BadRequestException(`Group '${exists.name}' already exists.`);
     }
 
+    let payload = { };
+    if(dto.logo){
+      payload = { name: dto.name, description: dto.description, logo: dto.logo }
+    }
+    else{
+      payload = { name: dto.name, description: dto.description }
+    }
+
     await getRepository(GroupEntity).createQueryBuilder()
       .update(GroupEntity)
-      .set({ name: dto.name, description: dto.description, logo: dto.logo })
+      .set(payload)
       .where("id = :id", { id })
       .execute();
 

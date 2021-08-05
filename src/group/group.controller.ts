@@ -93,7 +93,7 @@ export class GroupController {
   )
   async update(@Body() dto: UpdateGroupDto, @Param('id') id: string, @UploadedFile() logo: any, @Req() req: any): Promise<boolean> {
     const user = req.user;
-    if (logo && dto.logo) {
+    if (logo) {
       const imageUrl = await uploadFile(logo.path);
       dto.logo = imageUrl;
     }
