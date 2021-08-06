@@ -49,7 +49,7 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
             //         endTime: event.endTime,
             //         venue: event.venue,
             //         organizerName: event.organizerName,
-            //         organizerPhoneNo: event.organizerPhoneNumber,
+            //         organizerphoneNumber: event.organizerPhoneNumber,
             //         accessCode: event.requireUniqueAccessCode ? payload.accessCode : 'NIL',
             //         url: event.online ? event.url : 'NIL'
             //     }

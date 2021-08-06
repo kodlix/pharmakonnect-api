@@ -9,12 +9,12 @@ export class CreateGroupDto {
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    readonly name: string
+    name: string
 
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    readonly description: string;
+    description: string;
 
     @ApiProperty()
     @ApiPropertyOptional()

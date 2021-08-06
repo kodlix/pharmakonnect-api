@@ -17,7 +17,7 @@ export class ContactEntity extends AbstractBaseEntity {
     lastName: string
 
     @Column()
-    phoneNo: string
+    phoneNumber: string
 
     @Column()
     email: string

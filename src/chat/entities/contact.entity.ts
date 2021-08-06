@@ -20,7 +20,7 @@ export class Contact extends AbstractBaseEntity{
     lastName : string
 
     @Column()
-    phoneNo : string
+    phoneNumber : string
 
     @Column()
     email : string

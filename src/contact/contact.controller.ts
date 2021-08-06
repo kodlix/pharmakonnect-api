@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Req, UseGuards, Query } from '@nestjs/common';
 import { ContactService } from './contact.service';
 import { CreateContactDto } from './dto/create-contact.dto';
-import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { ContactAdvanceFilter } from 'src/_common/filter.dto';
 
 @Controller('contact')
 @ApiBearerAuth()
@@ -23,6 +24,12 @@ export class ContactController {
   async findAll(@Query('page') page: number, @Query('take') take: number, @Query('from') from: string, @Req() req: any) {
     const { user } = req;
     return await this.contactService.findAll(page, take, user, from);
+  }
+
+  @Get('filter')
+  @ApiOperation({description: 'get contacts for advance filter'})
+  async filterContact(@Query() filter: ContactAdvanceFilter) {
+    return await this.contactService.filter(filter);
   }
 
   @Get(':id')

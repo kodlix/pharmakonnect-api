@@ -9,7 +9,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { editFileName, imageFileFilter } from 'src/_utility/fileupload.util';
 import { diskStorage } from 'multer';
 import { UseInterceptors } from '@nestjs/common';
-import { CreateGroupContactDto } from './dto/create-group-contact.dto';
+import { CreateGroupContactDto, CreateNewGroupAndContactDto } from './dto/create-group-contact.dto';
 import { uploadFile } from 'src/_utility/upload.util';
 import { group } from 'console';
 
@@ -46,7 +46,7 @@ export class GroupController {
       fileFilter: imageFileFilter,
     }),
   )
-  async create(@Body() dto: CreateGroupDto, @UploadedFile() logo: any, @Req() req: any,): Promise<any[]> {
+  async create(@Body() dto: CreateGroupDto, @UploadedFile() logo: any, @Req() req: any,): Promise<any> {
     const user = req.user;
     if (logo) {
       const imageUrl = await uploadFile(logo.path);
@@ -58,11 +58,18 @@ export class GroupController {
 
   @Post('members')
   @ApiBody({type: CreateGroupContactDto})
-  @ApiOperation({ summary: 'Add contact to group' })
+  @ApiOperation({ summary: 'Add contact to' })
   async createMember(@Body() createGroupMemberDto: CreateGroupContactDto, @Req() req: any ): Promise<any>{
     const result = await this.groupService.createGroupContact(createGroupMemberDto, req.user);
     return result;
+  }
 
+  @Post('new/members')
+  @ApiBody({type: CreateNewGroupAndContactDto})
+  @ApiOperation({ summary: 'group Create new group with contacts' })
+  async createNewGroupAndMember(@Body() dto: CreateNewGroupAndContactDto, @Req() req: any ): Promise<any>{
+    const result = await this.groupService.createGroupWithContact(dto, req.user);
+    return result;
   }
   
   @Put(':id')
