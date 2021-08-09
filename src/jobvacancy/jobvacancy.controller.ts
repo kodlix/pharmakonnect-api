@@ -64,6 +64,16 @@ export class JobVacancyController {
         return await this.jobvacancyService.findJob(search, page);
   }
 
+  @Get('/job')
+  @ApiOperation({ summary: 'Get all JobVacancy' })
+  @ApiResponse({ status: 201, description: 'Success.' })
+  @ApiResponse({ status: 404, description: 'Not Found.' })
+  @ApiQuery({ name: 'page', required: false})
+  @ApiQuery({ name: 'search', required: false})
+  async findAllJob(@Req() req: any, @Query('search') search: string, @Query('page') page: number): Promise<JobVacancyRO[]> {
+      return await this.jobvacancyService.findAllJob(search, page);
+}
+
   @Get(':id')
   @ApiResponse({ status: 201, description: 'Success.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
