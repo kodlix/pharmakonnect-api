@@ -21,15 +21,16 @@ export class ContactController {
   }
 
   @Get()
-  async findAll(@Query('page') page: number, @Query('take') take: number, @Query('from') from: string, @Req() req: any) {
+  async findAll(@Query('page') page: number, @Query('take') take: number, 
+  @Query('from') from: string, @Req() req: any) {
     const { user } = req;
     return await this.contactService.findAll(page, take, user, from);
   }
 
   @Get('filter')
   @ApiOperation({description: 'get contacts for advance filter'})
-  async filterContact(@Query() filter: ContactAdvanceFilter) {
-    return await this.contactService.filter(filter);
+  async filterContact(@Query() filter: ContactAdvanceFilter,  @Req() req: any) {
+    return await this.contactService.filter(filter, req.user);
   }
 
   @Get(':id')

@@ -12,7 +12,7 @@ import { ContactEntity } from './entities/contact.entity';
 
 @Injectable()
 export class ContactService {
- 
+
   constructor(
     @InjectRepository(ContactEntity)
     private readonly repository: Repository<ContactEntity>,
@@ -27,7 +27,8 @@ export class ContactService {
       let contactExist = [];
       for (let value of dto) {
         let isExist = await getRepository(ContactEntity).findOne({
-           where: { creatorId: user.id, accountId: value.accountId } })
+          where: { creatorId: user.id, accountId: value.accountId }
+        })
 
         if (isExist) {
           contactExist.push('User already exist in your contact.')
@@ -216,7 +217,7 @@ export class ContactService {
 
   }
 
-  async filter(dto: ContactAdvanceFilter) {
+  async filter(dto: ContactAdvanceFilter, user: AccountEntity) {
     const entityManager = getManager();
     let whereConditions: any[] = [];
     if (dto.email) {
@@ -259,10 +260,20 @@ export class ContactService {
       const conditions = [...whereConditions]
       let groups = await entityManager.find(GroupMemeberView, {
         where: conditions,
-        order: {firstName: 'ASC'}        
+        order: { firstName: 'ASC' }
       });
 
       groups = this.removeDuplicates(groups, "email");
+      if (groups.length > 0) {
+        const contacts = await getRepository(ContactEntity).createQueryBuilder('c')
+          .where(`c.creatorId = :userId`, { userId: user.id })
+          .getMany();
+
+        const contactIds = contacts.map(x => x.accountId);
+        if (contactIds.length > 0) {
+          groups = groups.filter(x => !contactIds.includes(x.id));
+        }
+      }
       return groups;
     }
 
@@ -271,8 +282,8 @@ export class ContactService {
 
   private removeDuplicates = (userArray, key) => {
     return userArray.reduce((arr, item) => {
-        const removed = arr.filter(i => i[key] !== item[key]);
-        return [...removed, item];
+      const removed = arr.filter(i => i[key] !== item[key]);
+      return [...removed, item];
     }, []);
-};
+  };
 }
