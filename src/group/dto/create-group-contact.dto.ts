@@ -13,7 +13,6 @@ export class CreateGroupContactDto {
     @ApiProperty()
     members: string[]
 
-    @IsNotEmpty()
     @IsBoolean()
     @ApiProperty({ default: false })
     addMembersToContact: boolean;
