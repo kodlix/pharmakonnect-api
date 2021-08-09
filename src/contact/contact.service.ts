@@ -3,7 +3,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
 import { AccountEntity } from 'src/account/entities/account.entity';
-import { CreateGroupContactDto } from 'src/group/dto/create-group-contact.dto';
 import { GroupMemeberView } from 'src/group/entities/group-member.view';
 import { GroupService } from 'src/group/group.service';
 import { ContactAdvanceFilter } from 'src/_common/filter.dto';
@@ -258,12 +257,22 @@ export class ContactService {
 
     if (whereConditions.length > 0) {
       const conditions = [...whereConditions]
-      const groups = await entityManager.find(GroupMemeberView, {
-        where: conditions
+      let groups = await entityManager.find(GroupMemeberView, {
+        where: conditions,
+        order: {firstName: 'ASC'}        
       });
+
+      groups = this.removeDuplicates(groups, "email");
       return groups;
     }
 
     return [];
   }
+
+  private removeDuplicates = (userArray, key) => {
+    return userArray.reduce((arr, item) => {
+        const removed = arr.filter(i => i[key] !== item[key]);
+        return [...removed, item];
+    }, []);
+};
 }
