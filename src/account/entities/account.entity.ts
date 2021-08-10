@@ -120,12 +120,18 @@ export class AccountEntity extends AbstractBaseEntity {
   @Column({ nullable: true })
   organizationId: string;
 
- 
   @Column({ nullable: true, default: staffStatus.PENDING })
   staffStatus: string;
 
   @Column({ nullable: true })
   message: string;
+
+  @Column({ nullable: true })
+  yearOfGraduation: string;
+
+  @Column({ nullable: true })
+  school: string;
+
 
   // co-operation
   @Length(256)

@@ -28,6 +28,8 @@ export interface IndividualRO {
     phoneNumber: string;
     pcn: string;
     profileImage: string;
+    yearOfGraduation: string;
+    school:string;
 }
 
 export interface CorperateRO {
