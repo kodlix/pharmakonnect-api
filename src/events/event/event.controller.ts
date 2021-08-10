@@ -15,7 +15,6 @@ import { uploadFile } from 'src/_utility/upload.util';
 
 @Controller('event')
 @ApiBearerAuth()
-@UseGuards(AuthGuard())
 @ApiTags('event')
 export class EventController {
   constructor(private readonly eventService: EventService) { }
@@ -33,6 +32,7 @@ export class EventController {
   @ApiOperation({ summary: 'Save Event' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 201, description: 'The record has been successfully created' })
+  @UseGuards(AuthGuard())
   async create(@Body() createEventDto: CreateEventDto, @Req() req: any, @UploadedFile() eventImage: any): Promise<string> {
 
     let imageUrl = "";
@@ -55,6 +55,7 @@ export class EventController {
   @Get('allevents')
   @ApiOperation({ summary: 'Get all events' })
   @ApiResponse({ status: 200, description: 'Return all events' })
+  @UseGuards(AuthGuard())
   async Get(@Query() filterDto: FilterDto): Promise<EventRO[]> {
     return await this.eventService.GetAllEvents(filterDto);
   }
@@ -62,6 +63,7 @@ export class EventController {
   @Get('myevent')
   @ApiOperation({ summary: 'Get all my events' })
   @ApiResponse({ status: 200, description: 'Return all my events' })
+  @UseGuards(AuthGuard())
   async findMyEvents(@Query() filterDto: FilterDto, @Req() req: any): Promise<EventRO[]> {
     return await this.eventService.findMyEvents(filterDto, req.user);
   }
@@ -69,6 +71,7 @@ export class EventController {
   @Get(':id')
   @ApiOperation({ summary: 'Get event' })
   @ApiResponse({ status: 200, description: 'Return event' })
+  @UseGuards(AuthGuard())
   async findOne(@Param('id') id: string): Promise<EventRO> {
     return await this.eventService.findOne(id);
   }
@@ -85,6 +88,7 @@ export class EventController {
   @Put(':id')
   @ApiOperation({ summary: 'Update event' })
   @ApiResponse({ status: 200, description: 'Return event successfully updated' })
+  @UseGuards(AuthGuard())
   async update(@Param('id') id: string, @Body() request: UpdateEventDto, @Req() req: any,  @UploadedFile() eventImage: any): Promise<string> {
     let imageUrl = "";
     if (eventImage) {
@@ -98,6 +102,7 @@ export class EventController {
   @Put('publish/:id')
   @ApiOperation({ summary: 'Publish event' })
   @ApiResponse({ status: 200, description: 'Return event successfully published' })
+  @UseGuards(AuthGuard())
   async publishEvent(@Param('id') id: string, @Req() req: any): Promise<string> {
     if (req.user.accountType != 'Admin') {
       throw new HttpException('Only an admin user can publish event.', HttpStatus.BAD_REQUEST)
@@ -108,6 +113,7 @@ export class EventController {
   @Put('reject/:id')
   @ApiOperation({ summary: 'Reject event' })
   @ApiResponse({ status: 200, description: 'Return event successfully rejected' })
+  @UseGuards(AuthGuard())
   async rejectEvent(@Param('id') id: string, @Body() payload: { rejectionMessage }, @Req() req: any): Promise<string> {
     if (req.user.accountType != 'Admin') {
       throw new HttpException('Only an admin user can reject event.', HttpStatus.BAD_REQUEST)
@@ -120,6 +126,7 @@ export class EventController {
   @ApiOperation({ summary: 'Register for an Event' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 201, description: 'Registration successful' })
+  @UseGuards(AuthGuard())
   async EventRegistration(@Body() eventRegistrationDtoDto: EventRegistrationDto, @Req() req: any): Promise<string> {
     return await this.eventService.addEventRegistration(eventRegistrationDtoDto, req.user);
   }
@@ -128,6 +135,7 @@ export class EventController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete event' })
   @ApiResponse({ status: 200, description: 'Event successfully deleted' })
+  @UseGuards(AuthGuard())
   async remove(@Param('id') id: string) {
     return await this.eventService.remove(id);
   }
