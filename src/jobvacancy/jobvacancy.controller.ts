@@ -32,7 +32,6 @@ import { FilterDto } from 'src/_common/filter.dto';
 
 @Controller('jobvacancy')
 @ApiBearerAuth()
-@UseGuards(AuthGuard())
 @ApiTags('jobvacancy')
 export class JobVacancyController {
   constructor(private readonly jobvacancyService: JobVacancyService) { }
@@ -41,6 +40,7 @@ export class JobVacancyController {
   @ApiOperation({ summary: 'Create jobvacancy' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 201, description: 'Jobvacancy successfully created' })
+  @UseGuards(AuthGuard())
   create(@Body() createJobVacancyDto: CreateJobVacancyDto, @Req() req: any) {
     return this.jobvacancyService.create(createJobVacancyDto, req.user);
   }
@@ -68,6 +68,7 @@ export class JobVacancyController {
   @ApiResponse({ status: 201, description: 'Success.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Get jobvacancy by Id' })
+  @UseGuards(AuthGuard())
   async findOne(@Param('id') id: string): Promise<JobVacancyRO> {
     return await this.jobvacancyService.findOne(id);
   }
@@ -76,6 +77,7 @@ export class JobVacancyController {
   @ApiResponse({ status: 201, description: 'Success.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Get jobvacancy by AccountId' })
+  @UseGuards(AuthGuard())
   async findByAccountId(@Query('page') page: number, @Req() req
   ): Promise<JobVacancyRO[]> {
     const { user } = req;
@@ -87,6 +89,7 @@ export class JobVacancyController {
   @ApiResponse({ status: 201, description: 'Update Successfull.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Update jobvacancy' })
+  @UseGuards(AuthGuard())
   async update(
     @Param('id') id: string,
     @Body() updateJobVacancyDto: UpdateJobVacancyDto,
@@ -99,6 +102,7 @@ export class JobVacancyController {
   @ApiResponse({ status: 201, description: 'Delete Successfull.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Delete jobvacancy' })
+  @UseGuards(AuthGuard())
   async remove(@Param('id') id: string): Promise<any> {
     if (id === null) {
       throw new HttpException(
@@ -112,6 +116,7 @@ export class JobVacancyController {
   @ApiResponse({ status: 201, description: 'Approved.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Approve jobvacancy' })
+  @UseGuards(AuthGuard())
   async approve(
     @Param('id') id: string,
     @Body() approveJobVacancyDto: ApproveJobVacancyDto,
@@ -123,6 +128,7 @@ export class JobVacancyController {
   @ApiResponse({ status: 201, description: 'Rejected.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Reject jobvacancy' })
+  @UseGuards(AuthGuard())
   async reject(
     @Param('id') id: string,
     @Body() rejectJobVacancyDto: RejectJobVacancyDto,
