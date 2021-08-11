@@ -302,6 +302,8 @@ export class AccountRepository extends Repository<AccountEntity> {
       firstName: user.firstName,
       longitude: user.longitude,
       phoneNumber: user.phoneNumber,
+      yearOfGraduation:user.yearOfGraduation,
+      school: user.school,
       profileImage: user.profileImage,
       accountPackage: user.accountPackage,
       organizationName: user.organizationName,
