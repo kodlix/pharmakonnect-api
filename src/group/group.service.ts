@@ -157,6 +157,7 @@ export class GroupService extends Repository<GroupEntity> {
           groupChatID: dto.groupId,
           accountId: m.contactId,
           accountName: userInfo.firstName ? `${userInfo.firstName} ${userInfo.lastName}` : userInfo.organizationName,
+          accountType: userInfo.accountType,
           createdAt: new Date(),
           createdBy: m.createdBy,
           accountImage: userInfo.profileImage ? userInfo.profileImage : userInfo.premisesImage,
@@ -294,11 +295,26 @@ export class GroupService extends Repository<GroupEntity> {
 
   }
 
-  async removeGoupMemberId(id: string, groupId: string, user: any): Promise<boolean> {
+  async removeGoupMemberId(id: string, groupId: string, user: any, from: string): Promise<boolean> {
     await getConnection().createQueryBuilder().delete().from(GroupMemberEntity)
       .where("contactId =:id AND ownerId =:ownerId AND groupId =:groupId",
-        { id, groupId, ownerId: user.id }).execute()
+        { id, groupId, ownerId: user.id }).execute();
 
+    if(from === 'chat') {
+
+      await getConnection().createQueryBuilder()
+      .delete()
+      .from(GroupMemberEntity)
+      .where("contactId =:id AND groupId =:groupId",
+      { id, groupId}).execute();
+
+      await getConnection().createQueryBuilder()
+      .delete()
+      .from(ParticipantEntity)
+      .where("accountId =:id AND groupChatID =:groupId",
+      { id, groupId}).execute();
+    }
+ 
     return true;
   }
 }

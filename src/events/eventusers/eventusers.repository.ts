@@ -25,6 +25,7 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
         
         const newEventUsers = plainToClass(EventUsersEntity, payload);
         newEventUsers.createdBy = user.createdBy;
+        newEventUsers.accountId = user.id;
                 
         const errors = await validate(newEventUsers);
         if(errors.length > 0) {

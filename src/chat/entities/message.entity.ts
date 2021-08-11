@@ -54,8 +54,8 @@ export class MessageEntity extends AbstractBaseEntity{
     @CreateDateColumn({ name: 'postedOn', default: new Date() })
     postedOn: Date
 
-    @Column("simple-array", {nullable: true})
-    groupMembersId : string[]
+    // @Column("simple-array", {nullable: true})
+    // groupMembersId : string[]
 
 
 }

@@ -69,6 +69,10 @@ export class CreateConversationDto {
     @ApiProperty()
     groupMembers? : any;
 
+    @ApiPropertyOptional()
+    @ApiProperty()
+    groupCreationDate: Date
+
 }
 
 export class CreateMessageDto{

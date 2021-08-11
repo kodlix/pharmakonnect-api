@@ -13,7 +13,7 @@ import { ViewEntity, ViewColumn } from "typeorm";
      "account"."city" as "city", "groupMember"."ownerId" as "ownerId" FROM "Account" "account"
     LEFT JOIN "GroupMember" "groupMember" ON "account"."id" = "groupMember"."contactId"
     LEFT JOIN "Group" "group" ON "group"."id" = "groupMember"."groupId"
-    WHERE "account"."accountType" = 'individual' AND "groupMember"."ownerId" IS NOT NULL
+    WHERE ("account"."accountType" = 'individual' OR "account"."accountType" = 'corporate' )  AND "groupMember"."ownerId" IS NOT NULL
      `
 })
 

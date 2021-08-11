@@ -140,7 +140,8 @@ export class ContactService {
       members: group.members,
       isGroupChat: true,
       ownerId: group.ownerId,
-      ownerName: group.ownerName
+      ownerName: group.ownerName,
+      groupCreationDate: group.createdAt
     }
 
     return data;

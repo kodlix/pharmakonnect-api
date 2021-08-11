@@ -11,6 +11,7 @@ import { PollEntity } from 'src/poll/entities/poll.entity';
 import { ContactEntity } from 'src/contact/entities/contact.entity';
 import { GroupEntity } from 'src/group/entities/group.entity';
 import { plainToClass } from 'class-transformer';
+import { EventUsersEntity } from 'src/events/eventusers/entities/eventusers.entity';
 
 @Injectable()
 export class DashboardService {
@@ -134,12 +135,31 @@ export class DashboardService {
 
   // get upcomming events a  user registered for
   async getFutureEventsByUser(user: AccountEntity): Promise<EventEntity[]> {
-    const events = await getRepository(EventEntity).createQueryBuilder('e')
-    .where(`e.published = true AND e.disabled = false AND e.endDate >= NOW()`)
-    .orderBy('e.createdBy', 'ASC')
-    .take(10)
-    .getMany()
-  return plainToClass(EventEntity, events); 
+
+
+    const eventsRegFor = await EventUsersEntity.find({where: {accountId: user.id}});
+    const eveIds = [];
+
+    if(eventsRegFor.length > 0) {
+      for (const e of eventsRegFor) {
+        eveIds.push(e.eventId);
+      }
+
+      const events = await getRepository(EventEntity).createQueryBuilder('e')
+      .where("e.published = true")
+      .andWhere("e.id IN (:...eveIds)", {eveIds})
+      .andWhere("e.startDate >= Now()")
+       .andWhere("e.endDate >= Now()")
+      .orderBy('e.createdBy', 'ASC')
+      .take(10)
+      .getMany()
+
+      return plainToClass(EventEntity, events); 
+
+    }
+
+    return [];
+   
   }
 
   // get latest blogs

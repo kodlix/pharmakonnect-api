@@ -58,9 +58,11 @@ export class ConversationEntity extends AbstractBaseEntity {
     @OneToMany(() => MessageEntity, t => t.conversation, {eager: true, cascade: true})
     messages : MessageEntity[]
 
+    @Column({ name: 'groupCreationDate', default: new Date()})
+    groupCreationDate: Date
     
-    @Column("simple-array", {nullable: true})
-    groupMembersId : string[]
+    // @Column("simple-array", {nullable: true})
+    // groupMembersId : string[]
 
 
 

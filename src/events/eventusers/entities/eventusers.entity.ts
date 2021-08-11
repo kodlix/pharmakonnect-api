@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { IsEmail } from "class-validator";
 import { EventEntity } from "src/events/event/entities/event.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
@@ -28,6 +27,9 @@ export class EventUsersEntity extends AbstractBaseEntity {
 
     @Column('uuid')
     eventId: string;
+
+    @Column('uuid')
+    accountId: string;
 
 
 }

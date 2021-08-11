@@ -31,6 +31,22 @@ export class ConversationRepository extends Repository<ConversationEntity>{
         .orderBy("c.updatedOn", "DESC")
         .addOrderBy("messages.createdAt", "DESC")
         .getMany();
+
+        // for (const s  of getConversationList){
+        //     const iniinfo = await AccountEntity.findOne(s.initiatorId);
+        //     const cinfo = await AccountEntity.findOne(s.counterPartyId);
+
+        //     if(iniinfo){
+        //         s.initiatorName = iniinfo.firstName && iniinfo.lastName ? `${iniinfo.firstName} ${iniinfo.lastName}` : iniinfo.organizationName;
+        //         s.initiatorImage = iniinfo.profileImage ? iniinfo.profileImage : iniinfo.premisesImage;
+        //     }
+
+        //     if(cinfo){
+        //         s.counterPartyName = cinfo.firstName && cinfo.lastName ? `${cinfo.firstName} ${cinfo.lastName}` : cinfo.organizationName;
+        //         s.counterPartyImage = cinfo.profileImage ? cinfo.profileImage : cinfo.premisesImage;
+        //     }
+
+        // }
         
         return getConversationList;
     }
@@ -81,9 +97,10 @@ export class ConversationRepository extends Repository<ConversationEntity>{
                 convers.counterPartyId = dto.counterPartyId;
                 convers.initiatorName =  user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.organizationName;
                 convers.counterPartyName = dto.counterPartyName;
-                convers.initiatorImage = dto.initiatorImage;
+                convers.initiatorImage = dto.initiatorImage || user.profileImage || user.premisesImage;
                 convers.counterPartyImage = dto.counterPartyImage;
                 convers.createdAt = new Date();
+                convers.groupCreationDate = dto.groupCreationDate;
 
                 let result = await ConversationEntity.save(convers);
                 //Call create MESSAGE end point
@@ -95,7 +112,7 @@ export class ConversationRepository extends Repository<ConversationEntity>{
                 msg.message = dto.message;
                 msg.postedOn = new Date();
                 msg.createdAt = new Date();
-                msg.createdBy = `${user.firstName} ${user.lastName}`;
+                msg.createdBy = user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.organizationName;
                 msg.senderId = user.id;
                 msg.recieverId = dto.counterPartyId;
 
@@ -119,9 +136,7 @@ export class ConversationRepository extends Repository<ConversationEntity>{
                 conversadmin.channelLogo = dto.channelLogo;
                 conversadmin.initiatorId = user.id;
                 conversadmin.initiatorName =  user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.organizationName;
-                conversadmin.groupMembersId = dto.groupMembers.map(x => x.id);
-                
-
+        
 
                 let resp = await ConversationEntity.save(conversadmin);
 
@@ -134,6 +149,7 @@ export class ConversationRepository extends Repository<ConversationEntity>{
                         accountId: m.id,
                         accountName: m.firstName ? `${m.firstName} ${m.lastName}` : m.organizationName,
                         accountImage: m.profileImage ? m.profileImage : m.premisesImage,
+                        accountType: m.accountType,
                         createdAt:  new Date(),
                         createdBy: dto.creatorName
                     }
@@ -149,11 +165,10 @@ export class ConversationRepository extends Repository<ConversationEntity>{
                 msg.message = dto.message;
                 msg.postedOn = new Date();
                 msg.createdAt = new Date();
-                msg.createdBy = `${user.firstName} ${user.lastName}`;
+                msg.createdBy = user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.organizationName;
                 msg.senderId = user.id;
                 msg.groupChatID = dto.channelId;
-                msg.groupMembersId = dto.groupMembers.map(x => x.id);
-    
+                
                 await this.msgRepo.save(msg);
 
               resp = await ConversationEntity.findOne(resp.id, {relations: ['messages', 'participants']});
@@ -167,44 +182,12 @@ export class ConversationRepository extends Repository<ConversationEntity>{
 
             if (dto.isGroupChat) {
 
-                const groupParticipantsFromUi = [];
-
                 exist.updatedOn = new Date();
-                let latestGroupMembers = await GroupMemberEntity.find({where: {groupId: dto.channelId}});
-                const groupParticipants = dto.groupMembers;
-
-
-                if(latestGroupMembers.length > groupParticipants.length) {
-                    exist.groupMembersId = latestGroupMembers.map(x => x.contactId);
-                }
+                
 
                 let resp = await ConversationEntity.save(exist);
 
                 resp = await ConversationEntity.findOne(resp.id, {relations: ['messages', 'participants']});
-
-                if(latestGroupMembers.length > groupParticipants.length) {
-                    latestGroupMembers = latestGroupMembers.filter(x => !groupParticipants.includes(x));
-        
-                        for (const m of latestGroupMembers) {
-                            const userInfo = await AccountEntity.findOne(m.contactId);
-                            let obj = {
-                                conversationId: resp.id,
-                                groupChatID: dto.channelId,
-                                accountId: m.contactId,
-                                accountName: userInfo.firstName ? `${userInfo.firstName} ${userInfo.lastName}` : userInfo.organizationName,
-                                createdAt:  new Date(),
-                                createdBy: dto.creatorName,
-                                accountImage: userInfo.profileImage ? userInfo.profileImage : userInfo.premisesImage,
-
-                            }
-
-                            groupParticipantsFromUi.push(obj);
-                            obj = {} as any;
-                        }
-
-                        await ParticipantEntity.save(groupParticipantsFromUi);
-
-                }
                 //Call create MESSAGE end point
 
                 const msg = new MessageEntity();
@@ -212,11 +195,10 @@ export class ConversationRepository extends Repository<ConversationEntity>{
                 msg.message = dto.message;
                 msg.postedOn = new Date();
                 msg.createdAt = new Date();
-                msg.createdBy = `${user.firstName} ${user.lastName}`;
+                msg.createdBy = user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.organizationName;
                 msg.senderId = user.id;
                 msg.groupChatID = dto.channelId;
-                msg.groupMembersId = latestGroupMembers.map(x => x.contactId);
-    
+                
                 await this.msgRepo.save(msg);
 
         
@@ -236,7 +218,7 @@ export class ConversationRepository extends Repository<ConversationEntity>{
                 msg.message = dto.message;
                 msg.postedOn = new Date();
                 msg.createdAt = new Date();
-                msg.createdBy = `${user.firstName} ${user.lastName}`;
+                msg.createdBy = user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.organizationName;
                 msg.senderId = user.id;
                 msg.recieverId = dto.counterPartyId;
 

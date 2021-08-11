@@ -140,10 +140,10 @@ export class GroupController {
     return await this.groupService.removebyId(groupId, user);
   }
 
-  @Delete('groupmember/:contactId/:groupId')
+  @Delete('groupmember/:contactId/:groupId/:from')
   @ApiOperation({ summary: 'Delete contact from group' })
-  async removeContact(@Param('contactId') contactId:string, @Param('groupId') groupId:string, @Req() req: any) {
+  async removeContact(@Param('contactId') contactId:string, @Param('groupId') groupId:string, @Param('from') from:string, @Req() req: any) {
     const { user } = req;
-   return await this.groupService.removeGoupMemberId(contactId, groupId, user)
+   return await this.groupService.removeGoupMemberId(contactId, groupId, user, from)
   }
 }
