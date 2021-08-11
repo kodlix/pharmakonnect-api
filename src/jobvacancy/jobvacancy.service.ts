@@ -44,6 +44,10 @@ export class JobVacancyService {
     return await this.jobvacancyRepository.findJob(search, page);
 }
 
+async findAllJob(search: string, page: number): Promise<JobVacancyRO[]> {
+  return await this.jobvacancyRepository.findAllJob(search, page);
+}
+
   async findOne(id: string): Promise<JobVacancyRO> {
     return await this.jobvacancyRepository.findById(id);
   }

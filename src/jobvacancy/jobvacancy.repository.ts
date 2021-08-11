@@ -273,22 +273,36 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
 
    return await this.find({where: {approved: true, rejected: false}, order: { approvedOn: 'DESC' }, take: 25, skip: page ? 25 * (page - 1) : 0});
 
-
-
-    // const query = this.createQueryBuilder('job');
-    // if (search) {
-    //  const searchData = query.andWhere('(job.nameOfCorporation LIKE :search OR job.jobTitle LIKE :search OR job.jobLocation LIKE :search OR job.contactType LIKE :search)',
-    //     { search: `%${search}%` }).orderBy('job.approvedOn', 'DESC').take(25).skip(25 * (page - 1));
-    //     searchData.where({ approved: true, rejected: false || null }).getMany();
-    //     const itemToReturn = await query.where({ approved: true, rejected: false || null }).getMany();
-    // return itemToReturn;
-    // } else {
-    //   query.orderBy('job.approvedOn', 'DESC');
-    //   const itemToReturn = await query.where({ approved: true, rejected: false || null }).getMany();
-    //   return itemToReturn;
-    // }
    
   }
+  async findAllJob(search: string, page: number): Promise<JobVacancyEntity[]> {
+
+
+    if(search) {
+
+      const jobList =  await this.createQueryBuilder("job")
+               .where(new Brackets(qb => {
+                   qb.where("job.nameOfCorporation ILike :nameOfCorporation", { nameOfCorporation: `%${search}%` })
+                   .orWhere("job.jobTitle ILike :jobTitle", { jobTitle: `%${search}%` })
+                   .orWhere("job.jobLocation ILike :jobLocation", { jobLocation: `%${search}%` })
+                   .orWhere("job.contactType ILike :contactType", { contactType: `%${search}%` })
+               }))
+               .orderBy("job.createdAt", "DESC")
+               .take(25)
+               .skip(25 * (page ? page - 1 : 0))
+               .getMany();
+
+       return jobList;
+   }
+
+   return await this.find({ 
+    order: { createdAt: 'DESC' }, 
+    take: 25, 
+    skip: page ? 25 * (page - 1) : 0});
+
+   
+  }
+
 }
 
 function validateUrl(value) {
