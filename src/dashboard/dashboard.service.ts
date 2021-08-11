@@ -149,7 +149,7 @@ export class DashboardService {
       .where("e.published = true")
       .andWhere("e.id IN (:...eveIds)", {eveIds})
       .andWhere("e.startDate >= Now()")
-       .andWhere("e.endDate >= Now()")
+      .andWhere("e.endDate >= Now()")
       .orderBy('e.createdBy', 'ASC')
       .take(10)
       .getMany()
