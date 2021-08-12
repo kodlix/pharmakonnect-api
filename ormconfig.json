@@ -7,5 +7,4 @@
   "database": "pharmakonnectdb",
   "entities": ["dist/**/*.entity.js", "dist/**/*.view.js"],
   "synchronize": true,
-  "logging": true
 }
