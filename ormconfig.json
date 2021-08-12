@@ -6,5 +6,5 @@
   "password": "!Pass4sure",
   "database": "pharmakonnectdb",
   "entities": ["dist/**/*.entity.js", "dist/**/*.view.js"],
-  "synchronize": true,
+  "synchronize": true
 }
