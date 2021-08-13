@@ -7,12 +7,12 @@ export enum pollTypes {
 
 
 export enum pollQuestionType {
+  MULTI_CHOICE = 'Multi-choice',
   YES_NO = 'Yes/No',
   TRUE_FALSE = 'True/False',
-  MULTI_CHOICE = 'Multi-choice',
-  MULTI_ANSWER = 'Multi-answer',
+  // MULTI_ANSWER = 'Multi-answer',
   // RATING_SCALES = 'Rating-Scales',
-  OPEN_ENDED = 'Open-ended',
+  //OPEN_ENDED = 'Open-ended',
   // DROP_DOWN = 'Drop-down'
 }
 
