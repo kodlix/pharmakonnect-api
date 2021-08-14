@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { AccountEntity } from 'src/account/entities/account.entity';
+import { CreatePollVoteDto } from './dto/create-poll-vote.dto';
 import { CreatePollDto } from './dto/create-poll.dto';
 import { UpdatePollDto } from './dto/update-poll.dto';
 import { pollQuestionType, pollTypes } from './poll.constant';
+import { PollVoteRepository } from './repositories/poll-vote.repository';
 import { PollRepository } from './repositories/poll.repository';
 
 @Injectable()
@@ -10,7 +12,10 @@ export class PollService {
   /**
    * poll servcie 
    */
-  constructor(private readonly pollRepository: PollRepository) {}
+  constructor(
+    private readonly pollRepository: PollRepository,
+    private readonly pollVoteRepository: PollVoteRepository
+    ) {}
   async create(createPollDto: CreatePollDto, user :AccountEntity) {
     return await  this.pollRepository.createEntity(createPollDto, user);
   }
@@ -38,8 +43,20 @@ export class PollService {
     return await  this.pollRepository.updateEntity(id, updatePollDto, user);
   }
 
+  async publish(id: string, user :AccountEntity) {
+    return await  this.pollRepository.publish(id, user);
+  }
+
+  async deactivate(id: string, user :AccountEntity) {
+    return await  this.pollRepository.deactivate(id, user);
+  }
+
   async remove(id: string) {
     return await  this.pollRepository.deleteEntity(id);
+  }
+
+  async vote(dto: CreatePollVoteDto, user :AccountEntity) {
+    return await  this.pollVoteRepository.vote(dto, user);
   }
 
   private convertEnumToArray (enumEntity) {

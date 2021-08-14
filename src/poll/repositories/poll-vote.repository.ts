@@ -2,9 +2,10 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { AccountEntity } from 'src/account/entities/account.entity';
-import { Repository, EntityRepository, DeleteResult, ILike } from 'typeorm';
+import { Repository, EntityRepository, DeleteResult, ILike, getRepository } from 'typeorm';
 import { CreatePollVoteDto } from '../dto/create-poll-vote.dto';
 import { PollVoteEntity } from '../entities/poll-vote.entity';
+import { PollEntity } from '../entities/poll.entity';
 import { PollRepository } from './poll.repository';
 
 
@@ -13,7 +14,7 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
   constructor(private readonly pollRepository: PollRepository) {
     super();
   }
-  async vote(dto: CreatePollVoteDto, user: AccountEntity): Promise<PollVoteEntity> {
+  async vote(dto: CreatePollVoteDto, user: AccountEntity): Promise<PollVoteEntity[]> {
 
     if (dto && !dto.pollId) {
       throw new HttpException(
@@ -23,14 +24,17 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
     }
 
 
-    if (dto && !dto.questionId) {
+    if (dto && dto.pollOptions.find(x => x.questionId === undefined)) {
       throw new HttpException(
         `Question does not exist`,
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    const existingPoll = await this.pollRepository.findById(dto.pollId);      
+    const existingPoll = await getRepository(PollEntity).createQueryBuilder('poll')
+    .where(`poll.id =:pollId`, {pollId: dto.pollId})
+    .getOne();
+
     if (!existingPoll) {
       throw new HttpException(
         `Poll does not exist`,
@@ -40,24 +44,28 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
 
     if (existingPoll.endDate < (new Date())) {
       throw new HttpException(
-        `Sorry, poll is no longer open for registration.`,
+        `Sorry, poll is no longer open for participation.`,
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    const existingVote = await this.findOne({
-      where: [
-        { pollId: dto.pollId, questionId: dto.questionId, email: dto.email },
-        { pollId: dto.pollId, questionId: dto.questionId, phonenumber: dto.phonenumber },
-      ],
-    });
+    const questionIds = dto.pollOptions.map(x => x.questionId);
 
-    if (existingVote) {
-      throw new HttpException(
-        `You have multiple vote not for this poll.`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    for (const questionId of questionIds) {
+      const existingVote = await this.findOne({
+        where: [
+          { pollId: dto.pollId, questionId: questionId, email: dto.email },
+          { pollId: dto.pollId, questionId: questionId, phonenumber: dto.phonenumber },
+        ],
+      });
+  
+      if (existingVote) {
+        throw new HttpException(
+          `You have already participated in this poll. Multiple submition not allowed`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }    
 
     const pollVote = plainToClass(PollVoteEntity, dto);
     pollVote.createdBy =  (dto.email || dto.phonenumber ) || user && user.email || 'administrator@netopconsult.com';
@@ -66,9 +74,21 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
     if(errors.length > 0) {
         throw new HttpException(errors, HttpStatus.BAD_REQUEST);
     }
+    
+    const newVotes: PollVoteEntity[] = [];
+    for (const option of dto.pollOptions) {
+      let newVote: PollVoteEntity = null;
+      newVote = pollVote;
+      newVote.optionId = option.optionId;
+      newVote.questionId = option.questionId;
+      newVote.content = option.content;
+      newVote.questionType = option.questionType;      
+
+      newVotes.push(newVote);
+    }
 
     try {        
-        return await this.save(pollVote);
+        return await this.save(newVotes);
     } catch(error)  {
         throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }

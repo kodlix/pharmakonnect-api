@@ -55,6 +55,8 @@ export class PollEntity extends AbstractBaseEntity
 
     @Column({type: 'bool', default: true})
     active: boolean;
+
+    owner: string;
     
     @ManyToOne(() => AccountEntity, acc => acc.polls)
     account: AccountEntity;
@@ -64,6 +66,5 @@ export class PollEntity extends AbstractBaseEntity
 
     @OneToMany(() => PollOptionEntity, (x) => x.poll, { cascade: ['insert', 'update'] })
     options: PollOptionEntity[];
-
-    
+   
 }

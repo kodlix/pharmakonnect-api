@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreatePollVoteDto {
   @ApiProperty()
@@ -14,14 +14,21 @@ export class CreatePollVoteDto {
 
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  questionId: string;
+  @IsOptional()
+  email: string;
 
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  questionType: string;
+  @IsOptional()
+  phonenumber: string;
 
+  @IsArray()
+  @IsNotEmpty()
+  @ApiProperty()
+  pollOptions : CreatePollVoteOptionDto[]
+}
+
+export class CreatePollVoteOptionDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -34,12 +41,16 @@ export class CreatePollVoteDto {
 
   @ApiProperty()
   @IsString()
-  @IsOptional()
-  email: string;
-
+  @IsNotEmpty()
+  questionId: string;
 
   @ApiProperty()
   @IsString()
-  @IsOptional()
-  phonenumber: string;
+  @IsNotEmpty()
+  questionType: string;
+
 }
+
+
+
+
