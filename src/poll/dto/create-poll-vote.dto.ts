@@ -20,7 +20,12 @@ export class CreatePollVoteDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
-  phonenumber: string;
+  accountId: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  phoneNumber: string;
 
   @IsArray()
   @IsNotEmpty()

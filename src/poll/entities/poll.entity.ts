@@ -3,6 +3,7 @@ import { AbstractBaseEntity } from "src/_common/base.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
 import { PollOptionEntity } from "./poll-option.entity";
 import { PollQuestionEntity } from "./poll-question.entity";
+import { PollVoteEntity } from "./poll-vote.entity";
 
 
 @Entity('Poll')
@@ -66,5 +67,8 @@ export class PollEntity extends AbstractBaseEntity
 
     @OneToMany(() => PollOptionEntity, (x) => x.poll, { cascade: ['insert', 'update'] })
     options: PollOptionEntity[];
+
+    @OneToMany(() => PollVoteEntity, (x) => x.poll )
+    votes: PollVoteEntity[];
    
 }

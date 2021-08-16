@@ -29,7 +29,7 @@ export class PollQuestionEntity extends BaseEntity {
 
   @Column()
   createdBy: string;
-
+  
   @CreateDateColumn({ name: 'createdAt', default: new Date() })
   createdAt: Date;
 

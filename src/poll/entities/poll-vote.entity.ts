@@ -1,11 +1,12 @@
 import { AbstractBaseEntity } from "src/_common/base.entity";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, ManyToOne } from "typeorm";
+import { PollEntity } from "./poll.entity";
 
 
 @Entity('PollVote')
 export class PollVoteEntity extends AbstractBaseEntity
  {
-    @Column({length: 125})
+    @Column()
     pollId: string;
 
     @Column({length: 50})
@@ -21,7 +22,7 @@ export class PollVoteEntity extends AbstractBaseEntity
     email: string;
 
     @Column({length: 125, nullable: true})
-    phonenumber: string;
+    phoneNumber: string;
 
     @Column({length: 125})
     optionId: string;
@@ -34,4 +35,8 @@ export class PollVoteEntity extends AbstractBaseEntity
 
     @Column({type: 'bool', default: true})
     active: boolean;
+
+    @ManyToOne(() => PollEntity, (x) => x.votes )
+    poll: PollEntity;
+    
 }

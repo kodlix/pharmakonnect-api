@@ -22,6 +22,8 @@ export class PollOptionEntity extends BaseEntity
     @Column()
     content: string;
 
+    optionCount: number;
+
     @Column({type: 'bool', default: true})
     active: boolean;
 

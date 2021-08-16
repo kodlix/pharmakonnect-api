@@ -8,6 +8,7 @@ import { UpdatePollDto } from '../dto/update-poll.dto';
 import { PollEntity } from '../entities/poll.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { AccountRepository } from 'src/account/account.repository';
+import { PollSummaryDto } from '../dto/poll-summary.dto';
 
 
 @EntityRepository(PollEntity)
@@ -270,5 +271,40 @@ export class PollRepository extends Repository<PollEntity> {
     });
 
     return Poll;
+  }
+
+  async getPollSummary(id: string): Promise<PollSummaryDto> {
+    if (!id) {
+      throw new HttpException(`Invalid poll`, HttpStatus.BAD_REQUEST);
+    }
+
+    const existingPoll = await this.findOne(id, { relations: ['questions', 'questions.options', 'votes'] });
+    if (!existingPoll) {
+      throw new HttpException(`Poll does not exist`, HttpStatus.NOT_FOUND);
+    }
+
+    const pollOwner = await getRepository(AccountEntity).createQueryBuilder('acc')
+      .where(`acc.id =:accountId`, { accountId: existingPoll.accountId })
+      .getOne();
+
+    if (!pollOwner) {
+      throw new HttpException(`Poll has no valid owner.`, HttpStatus.NOT_FOUND);
+    }
+    existingPoll.owner = pollOwner?.firstName + " " + pollOwner?.lastName;
+
+    const pollSummaryDto = plainToClass(PollSummaryDto, existingPoll);
+    const votes = pollSummaryDto.votes;
+
+    pollSummaryDto.questions.forEach(q => {
+      for (const option of q.options) {
+        const count = votes.filter(x => x.optionId === option.id)?.length;
+        option.optionCount = count;
+        option.active = true;
+      }
+    })
+
+    pollSummaryDto.totalVotes = votes?.length;
+
+    return pollSummaryDto;
   }
 }

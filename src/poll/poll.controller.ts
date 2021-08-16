@@ -66,6 +66,14 @@ export class PollController {
     return this.pollService.findOne(id);
   }
 
+  @Get('/summary/:id')
+  @ApiResponse({ status: 201, description: 'Success.' })
+  @ApiResponse({ status: 404, description: 'Not Found.' })
+  @ApiOperation({ summary: 'Get poll summary by Id' })
+  getPollSummary(@Param('id') id: string): Promise<any> {
+    return this.pollService.getPollSummary(id);
+  }
+
   @Put(':id')
   @UseGuards(AuthGuard())
   update(@Param('id') id: string, @Body() updatePollDto: UpdatePollDto, @Req() req: any) {

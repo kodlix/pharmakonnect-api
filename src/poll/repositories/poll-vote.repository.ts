@@ -32,8 +32,8 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
     }
 
     const existingPoll = await getRepository(PollEntity).createQueryBuilder('poll')
-    .where(`poll.id =:pollId`, {pollId: dto.pollId})
-    .getOne();
+      .where(`poll.id =:pollId`, { pollId: dto.pollId })
+      .getOne();
 
     if (!existingPoll) {
       throw new HttpException(
@@ -55,46 +55,50 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
       const existingVote = await this.findOne({
         where: [
           { pollId: dto.pollId, questionId: questionId, email: dto.email },
-          { pollId: dto.pollId, questionId: questionId, phonenumber: dto.phonenumber },
+          { pollId: dto.pollId, questionId: questionId, phoneNumber: dto.phoneNumber },
         ],
       });
-  
+
       if (existingVote) {
         throw new HttpException(
           `You have already participated in this poll. Multiple submition not allowed`,
           HttpStatus.BAD_REQUEST,
         );
       }
-    }    
-
-    const pollVote = plainToClass(PollVoteEntity, dto);
-    pollVote.createdBy =  (dto.email || dto.phonenumber ) || user && user.email || 'administrator@netopconsult.com';
-
-    const errors = await validate(pollVote);
-    if(errors.length > 0) {
-        throw new HttpException(errors, HttpStatus.BAD_REQUEST);
     }
-    
+
+   
+    const errors = await validate(dto);
+    if (errors.length > 0) {
+      throw new HttpException(errors, HttpStatus.BAD_REQUEST);
+    }
+
     const newVotes: PollVoteEntity[] = [];
     for (const option of dto.pollOptions) {
-      let newVote: PollVoteEntity = null;
-      newVote = pollVote;
+      let newVote: any = {};
+
+      newVote.pollId = dto.pollId;
+      newVote.pollType = dto.pollType;      
+      newVote.createdBy = (dto.email || dto.phoneNumber) || dto && dto.email || 'administrator@netopconsult.com';
+      newVote.email = dto && dto.email || null;
       newVote.optionId = option.optionId;
       newVote.questionId = option.questionId;
       newVote.content = option.content;
-      newVote.questionType = option.questionType;      
+      newVote.content = option.content;
+      newVote.accountId = dto && dto.accountId || null;
+      newVote.questionType = option.questionType;
 
       newVotes.push(newVote);
     }
 
-    try {        
-        return await this.save(newVotes);
-    } catch(error)  {
-        throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    try {
+      return await this.save(newVotes);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  
+
   async deleteEntity(id: string): Promise<DeleteResult> {
     if (!id) {
       throw new HttpException(`Invalid poll Vote`, HttpStatus.BAD_REQUEST);
@@ -104,7 +108,7 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
     if (!existingPollVote) {
       throw new HttpException(`poll not found`, HttpStatus.NOT_FOUND);
     }
-  
+
     return await this.delete({ id: existingPollVote.id });
   }
 
@@ -121,7 +125,7 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
   }
 
 
-  async findAllVotes(page = 1, searchParam: string): Promise<PollVoteEntity[]> {  
+  async findAllVotes(page = 1, searchParam: string): Promise<PollVoteEntity[]> {
     if (searchParam) {
       const param = `%${searchParam}%`
       const searchResult = await this.find({
@@ -129,17 +133,17 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
           { email: ILike(param) },
           { phonenumber: ILike(param) },
           { pollType: ILike(param) },
-          { questionType: ILike(param) },          
+          { questionType: ILike(param) },
         ],
-        order: { createdAt: 'ASC'},
+        order: { createdAt: 'ASC' },
         take: 25,
-  
+
         skip: 25 * (page - 1),
       })
 
       return searchResult;
     }
-    
+
     const pollVotes = await this.find({
       order: { createdAt: 'ASC' },
       take: 25,

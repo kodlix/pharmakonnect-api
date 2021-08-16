@@ -39,6 +39,10 @@ export class PollService {
     }
   }
 
+  async getPollSummary(id) {
+    return await this.pollRepository.getPollSummary(id);
+  }
+
   async update(id: string, updatePollDto: UpdatePollDto, user :AccountEntity) {
     return await  this.pollRepository.updateEntity(id, updatePollDto, user);
   }
