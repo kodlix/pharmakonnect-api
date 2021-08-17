@@ -13,6 +13,7 @@ import { PollSummaryDto } from '../dto/poll-summary.dto';
 
 @EntityRepository(PollEntity)
 export class PollRepository extends Repository<PollEntity> {
+
   constructor(private readonly accountRepository: AccountRepository) {
     super();
   }
@@ -150,14 +151,20 @@ export class PollRepository extends Repository<PollEntity> {
     existingPoll.published = true;
     existingPoll.publishedAt = new Date();
     existingPoll.publishedBy = user.email;
+    existingPoll.active = false;
+
 
     return await existingPoll.save();
   }
-  
-  async deactivate(id: string, user: AccountEntity): Promise<PollEntity> {
+
+  async reject(id: string, message: string, user: AccountEntity): Promise<PollEntity> {
 
     if (!id) {
       throw new HttpException(`Invalid poll`, HttpStatus.BAD_REQUEST);
+    }
+
+    if (!message) {
+      throw new HttpException(`Rejection message is required.`, HttpStatus.BAD_REQUEST);
     }
 
     const existingPoll = await this.findOne(id);
@@ -165,7 +172,31 @@ export class PollRepository extends Repository<PollEntity> {
       throw new HttpException(`Poll does not exist`, HttpStatus.NOT_FOUND);
     }
 
+    existingPoll.published = false;
+    existingPoll.rejected = true;
+    existingPoll.publishedAt = null;
+    existingPoll.publishedBy = null;
+    existingPoll.updatedAt = new Date();
+    existingPoll.updatedBy = user?.email;
     existingPoll.active = false;
+
+    return await existingPoll.save();
+  }
+
+  async deactivate(id: string, user: AccountEntity): Promise<PollEntity> {
+
+    if (!id) {
+      throw new HttpException(`Invalid poll`, HttpStatus.BAD_REQUEST);
+    }
+
+    const existingPoll = await this.findOne({ id, accountId: user.id });
+    if (!existingPoll) {
+      throw new HttpException(`Poll does not exist`, HttpStatus.NOT_FOUND);
+    }
+
+    existingPoll.active = false;
+    existingPoll.updatedBy = user.email;
+    existingPoll.updatedAt = new Date();
     return await existingPoll.save();
   }
 
@@ -236,6 +267,38 @@ export class PollRepository extends Repository<PollEntity> {
     return Poll;
   }
 
+  async findPublished(page: number, searchParam: string): Promise<PollEntity[]> {
+    if (searchParam) {
+      const param = `%${searchParam}%`
+      const searchResult = await this.find({
+        where: [
+          { title: ILike(param), published: true, active: true },
+          { slug: ILike(param), published: true, active: true },
+          { hint: ILike(param), published: true, active: true },
+          { type: ILike(param), published: true, active: true },
+          { createdBy: ILike(param), published: true, active: true },
+          { description: ILike(param), published: true, active: true },
+        ],
+        order: { createdAt: 'DESC', published: 'DESC' },
+        take: 25,
+
+        skip: 25 * (page - 1),
+      })
+
+      return searchResult;
+    }
+
+    const Poll = await this.find({
+      where: { published: true, active: true },
+      order: { createdAt: 'DESC', published: 'DESC' },
+      take: 25,
+
+      skip: 25 * (page - 1),
+    });
+
+    return Poll;
+  }
+
 
   async findAllPollsByAccount(page = 1, searchParam: string, user: AccountEntity): Promise<PollEntity[]> {  // @TODO convert to full-text search
     if (searchParam) {
@@ -243,13 +306,12 @@ export class PollRepository extends Repository<PollEntity> {
       const searchResult = await this.find({
         where:
           [
-            { accountId: user.id },
-            { title: ILike(param) },
-            { slug: ILike(param) },
-            { hint: ILike(param) },
-            { type: ILike(param) },
-            { createdBy: ILike(param) },
-            { description: ILike(param) },
+            { title: ILike(param), accountId: user.id },
+            { slug: ILike(param), accountId: user.id },
+            { hint: ILike(param), accountId: user.id },
+            { type: ILike(param), accountId: user.id },
+            { createdBy: ILike(param), accountId: user.id },
+            { description: ILike(param), accountId: user.id },
           ],
         order: { createdAt: 'DESC', published: 'DESC' },
         take: 25,

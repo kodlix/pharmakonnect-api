@@ -5,7 +5,7 @@ import { UpdatePollDto } from './dto/update-poll.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AccountEntity } from 'src/account/entities/account.entity';
-import { CreatePollVoteDto } from './dto/create-poll-vote.dto';
+import { CreatePollVoteDto, RejectDto } from './dto/create-poll-vote.dto';
 
 @Controller('poll')
 @ApiBearerAuth()
@@ -49,9 +49,18 @@ export class PollController {
     return this.pollService.findAllByOwner(page, searchParam, req?.user)
   }
 
+  @Get('all/published')
+  @ApiOperation({ summary: 'Get all published polls' })
+  @ApiResponse({ status: 201, description: 'Success' })
+  @ApiResponse({ status: 404, description: 'Not Found.' })
+  @UseGuards(AuthGuard())
+  findAlPublished(@Req() req: any, @Query('page') page?: number, @Query('search') searchParam?: string): Promise<any> {
+    return this.pollService.findAllPublished(page, searchParam)
+  }
+
   @Get('setting')
   @UseGuards(AuthGuard())
-  @ApiOperation({ summary: 'Get all poll setting' })
+  @ApiOperation({ summary: 'Get general poll setting' })
   @ApiResponse({ status: 201, description: 'Success' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   getPollSetting(): Promise<any> {
@@ -76,21 +85,35 @@ export class PollController {
 
   @Put(':id')
   @UseGuards(AuthGuard())
+  @ApiResponse({ status: 201, description: 'Success.' })
+  @ApiOperation({ summary: 'Update poll by Id' })
   update(@Param('id') id: string, @Body() updatePollDto: UpdatePollDto, @Req() req: any) {
     return this.pollService.update(id, updatePollDto, req?.user);
   }
 
   @Put(':id/publish')
   @UseGuards(AuthGuard())
+  @ApiResponse({ status: 201, description: 'Success.' })
+  @ApiOperation({ summary: 'publish poll by Id' })
   publish(@Param('id') id: string, @Req() req: any) {
     return this.pollService.publish(id, req?.user);
   }
 
-  // @Put(':id/deactivate')
-  // @UseGuards(AuthGuard())
-  // deactivate(@Param('id') id: string, @Req() req: any) {
-  //   return this.pollService.deactivate(id, req?.user);
-  // }
+  @Put(':id/deactivate')
+  @UseGuards(AuthGuard())
+  @ApiResponse({ status: 201, description: 'Success.' })
+  @ApiOperation({ summary: 'Active poll by Id' })
+  deactivate(@Param('id') id: string, @Req() req: any) {
+    return this.pollService.deactivate(id, req?.user);
+  }
+
+  @Put(':id/reject')
+  @UseGuards(AuthGuard())  
+  @ApiResponse({ status: 201, description: 'Success.' })
+  @ApiOperation({ summary: 'Reject poll by Id' })
+  reject(@Body() dto: RejectDto, @Param('id') id: string, @Req() req: any) {
+    return this.pollService.reject(id, dto.message, req?.user);
+  }
 
   @Delete(':id')
   @UseGuards(AuthGuard())

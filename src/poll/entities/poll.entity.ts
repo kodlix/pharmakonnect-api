@@ -7,43 +7,45 @@ import { PollVoteEntity } from "./poll-vote.entity";
 
 
 @Entity('Poll')
-export class PollEntity extends AbstractBaseEntity
- {
-    @PrimaryColumn({length: 550})
+export class PollEntity extends AbstractBaseEntity {
+    @PrimaryColumn({ length: 550 })
     id: string;
 
-    @Column({length: 550})
+    @Column({ length: 550 })
     title: string;
 
-    @Column({length: 600, nullable: true})
+    @Column({ length: 600, nullable: true })
     slug: string;
 
-    @Column({length: 550})
+    @Column({ length: 550 })
     description: string;
 
-    @Column({length: 550, nullable: true})
+    @Column({ length: 550, nullable: true })
     url: string;
 
-    @Column({length: 50, nullable: true})
+    @Column({ length: 50, nullable: true })
     accessCode: string;
 
-    @Column({type: 'bool', default: false})
+    @Column({ type: 'bool', default: false })
     requiresLogin: boolean;
 
-    @Column({length: 50})
+    @Column({ length: 50 })
     type: string;
 
-    @Column({length: 500, nullable: true})
+    @Column({ length: 500, nullable: true })
     hint: string;
 
-    @Column({type: 'bool', default: false})
+    @Column({ type: 'bool', default: false })
     published: boolean;
 
-    @Column({nullable: true})
+    @Column({ type: 'bool', default: false })
+    rejected: boolean;
+
+    @Column({ nullable: true })
     publishedAt: Date;
 
-    @Column({type: 'varchar', nullable: true})
-    publishedBy: string;
+    @Column({ type: 'varchar', nullable: true })
+    publishedBy: string;   
 
     @Column()
     startDate: Date;
@@ -51,14 +53,17 @@ export class PollEntity extends AbstractBaseEntity
     @Column()
     endDate: Date;
 
-    @Column({nullable: false})
+    @Column({ nullable: false })
     accountId: string;
 
-    @Column({type: 'bool', default: true})
+    @Column({ type: 'bool', default: true })
     active: boolean;
 
+    @Column({ nullable: true })
+    message: string;
+
     owner: string;
-    
+
     @ManyToOne(() => AccountEntity, acc => acc.polls)
     account: AccountEntity;
 
@@ -68,7 +73,7 @@ export class PollEntity extends AbstractBaseEntity
     @OneToMany(() => PollOptionEntity, (x) => x.poll, { cascade: ['insert', 'update'] })
     options: PollOptionEntity[];
 
-    @OneToMany(() => PollVoteEntity, (x) => x.poll )
+    @OneToMany(() => PollVoteEntity, (x) => x.poll)
     votes: PollVoteEntity[];
-   
+
 }
