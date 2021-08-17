@@ -13,13 +13,11 @@ import { PollSummaryDto } from '../dto/poll-summary.dto';
 
 @EntityRepository(PollEntity)
 export class PollRepository extends Repository<PollEntity> {
-  /**
-   *
-   */
   constructor(private readonly accountRepository: AccountRepository) {
     super();
-
   }
+
+
   async createEntity(dto: CreatePollDto, user: AccountEntity): Promise<PollEntity> {
     const existingPoll = await this.findOne({
       where: { title: dto.title, accountId: user.id }

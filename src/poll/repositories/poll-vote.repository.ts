@@ -15,6 +15,7 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
     super();
   }
   async vote(dto: CreatePollVoteDto, user: AccountEntity): Promise<PollVoteEntity[]> {
+    
 
     if (dto && !dto.pollId) {
       throw new HttpException(
@@ -45,6 +46,13 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
     if (existingPoll.endDate < (new Date())) {
       throw new HttpException(
         `Sorry, poll is no longer open for participation.`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (existingPoll.requiresLogin && !dto.accountId) {
+      throw new HttpException(
+        `You must login to participate.`,
         HttpStatus.BAD_REQUEST,
       );
     }
