@@ -270,6 +270,7 @@ export class EventRepository extends Repository<EventEntity> {
         }
 
         ev.published = true;
+        ev.rejected = false;
         ev.publishedOn = new Date();
         
         try {
@@ -293,6 +294,7 @@ export class EventRepository extends Repository<EventEntity> {
         }
 
         ev.rejected = true;
+        ev.published = false;
         ev.rejectionMessage = rejectionMessage;
         ev.rejectedOn = new Date();
         
