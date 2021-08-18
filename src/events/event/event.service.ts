@@ -3,6 +3,7 @@ import { AccountRepository } from 'src/account/account.repository';
 import { AccountEntity } from 'src/account/entities/account.entity';
 import { NotificationType } from 'src/enum/enum';
 import { NotificationGateway } from 'src/gateway/notification.gateway';
+import { NodeMailerService } from 'src/mailer/node-mailer.service';
 import { NotificationRO } from 'src/notifications/notification/interface/notification.interface';
 import { NotificationRepository } from 'src/notifications/notification/notification.repository';
 import { NotificationTypeRepository } from 'src/notifications/notificationtype/notificationtype.repository';
@@ -22,7 +23,7 @@ export class EventService {
   private  notTypeRepo: NotificationTypeRepository;
   private  notiRepo: NotificationRepository
 
-  constructor(private readonly eventRepo: EventRepository, connection: Connection, private readonly notiGateway: NotificationGateway) {
+  constructor(private readonly mailService: NodeMailerService, private readonly eventRepo: EventRepository, connection: Connection, private readonly notiGateway: NotificationGateway) {
       this.acctRepo = connection.getCustomRepository(AccountRepository);
       this.notTypeRepo = connection.getCustomRepository(NotificationTypeRepository);
       this.notiRepo = connection.getCustomRepository(NotificationRepository);
@@ -151,7 +152,58 @@ export class EventService {
   }
 
   async addEventRegistration(payload: EventRegistrationDto, user: AccountEntity): Promise<string> {
-    return await this.eventRepo.addEventRegistration(payload, user);
+    
+    try {
+       await this.eventRepo.addEventRegistration(payload, user);
+      const event = await this.eventRepo.findOne({where: {id: payload.eventId}});
+      
+    (event.startTime as any) = (event.startTime as any).split(':')[0] >= 12 ? `${event.startTime} PM` : `${event.startTime} AM`;
+             (event.endTime as any) = (event.endTime as any).split(':')[0] >= 12 ? `${event.endTime} PM` : `${event.endTime} AM`;
+
+            //  const msg = {
+            //     to: payload.email,
+            //     from: "Kaapsul <zack.aminu@netopconsult.com>",
+            //     templateId: 'd-3f12473cbde44380be0c9a66f34a8784',
+            //     dynamicTemplateData: {
+            //         name: payload.name,
+            //         eventName: event.name,
+            //         Sdate: event.startDate,
+            //         Edate: event.endDate,
+            //         startTime: event.startTime,
+            //         endTime: event.endTime,
+            //         venue: event.venue,
+            //         organizerName: event.organizerName,
+            //         organizerphoneNumber: event.organizerPhoneNumber,
+            //         accessCode: event.requireUniqueAccessCode ? payload.accessCode : 'NIL',
+            //         url: event.online ? event.url : 'NIL'
+            //     }
+            // }
+
+            
+            
+                const subject = `Your ${event.name} registration details is here`;
+                const html = `<p> Dear ${payload.name}, </p> <br>
+                        <p> Thanks for registering for the event ${event.name}, please find below the details of the event.</p> <br>
+                        <p> Event Name: <strong> ${event.name} </strong> </p> <br>
+                        <p> Start Date: <strong> ${event.startDate} </strong> </p> <br>
+                        <p> End Date: <strong> ${event.endDate} </strong> </p> <br>
+                        <p> Start Time: <strong> ${event.startTime} </strong> </p> <br>
+                        <p> End Time: <strong> ${event.endTime} </strong> </p> <br>
+                        <p> Venue: <strong> ${event.venue} </strong> </p> <br>
+                        <p> Organizer Name: <strong> ${event.organizerName} </strong> </p> <br>
+                        <p> Organizer Phone No: <strong> ${event.organizerPhoneNumber} </strong></p> <br>
+                        <p> Access Code: <strong> ${event.requireUniqueAccessCode ? payload.accessCode : 'NIL'} </strong> </p> <br>
+                        <p> Url: <strong> ${event.url ? event.url : 'NIL'} </strong> </p>
+                        `
+            
+            await this.mailService.sendHtmlMailAsync(payload.email, subject, html);
+
+            return "Successfully registered for the event, Kindly check you email for event details"
+
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
+    
   }
 
   async remove(id: string) : Promise<DeleteResult>{

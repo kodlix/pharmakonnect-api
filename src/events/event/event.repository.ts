@@ -13,6 +13,8 @@ import { EventRegistrationDto } from "./dto/event-registration.dto";
 import { EventUsersRepository } from "../eventusers/eventusers.repository";
 import { isNotValidDate } from "src/_utility/date-validator.util";
 import { isNotValidTime } from "src/_utility/time-validator.util";
+import { EventUsersRO } from "../eventusers/interfaces/eventusers.interface";
+import { EventUsersEntity } from "../eventusers/entities/eventusers.entity";
 
 
 @EntityRepository(EventEntity)
@@ -306,7 +308,7 @@ export class EventRepository extends Repository<EventEntity> {
         }
     }
 
-    async addEventRegistration(payload: EventRegistrationDto, user: AccountEntity): Promise<string> {
+    async addEventRegistration(payload: EventRegistrationDto, user: AccountEntity): Promise<EventUsersRO> {
         
         const today = new Date();
 
@@ -330,9 +332,9 @@ export class EventRepository extends Repository<EventEntity> {
             throw new HttpException(`This event does not accept registration anymore`, HttpStatus.BAD_REQUEST);
         }
 
-        if(today.getDate() > new Date(eventRegistringFor.endDate).getDate()) {
-            throw new HttpException(`The event has ended.`, HttpStatus.BAD_REQUEST);
-        }
+        // if(today.getDate() > new Date(eventRegistringFor.endDate).getDate()) {
+        //     throw new HttpException(`The event has ended.`, HttpStatus.BAD_REQUEST);
+        // }
 
         if(eventRegistringFor.cost > 0) {
 
@@ -358,7 +360,7 @@ export class EventRepository extends Repository<EventEntity> {
             throw new HttpException(`Sorry, The maximum number of participants has been reached for this event`, HttpStatus.BAD_REQUEST);
         }
 
-        return await eventUsersRepository.createEventUsers(payload, user, eventRegistringFor);
+        return await eventUsersRepository.createEventUsers(payload, user);
 
     }
 

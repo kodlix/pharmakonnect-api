@@ -10,18 +10,17 @@ import { EventUsersRO } from "./interfaces/eventusers.interface";
 import { UpdateEventUserRegistrationDto } from "./dto/update-eventuser.dto";
 import { EventEntity } from "../event/entities/event.entity";
 import * as SendGrid from "@sendgrid/mail";
-import { NodeMailerService } from "src/mailer/node-mailer.service";
 
 @EntityRepository(EventUsersEntity)
 export class EventUsersRepository extends Repository<EventUsersEntity> {
 
     
-    constructor(private readonly mailService: NodeMailerService) {
+    constructor() {
         super();
         //SendGrid.setApiKey("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")
     }
 
-    async createEventUsers(payload: EventRegistrationDto, user: AccountEntity, event: EventEntity): Promise<string> {
+    async createEventUsers(payload: EventRegistrationDto, user: AccountEntity): Promise<EventUsersRO> {
         
         const newEventUsers = plainToClass(EventUsersEntity, payload);
         newEventUsers.createdBy = user.createdBy;
@@ -33,54 +32,11 @@ export class EventUsersRepository extends Repository<EventUsersEntity> {
         }
 
         try {
-             await this.save(newEventUsers);
-             (event.startTime as any) = (event.startTime as any).split(':')[0] >= 12 ? `${event.startTime} PM` : `${event.startTime} AM`;
-             (event.endTime as any) = (event.endTime as any).split(':')[0] >= 12 ? `${event.endTime} PM` : `${event.endTime} AM`;
-
-            //  const msg = {
-            //     to: payload.email,
-            //     from: "Kaapsul <zack.aminu@netopconsult.com>",
-            //     templateId: 'd-3f12473cbde44380be0c9a66f34a8784',
-            //     dynamicTemplateData: {
-            //         name: payload.name,
-            //         eventName: event.name,
-            //         Sdate: event.startDate,
-            //         Edate: event.endDate,
-            //         startTime: event.startTime,
-            //         endTime: event.endTime,
-            //         venue: event.venue,
-            //         organizerName: event.organizerName,
-            //         organizerphoneNumber: event.organizerPhoneNumber,
-            //         accessCode: event.requireUniqueAccessCode ? payload.accessCode : 'NIL',
-            //         url: event.online ? event.url : 'NIL'
-            //     }
-            // }
-
+             return await this.save(newEventUsers);
             
-            
-                const subject = `Your ${event.name} registration details is here`;
-                const html = `<p> Dear ${payload.name}, </p> <br>
-                        <p> Thanks for registering for the event ${event.name}, please find below the details of the event.</p> <br>
-                        <p> Event Name: <strong> ${event.name} </strong> </p> <br>
-                        <p> Start Date: <strong> ${event.startDate} </strong> </p> <br>
-                        <p> End Date: <strong> ${event.endDate} </strong> </p> <br>
-                        <p> Start Time: <strong> ${event.startTime} </strong> </p> <br>
-                        <p> End Time: <strong> ${event.endTime} </strong> </p> <br>
-                        <p> Venue: <strong> ${event.venue} </strong> </p> <br>
-                        <p> Organizer Name: <strong> ${event.organizerName} </strong> </p> <br>
-                        <p> Organizer Phone No: <strong> ${event.organizerPhoneNumber} </strong></p> <br>
-                        <p> Access Code: <strong> ${event.requireUniqueAccessCode ? payload.accessCode : 'NIL'} </strong> </p> <br>
-                        <p> Url: <strong> ${event.url ? event.url : 'NIL'} </strong> </p>
-                        `
-            
-            await this.mailService.sendHtmlMailAsync(payload.email, subject, html);
-
-             //await SendGrid.send(msg);
-             return "Successfully registered for the event.";
         } catch(error)  {
             Logger.log("Reg + mail", error);
-            return "Successfully registered for the event.";
-            //throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

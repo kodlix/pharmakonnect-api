@@ -9,9 +9,11 @@ import { NotificationRepository } from 'src/notifications/notification/notificat
 import { AccountRepository } from 'src/account/account.repository';
 import { EveSubscriber } from 'src/_common/subscribers/event.subscriber';
 import { NotificationGateway } from 'src/gateway/notification.gateway';
+import { MailerModule } from 'src/mailer/mailer.module';
 
 @Module({
   imports: [
+    MailerModule,
     TypeOrmModule.forFeature([EventRepository]), AccountModule
   ],
   controllers: [EventController],
