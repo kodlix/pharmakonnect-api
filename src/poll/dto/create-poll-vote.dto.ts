@@ -56,6 +56,13 @@ export class CreatePollVoteOptionDto {
 
 }
 
+export class RejectDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty({message: "message is required"})
+  message: string;
+}
+
 
 
 

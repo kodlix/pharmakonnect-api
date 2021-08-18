@@ -9,6 +9,8 @@ import { PollRepository } from './repositories/poll.repository';
 
 @Injectable()
 export class PollService {
+ 
+
   /**
    * poll servcie 
    */
@@ -22,6 +24,10 @@ export class PollService {
 
   async findAll(pageNo : number, searchParam: string) {
     return await  this.pollRepository.findAllPolls(pageNo, searchParam);
+  }
+
+  async findAllPublished(page: number, searchParam: string): Promise<any> {
+    return await  this.pollRepository.findPublished(page, searchParam);
   }
 
   async findAllByOwner(pageNo : number, searchParam: string, user: AccountEntity) {
@@ -53,6 +59,10 @@ export class PollService {
 
   async deactivate(id: string, user :AccountEntity) {
     return await  this.pollRepository.deactivate(id, user);
+  }
+
+  async reject(id: string,  message: string, user: any) {
+    return await  this.pollRepository.reject(id, message, user);
   }
 
   async remove(id: string) {
