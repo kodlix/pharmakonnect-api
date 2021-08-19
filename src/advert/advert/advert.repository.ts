@@ -183,14 +183,14 @@ export class AdvertRepository extends Repository<AdvertEntity>{
         if(search) {
 
           const advert =  await this.createQueryBuilder("advert")
-                   .leftJoinAndSelect("advert.advertCategory", "advertCategory")
+                  .leftJoinAndSelect("advert.advertCategory", "advertCategory")
                    .where(new Brackets(qb => {
                        qb.where("advert.companyName ILike :companyName", { companyName: `%${search}%` })
                        .orWhere("advert.title ILike :title", { title: `%${search}%` })
-                       .orWhere("advert.advertserId ILike :advertserId", { advertserId: `%${search}%` })
+                       .orWhere("advert.advertiserId ILike :advertiserId", { advertiserId: `%${search}%` })
                        .orWhere("advertCategory.name ILike :name", { name: `%${search}%`})
                    }))
-                   .orderBy("advert.ApprovedOn", "DESC")
+                   .orderBy("advert.approvedOn", "DESC")
                    .take(25)
                    .skip(25 * (page ? page - 1 : 0))
                    .getMany();

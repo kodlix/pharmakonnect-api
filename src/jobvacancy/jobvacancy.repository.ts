@@ -8,6 +8,8 @@ import { UpdateJobVacancyDto } from './dto/update-jobvacancy.dto';
 import { JobVacancyEntity } from './entities/jobvacancy.entity';
 import { AccountEntity } from 'src/account/entities/account.entity';
 import { FilterDto } from 'src/_common/filter.dto';
+import { LessThanOrEqual } from 'typeorm';
+import { MoreThanOrEqual } from 'typeorm';
 
 @EntityRepository(JobVacancyEntity)
 export class JobVacancyRepository extends Repository<JobVacancyEntity> {
@@ -252,6 +254,7 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
   async findJob(search: string, page: number): Promise<JobVacancyEntity[]> {
 
 
+    const today = new Date();
     if(search) {
 
       const jobList =  await this.createQueryBuilder("job")
@@ -263,6 +266,8 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
                }))
                .andWhere("job.approved = true")
                .andWhere("job.rejected = false")
+               .andWhere("job.startDate <= NOW()")
+               .andWhere("job.endDate >= NOW()")
                .orderBy("job.approvedOn", "DESC")
                .take(25)
                .skip(25 * (page ? page - 1 : 0))
@@ -271,7 +276,10 @@ export class JobVacancyRepository extends Repository<JobVacancyEntity> {
        return jobList;
    }
 
-   return await this.find({where: {approved: true, rejected: false}, order: { approvedOn: 'DESC' }, take: 25, skip: page ? 25 * (page - 1) : 0});
+   return await this.find({where: {approved: true, rejected: false, startDate:LessThanOrEqual(today),endDate:MoreThanOrEqual(today)}, 
+                                 order: { approvedOn: 'DESC' }, 
+                                 take: 25, 
+                                 skip: page ? 25 * (page - 1) : 0});
 
    
   }
