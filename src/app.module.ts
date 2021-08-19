@@ -39,6 +39,9 @@ import { GroupModule } from './group/group.module';
 import { ChatGateway } from './gateway/chat.gateway';
 import { NotificationGateway } from './gateway/notification.gateway';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ModuleModule } from './module/module.module';
+import { ResourceTypeModule } from './resourcetype/resource-type.module';
+
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -77,6 +80,9 @@ import { DashboardModule } from './dashboard/dashboard.module';
     NotificationModule,
     NotificationtypeModule,
     DashboardModule,
+    ModuleModule,
+    ResourceTypeModule,
+    
   ],
   controllers: [AppController],
   providers: [AppService, ChatGateway, NotificationGateway],
