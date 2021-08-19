@@ -33,7 +33,7 @@ export class SchoolController {
   @ApiOperation({ summary: 'Get school' })
   @ApiResponse({ status: 200, description: 'Return school' })
   async findOne(@Param('id') id: string): Promise<SchoolRO> {
-    return await this.schoolService.findOne(id);
+    return await this.schoolService.findById(id);
   }
 
   @Put(':id')

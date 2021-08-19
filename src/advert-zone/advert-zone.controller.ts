@@ -33,7 +33,7 @@ export class AdvertZoneController {
   @ApiOperation({ summary: 'Get advert zone' })
   @ApiResponse({ status: 200, description: 'Return advert zone' })
   async findOne(@Param('id') id: string): Promise<AdvertZoneRO> {
-    return await this.advertZoneService.findOne(id);
+    return await this.advertZoneService.findById(id);
   }
 
   @Put(':id')

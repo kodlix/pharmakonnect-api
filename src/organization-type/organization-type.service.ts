@@ -7,14 +7,20 @@ import { OrganizationTypeEntity } from "./entities/organization-type.entity";
 import { CreateOrganizationTypeDto } from "./dto/create-organization-type.dto";
 import { OrganizationTypeRO } from "./interfaces/organization-type.interface";
 import { UpdateOrganizationTypeDto } from "./dto/update-organization-type.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+
 
 
 @Injectable()
-export class OrganizationTypeService extends Repository<OrganizationTypeEntity> {
+export class OrganizationTypeService {
+    constructor(
+        @InjectRepository(OrganizationTypeEntity)
+        private readonly zoneRepository: Repository<OrganizationTypeEntity>
+      ) { }
 
     async createEntity(payload: CreateOrganizationTypeDto, user: AccountEntity) : Promise<string> {
 
-        const isOrganizationTypeExist = await this.findOne({where: {name: payload.name}});
+        const isOrganizationTypeExist = await this.zoneRepository.findOne({where: {name: payload.name}});
         if(isOrganizationTypeExist) {
             throw new HttpException( `Organization type with ${payload.name} already exist`, HttpStatus.BAD_REQUEST);
         }
@@ -29,7 +35,7 @@ export class OrganizationTypeService extends Repository<OrganizationTypeEntity> 
         }
 
         try {
-             await this.save(newOrganizationType);
+             await this.zoneRepository.save(newOrganizationType);
              return "Organization type successfully saved";
         } catch(error)  {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -39,12 +45,12 @@ export class OrganizationTypeService extends Repository<OrganizationTypeEntity> 
 
     async getAll(): Promise<OrganizationTypeRO[]> {
         
-        return await this.find();
+        return await this.zoneRepository.find();
     }
 
     async findById(id: string): Promise<OrganizationTypeRO> {
 
-        const organizationType = await this.findOne(id);
+        const organizationType = await this.zoneRepository.findOne(id);
         if(organizationType) {
             return organizationType;
         }
@@ -54,9 +60,9 @@ export class OrganizationTypeService extends Repository<OrganizationTypeEntity> 
     
     async delete(id: string): Promise<DeleteResult> {
 
-        const organizationType = await this.findOne(id);
+        const organizationType = await this.zoneRepository.findOne(id);
         if(organizationType) {
-            return await this.delete(organizationType.id);
+            return await this.zoneRepository.delete(organizationType.id);
         }
 
         throw new HttpException(`The organization type cannot be found`, HttpStatus.NOT_FOUND);
@@ -64,12 +70,12 @@ export class OrganizationTypeService extends Repository<OrganizationTypeEntity> 
     }
 
     async updateEntity(id: string, payload: UpdateOrganizationTypeDto, user: AccountEntity) : Promise<string> {
-        const organizationType = await this.findOne(id);
+        const organizationType = await this.zoneRepository.findOne(id);
         if (organizationType ) {
 
             if( organizationType.name != payload.name) {
                 
-                const nameExist = await this.findOne({where: {name: payload.name}});
+                const nameExist = await this.zoneRepository.findOne({where: {name: payload.name}});
                 if(nameExist){
                     throw new HttpException( `Organization type with ${payload.name} is already in use`, HttpStatus.BAD_REQUEST);
                 }
@@ -82,7 +88,7 @@ export class OrganizationTypeService extends Repository<OrganizationTypeEntity> 
             const updated = plainToClassFromExist(organizationType, payload);
 
             try {
-                 await this.save(updated);
+                 await this.zoneRepository.save(updated);
                  return "Organization type successfully updated";
             } catch (error) {
                 throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);

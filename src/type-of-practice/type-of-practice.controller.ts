@@ -33,7 +33,7 @@ export class TypeOfPracticeController {
   @ApiOperation({ summary: 'Get type of practice' })
   @ApiResponse({ status: 200, description: 'Return type of practice' })
   async findOne(@Param('id') id: string): Promise<TypeOfPracticeRO> {
-    return await this.typeOfPracticeService.findOne(id);
+    return await this.typeOfPracticeService.findById(id);
   }
 
   @Put(':id')

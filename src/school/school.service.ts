@@ -7,14 +7,20 @@ import { SchoolEntity } from "./entities/school.entity";
 import { CreateSchoolDto } from "./dto/create-school.dto";
 import { SchoolRO } from "./interfaces/school.interface";
 import { UpdateSchoolDto } from "./dto/update-school.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+
 
 
 @Injectable()
-export class SchoolService extends Repository<SchoolEntity> {
+export class SchoolService {
+    constructor(
+        @InjectRepository(SchoolEntity)
+        private readonly zoneRepository: Repository<SchoolEntity>
+      ) { }
 
     async createEntity(payload: CreateSchoolDto, user: AccountEntity) : Promise<string> {
 
-        const isSchoolExist = await this.findOne({where: {name: payload.name}});
+        const isSchoolExist = await this.zoneRepository.findOne({where: {name: payload.name}});
         if(isSchoolExist) {
             throw new HttpException( `School with ${payload.name} already exist`, HttpStatus.BAD_REQUEST);
         }
@@ -29,7 +35,7 @@ export class SchoolService extends Repository<SchoolEntity> {
         }
 
         try {
-             await this.save(newSchool);
+             await this.zoneRepository.save(newSchool);
              return "School successfully saved";
         } catch(error)  {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -39,12 +45,12 @@ export class SchoolService extends Repository<SchoolEntity> {
 
     async getAll(): Promise<SchoolRO[]> {
         
-        return await this.find();
+        return await this.zoneRepository.find();
     }
 
     async findById(id: string): Promise<SchoolRO> {
 
-        const school = await this.findOne(id);
+        const school = await this.zoneRepository.findOne(id);
         if(school) {
             return school;
         }
@@ -54,9 +60,9 @@ export class SchoolService extends Repository<SchoolEntity> {
     
     async delete(id: string): Promise<DeleteResult> {
 
-        const school = await this.findOne(id);
+        const school = await this.zoneRepository.findOne(id);
         if(school) {
-            return await this.delete(school.id);
+            return await this.zoneRepository.delete(school.id);
         }
 
         throw new HttpException(`The school cannot be found`, HttpStatus.NOT_FOUND);
@@ -64,12 +70,12 @@ export class SchoolService extends Repository<SchoolEntity> {
     }
 
     async updateEntity(id: string, payload: UpdateSchoolDto, user: AccountEntity) : Promise<string> {
-        const school = await this.findOne(id);
+        const school = await this.zoneRepository.findOne(id);
         if (school ) {
 
             if( school.name != payload.name) {
                 
-                const nameExist = await this.findOne({where: {name: payload.name}});
+                const nameExist = await this.zoneRepository.findOne({where: {name: payload.name}});
                 if(nameExist){
                     throw new HttpException( `School with ${payload.name} is already in use`, HttpStatus.BAD_REQUEST);
                 }
@@ -82,7 +88,7 @@ export class SchoolService extends Repository<SchoolEntity> {
             const updated = plainToClassFromExist(school, payload);
 
             try {
-                 await this.save(updated);
+                 await this.zoneRepository.save(updated);
                  return "School successfully updated";
             } catch (error) {
                 throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);

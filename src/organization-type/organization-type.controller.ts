@@ -33,7 +33,7 @@ export class OrganizationTypeController {
   @ApiOperation({ summary: 'Get organization type' })
   @ApiResponse({ status: 200, description: 'Return organization type' })
   async findOne(@Param('id') id: string): Promise<OrganizationTypeRO> {
-    return await this.organizationTypeService.findOne(id);
+    return await this.organizationTypeService.findById(id);
   }
 
   @Put(':id')
