@@ -71,7 +71,7 @@ export class ResourceTypeRepository extends Repository<ResourceTypeEntity> {
 
             if( resourceType.name != payload.name) {
                 
-                const nameExist = await this.findOne({where: {name: ILike(`%${payload.name}%`)}});
+                const nameExist = await this.findOne({where: {name: payload.name}});
                 if(nameExist){
                     throw new HttpException( `Resource type with ${payload.name} is already in use`, HttpStatus.BAD_REQUEST);
                 }

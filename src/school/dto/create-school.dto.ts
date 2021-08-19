@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
 import { IsString, IsNotEmpty } from "class-validator";
 
-export class CreateModuleDto {
+export class CreateSchoolDto {
     @Expose()
     @IsString()
     @ApiProperty()
@@ -12,6 +12,13 @@ export class CreateModuleDto {
     @Expose()
     @IsString()
     @ApiProperty()
-    @IsNotEmpty({message: 'Description cannot be empty'})
-    description: string;
+    @IsNotEmpty({message: 'Address cannot be empty'})
+    address: string;
+
+    @Expose()
+    @IsString()
+    @ApiProperty()
+    @IsNotEmpty({message: 'City cannot be empty'})
+    city: string;
+
 }

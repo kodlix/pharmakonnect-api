@@ -40,7 +40,11 @@ import { ChatGateway } from './gateway/chat.gateway';
 import { NotificationGateway } from './gateway/notification.gateway';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ModuleModule } from './module/module.module';
-import { ResourceTypeModule } from './resourcetype/resource-type.module';
+import { ResourceTypeModule } from './resource-type/resource-type.module';
+import { TypeOfPracticeModule } from './type-of-practice/type-of-practice.module';
+import { SchoolModule } from './school/school.module';
+import { AdvertZoneModule } from './advert-zone/advert-zone.module';
+import { OrganizationTypeModule } from './organization-type/organization-type.module';
 
 @Module({
   imports: [
@@ -82,6 +86,10 @@ import { ResourceTypeModule } from './resourcetype/resource-type.module';
     DashboardModule,
     ModuleModule,
     ResourceTypeModule,
+    TypeOfPracticeModule,
+    SchoolModule,
+    AdvertZoneModule,
+    OrganizationTypeModule,
     
   ],
   controllers: [AppController],

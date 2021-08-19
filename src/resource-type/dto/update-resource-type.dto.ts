@@ -1,7 +1,6 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 export class UpdateResourceTypeDto {
     @Expose()
@@ -16,9 +15,4 @@ export class UpdateResourceTypeDto {
     @IsNotEmpty({message: 'Description cannot be empty'})
     description: string;
 
-    @Expose()
-    @IsString()
-    @ApiProperty()
-    @IsNotEmpty({message: 'Module cannot be empty'})
-    module: string;
 }

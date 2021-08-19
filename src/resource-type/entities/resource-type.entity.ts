@@ -5,13 +5,10 @@ import { Column, Entity } from "typeorm";
 @Entity('ResourceType')
 export class ResourceTypeEntity extends AbstractBaseEntity{
 
-    @Column({type: "varchar", length: 128})
+    @Column()
     name: string;
 
-    @Column({type: "varchar", length: 128})
+    @Column()
     description: string;
-
-    @Column({type: "varchar", length: 128})
-    module: string;
 
 }

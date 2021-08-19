@@ -14,7 +14,7 @@ export class ModuleRepository extends Repository<ModuleEntity> {
 
     async saveModule(payload: CreateModuleDto, user: AccountEntity) : Promise<string> {
 
-        const ismoduleNameExist = await this.findOne({where: {name: ILike(`%${payload.name}%`)}});
+        const ismoduleNameExist = await this.findOne({where: {name: payload.name}});
         if(ismoduleNameExist) {
             throw new HttpException( `Module with ${payload.name} already exist`, HttpStatus.BAD_REQUEST);
         }
