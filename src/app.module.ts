@@ -43,7 +43,7 @@ import { ModuleModule } from './module/module.module';
 import { ResourceTypeModule } from './resource-type/resource-type.module';
 import { TypeOfPracticeModule } from './type-of-practice/type-of-practice.module';
 import { SchoolModule } from './school/school.module';
-import { AdvertZoneModule } from './advert-zone/advert-zone.module';
+import { AdvertZoneModule } from './advert/advert-zone/advert-zone.module';
 import { OrganizationTypeModule } from './organization-type/organization-type.module';
 
 @Module({
