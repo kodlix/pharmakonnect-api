@@ -20,7 +20,7 @@ export class AccountController {
   constructor(private readonly accountService: AccountService) { }
 
   @Post('/login')
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 400, description: 'BadRequest' })
   @ApiResponse({ status: 201, description: 'Return user credential' })
   async login(@Body() loginDto: LoginDTO): Promise<UserRO> {
     return await this.accountService.login(loginDto);

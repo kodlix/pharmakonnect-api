@@ -30,11 +30,11 @@ export class AccountService {
     }
     const { email, accountPackage, isRegComplete, accountType, accountId, profileImage, name } = user
     if (!email) {
-      throw new HttpException({ error: `Invalid email or password` }, HttpStatus.UNAUTHORIZED);
+      throw new HttpException({ error: `Invalid email or password` }, HttpStatus.BAD_REQUEST);
     }
 
     if (!user.verified) {
-      throw new HttpException({ error: `emailNotVerified`, type: 'emailNotVerified' }, HttpStatus.UNAUTHORIZED);
+      throw new HttpException({ error: `emailNotVerified`, type: 'emailNotVerified' }, HttpStatus.BAD_REQUEST);
     }
     const payload: JwtPayload = { email };
     const accessToken = await this.jwtService.sign(payload);
@@ -85,30 +85,19 @@ export class AccountService {
     let contactIds = [user.id, ...contacts.map(c => c.accountId)];
 
     if (search) {
-      const searchQuery = `
-         account.firstName ILIKE :search OR 
-         account.lastName ILIKE :search OR
-        account.city ILIKE :search OR 
-        account.organizationName ILIKE :search OR
-        account.email ILIKE :search OR account.phoneNumber ILIKE :search OR
-        account.pcn ILIKE :search OR
-        account.typesOfPractice ILIKE :search OR
-        account.organizationType ILIKE :search OR
-        account.companyRegistrationNumber ILIKE :search OR
-        account.address ILIKE :search `;
-      // account._state.name ILIKE :search OR
-      // account._lga.name ILIKE :search OR
-      // account._country.name ILIKE :search`;
+      const searchQuery = `(account.firstName ILIKE :search OR 
+        account.lastName ILIKE :search OR account.email ILIKE :search OR
+        account.phoneNumber ILIKE :search)`;
 
       const accts = await getRepository(AccountEntity)
         .createQueryBuilder('account')
-        .where('account.isRegComplete = :status', { status: true })
-        .andWhere('account.accountType Not In (:...types)', {
+        .where(`account.isRegComplete = true AND account.accountType Not In (:...types) 
+        AND account.id Not In (:...contacts)`, {
+          contacts: contactIds,
           types:
-            [accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]
-        })
-        .andWhere('account.id Not In (:...contacts)', { contacts: contactIds })
-
+            [accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]        })
+        .andWhere(searchQuery, {search: `%${search}%`
+      })
         .skip(take * (page - 1))
         .take(take)
         .orderBy('account.createdAt', 'DESC')
@@ -118,19 +107,19 @@ export class AccountService {
     }
 
 
-    const accounts = await getRepository(AccountEntity)
-      .createQueryBuilder('account')
-      .where('account.isRegComplete = :status', { status: true })
-      .andWhere('account.accountType Not In (:...types)', {
-        types:
-          [accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]
-      })
-      .andWhere('account.id Not In (:...contacts)', { contacts: contactIds })
-      .skip(take * (page - 1))
-      .take(take)
-      .orderBy('account.createdAt', 'DESC')
-      .getMany();
-    return this.accountRepository.buildUserArrRO(accounts);
+    // const accounts = await getRepository(AccountEntity)
+    //   .createQueryBuilder('account')
+    //   .where('account.isRegComplete = :status', { status: true })
+    //   .andWhere('account.accountType Not In (:...types)', {
+    //     types:
+    //       [accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]
+    //   })
+    //   .andWhere('account.id Not In (:...contacts)', { contacts: contactIds })
+    //   .skip(take * (page - 1))
+    //   .take(take)
+    //   .orderBy('account.createdAt', 'DESC')
+    //   .getMany();
+    return this.accountRepository.buildUserArrRO([]);
   }
 
 

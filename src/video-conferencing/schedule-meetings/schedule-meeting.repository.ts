@@ -25,7 +25,7 @@ export class ScheduleMeetingRepository extends Repository<ScheduleMeetingEntity>
         }
         
         if(!user.id) {
-            throw new HttpException( `User ID is required`, HttpStatus.UNAUTHORIZED);
+            throw new HttpException( `User ID is required`, HttpStatus.BAD_REQUEST);
         }
 
         if(isNotValidDate(payload.startDate)) {

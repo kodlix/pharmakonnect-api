@@ -34,6 +34,16 @@ export class ContactService {
           contactExist.push('User already exist in your contact.')
         } else {
           let contact = new ContactEntity()
+
+          if (!value.phoneNumber) {
+            throw new HttpException({ error: `Cannot add '${value.firstName} ${value.lastName}' because the phone number is missing`, status: HttpStatus.INTERNAL_SERVER_ERROR },
+            HttpStatus.BAD_REQUEST);
+          }
+
+          if (!value.email) {
+            throw new HttpException({ error: `Cannot add '${value.firstName} ${value.lastName}' because the email is missing`, status: HttpStatus.INTERNAL_SERVER_ERROR },
+            HttpStatus.BAD_REQUEST);
+          }
           contact.accountId = value.accountId;
           contact.creatorId = user.id;
           contact.createdBy = user.createdBy //use created by
@@ -52,8 +62,8 @@ export class ContactService {
       return await contactrepository.save(contactArr);
 
     } catch (error) {
-      throw new HttpException({ error: `An error occured`, status: HttpStatus.INTERNAL_SERVER_ERROR },
-        HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException({ error: error?.response?.error, status: HttpStatus.BAD_REQUEST },
+        HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -75,6 +85,7 @@ export class ContactService {
       const result = await getRepository(AccountEntity)
         .createQueryBuilder('a')
         .where('a.id IN (:...userIds)', { userIds })
+        .orderBy('a.firstName', 'ASC')
         .skip(take * (page - 1))
         .take(take)
         .getMany();
