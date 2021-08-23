@@ -2,13 +2,16 @@
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { Column, Entity } from "typeorm";
 
-@Entity('Module')
-export class ModuleEntity extends AbstractBaseEntity{
+@Entity('School')
+export class SchoolEntity extends AbstractBaseEntity{
 
     @Column()
     name: string;
 
     @Column()
-    description: string;
+    address: string;
+
+    @Column()
+    city: string;
 
 }

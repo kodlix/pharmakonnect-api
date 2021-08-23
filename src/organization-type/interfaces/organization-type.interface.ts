@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
 
-export interface ResourceTypeRO {
+export interface OrganizationTypeRO {
     
     id: string;
     name: string;
     description: string;
-    module: string;
+
 }
   

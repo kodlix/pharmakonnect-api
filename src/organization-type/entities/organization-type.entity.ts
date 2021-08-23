@@ -2,8 +2,8 @@
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { Column, Entity } from "typeorm";
 
-@Entity('Module')
-export class ModuleEntity extends AbstractBaseEntity{
+@Entity('OrganizationType')
+export class OrganizationTypeEntity extends AbstractBaseEntity{
 
     @Column()
     name: string;

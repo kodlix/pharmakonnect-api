@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { IsString, IsNotEmpty } from 'class-validator';
 
-export class UpdateModuleDto {
+export class UpdateOrganizationTypeDto {
     @Expose()
     @IsString()
     @ApiProperty()
@@ -14,4 +14,5 @@ export class UpdateModuleDto {
     @ApiProperty()
     @IsNotEmpty({message: 'Description cannot be empty'})
     description: string;
+    
 }
