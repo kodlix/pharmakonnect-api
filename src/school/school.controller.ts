@@ -30,21 +30,21 @@ export class SchoolController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get school' })
+  @ApiOperation({ summary: 'Get school  by Id' })
   @ApiResponse({ status: 200, description: 'Return school' })
   async findOne(@Param('id') id: string): Promise<SchoolRO> {
     return await this.schoolService.findById(id);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update school' })
+  @ApiOperation({ summary: 'Update school  by Id' })
   @ApiResponse({ status: 200, description: 'Return school successfully updated' })
   async update(@Param('id') id: string, @Body() updateSchoolDto: UpdateSchoolDto, @Req() req: any ): Promise<string> {
     return await this.schoolService.updateEntity(id, updateSchoolDto, req.user);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete school' })
+  @ApiOperation({ summary: 'Delete school  by Id' })
   @ApiResponse({ status: 200, description: 'School successfully deleted' })
   async remove(@Param('id') id: string): Promise<DeleteResult> {
     return await this.schoolService.delete(id);
