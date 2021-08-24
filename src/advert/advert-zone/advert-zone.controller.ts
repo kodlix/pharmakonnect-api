@@ -30,21 +30,21 @@ export class AdvertZoneController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get advert zone' })
+  @ApiOperation({ summary: 'Get advert zone  by Id' })
   @ApiResponse({ status: 200, description: 'Return advert zone' })
   async findOne(@Param('id') id: string): Promise<AdvertZoneRO> {
     return await this.advertZoneService.findById(id);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update advert zone' })
+  @ApiOperation({ summary: 'Update advert zone  by Id' })
   @ApiResponse({ status: 200, description: 'Return advert zone successfully updated' })
   async update(@Param('id') id: string, @Body() updateAdvertZoneDto: UpdateAdvertZoneDto, @Req() req: any ): Promise<string> {
     return await this.advertZoneService.updateEntity(id, updateAdvertZoneDto, req.user);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete advert zone' })
+  @ApiOperation({ summary: 'Delete advert zone  by Id' })
   @ApiResponse({ status: 200, description: 'Advert zone successfully deleted' })
   async remove(@Param('id') id: string): Promise<DeleteResult> {
     return await this.advertZoneService.delete(id);

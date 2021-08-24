@@ -45,6 +45,9 @@ import { TypeOfPracticeModule } from './type-of-practice/type-of-practice.module
 import { SchoolModule } from './school/school.module';
 import { AdvertZoneModule } from './advert/advert-zone/advert-zone.module';
 import { OrganizationTypeModule } from './organization-type/organization-type.module';
+import { OrganizationCategoryModule } from './organization-category/organization-category.module';
+import { ProfessionModule } from './profession/profession.module';
+import { ProfessionalGroupModule } from './professional-group/professional-group.module';
 
 @Module({
   imports: [
@@ -90,6 +93,9 @@ import { OrganizationTypeModule } from './organization-type/organization-type.mo
     SchoolModule,
     AdvertZoneModule,
     OrganizationTypeModule,
+    OrganizationCategoryModule,
+    ProfessionModule,
+    ProfessionalGroupModule,
     
   ],
   controllers: [AppController],
