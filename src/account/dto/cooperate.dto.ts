@@ -23,6 +23,9 @@ export class CorperateDTO extends BaseAccountDTO {
     @IsString()
     @ApiProperty()
     readonly companyRegistrationNumber: string;
+    @IsString()
+    @ApiProperty()
+    readonly organizationCategory: string;
     @IsInt()
     @IsNotEmpty()
     @ApiProperty()
