@@ -1,100 +1,101 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { DeleteResult, Repository} from "typeorm";
+import { plainToClass, plainToClassFromExist } from 'class-transformer';
+import {validate} from 'class-validator';
 import { AccountEntity } from "src/account/entities/account.entity";
-import { DeleteResult, getRepository, Repository } from "typeorm";
-import { CreatePackageFeaturesDto } from "./dto/createpackage-feature.dto";
-import { UpdatePackageFeaturesDto } from "./dto/updatepackage-feature.dto";
-import { PackageFeatureEntity } from "./entities/packagefeature.entity";
+import { PackageEntity } from "./entities/package.entity";
+import { CreatePackageDto } from "./dto/create-package.dto";
+import { PackageRO } from "./interfaces/package.interface";
+import { UpdatePackageDto } from "./dto/update-package.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+
+
 
 @Injectable()
-export class PackageService extends Repository<PackageFeatureEntity> {
+export class PackageService {
+    constructor(
+        @InjectRepository(PackageEntity)
+        private readonly zoneRepository: Repository<PackageEntity>
+      ) { }
 
-      async createEntity(
-        dto: CreatePackageFeaturesDto,
-        user: AccountEntity
-      ): Promise<any[]> {
+    async createEntity(payload: CreatePackageDto, user: AccountEntity) : Promise<string> {
 
-        const repository = await getRepository(PackageFeatureEntity);
-          
-        const packages = Array<PackageFeatureEntity>();
+        const isPackageExist = await this.zoneRepository.findOne({where: {name: payload.name}});
+        if(isPackageExist) {
+            throw new HttpException( `Package with ${payload.name} already exist`, HttpStatus.BAD_REQUEST);
+        }
 
-        for (const feature of dto.features) {
-            const newPackage = new PackageFeatureEntity();   
-            newPackage.packageName = dto.name;
-            newPackage.packageId = dto.packageId;
-            newPackage.featureId = feature.id;
-            newPackage.featureName = feature.name;
-            newPackage.createdBy = user.createdBy;
-            newPackage.accountId = user.id;
-            packages.push(newPackage)
-        } 
-           
-        return await repository.save(packages);
+        const newPackage = plainToClass(PackageEntity, payload);
+        newPackage.createdBy = user.createdBy;        
+
+        const errors = await validate(newPackage);
+
+        if(errors.length > 0) {
+            throw new HttpException(errors, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+             await this.zoneRepository.save(newPackage);
+             return "Package successfully saved";
+        } catch(error)  {
+            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
-    async updateEntity(
-      id: string,
-      dto: UpdatePackageFeaturesDto,
-      user: AccountEntity,
-    ): Promise<any> {
-      const repository = await getRepository(PackageFeatureEntity);
+    async getAll(): Promise<PackageRO[]> {
+        
+        return await this.zoneRepository.find();
+    }
 
+    async findById(id: string): Promise<PackageRO> {
+
+        const packagefeature = await this.zoneRepository.findOne(id);
+        if(packagefeature) {
+            return packagefeature;
+        }
+        throw new HttpException(`The package cannot be found`, HttpStatus.NOT_FOUND);
+
+    }
     
-        let packages = new PackageFeatureEntity;
-        packages = await this.findOne(id);
-        
-        for (const feature of dto.features) {
-            const newPackage = new PackageFeatureEntity();   
-            newPackage.packageName = dto.name;
-            newPackage.packageId = dto.packageId;
-            newPackage.featureId = feature.id;
-            newPackage.featureName = feature.name;
-            newPackage.updatedBy = user.createdBy;
-            newPackage.accountId = user.id;
-          
-           // packages.push(newPackage)
-        } 
-                 
-        return await repository.save(packages);
+    async delete(id: string): Promise<DeleteResult> {
+
+        const packagefeature = await this.zoneRepository.findOne(id);
+        if(packagefeature) {
+            return await this.zoneRepository.delete(packagefeature.id);
+        }
+
+        throw new HttpException(`The package cannot be found`, HttpStatus.NOT_FOUND);
+
     }
 
-    async findAll(): Promise<PackageFeatureEntity[]> {
-      const repository = await getRepository(PackageFeatureEntity);
+    async updateEntity(id: string, payload: UpdatePackageDto, user: AccountEntity) : Promise<string> {
+        const packagefeature = await this.zoneRepository.findOne(id);
+        if (packagefeature ) {
 
-      const packages = await repository.find();      
-      return packages;
+            if( packagefeature.name != payload.name) {
+                
+                const nameExist = await this.zoneRepository.findOne({where: {name: payload.name}});
+                if(nameExist){
+                    throw new HttpException( `Package with ${payload.name} is already in use`, HttpStatus.BAD_REQUEST);
+                }
+            }
+         
+
+            packagefeature.updatedAt = new Date();
+            packagefeature.updatedBy = user.updatedBy || user.createdBy;
+
+            const updated = plainToClassFromExist(packagefeature, payload);
+
+            try {
+                 await this.zoneRepository.save(updated);
+                 return "Package successfully updated";
+            } catch (error) {
+                throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        throw new HttpException(`The package cannot be found`, HttpStatus.NOT_FOUND);
     }
 
-    async deleteEntity(id: string): Promise<DeleteResult> {
-
-      const repository = await getRepository(PackageFeatureEntity);
-
-      const packages = await repository.findOne(id);
-      return await repository.delete({ id: packages.id });
-    }
-
-
-
-
-
-
-    // constructor(private readonly packageRepository: PackageFeatureRepository) { }
-
-    // async create(
-    //     dto: CreatePackageFeaturesDto,
-        
-    // ): Promise<PackageRO[]> {
-    //     return await this.packageRepository.createEntity(dto);
-    // }
-
-    // async findAll(): Promise<PackageRO[]> {
-    //     return await this.packageRepository.findAll();
-    // }
-
-    // async remove(id: string) {
-    //     return await this.packageRepository.deleteEntity(id);
-    // }
-}
-
-function InjectRepository(User: any) {
-    throw new Error("Function not implemented.");
 }

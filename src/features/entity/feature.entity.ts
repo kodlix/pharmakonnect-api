@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { AccountEntity } from "src/account/entities/account.entity";
-import { PackageFeatureEntity } from "src/package/entities/packagefeature.entity";
+import { PackageEntity } from "src/package/entities/package.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { Entity, Column, ManyToOne } from "typeorm";
 
@@ -25,7 +25,7 @@ export class FeatureEntity extends AbstractBaseEntity {
   accountId: string;
 
 
-  @ManyToOne(() => PackageFeatureEntity, (s) => s.feature)
-  package: PackageFeatureEntity;
+  // @ManyToOne(() => PackageEntity, (s) => s.feature)
+  // package: PackageEntity;
 
 }

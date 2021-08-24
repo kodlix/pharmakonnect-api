@@ -26,7 +26,6 @@ import { CategoryModule } from './blog/category/category.module';
 import { EventsModule } from './events/events.module';
 import { EventReminderModule } from './events/tasks/event-reminder.module';
 import { PollModule } from './poll/poll.module';
-import { PackageModule } from './package/package.module';
 import { FeatureModule } from './features/feature.module';
 import { MailerModule } from './mailer/mailer.module';
 import { LikeModule } from './user-like/like.module';
@@ -48,6 +47,7 @@ import { OrganizationTypeModule } from './organization-type/organization-type.mo
 import { OrganizationCategoryModule } from './organization-category/organization-category.module';
 import { ProfessionModule } from './profession/profession.module';
 import { ProfessionalGroupModule } from './professional-group/professional-group.module';
+import { PackageModule } from './package/package.module';
 
 @Module({
   imports: [
@@ -78,7 +78,6 @@ import { ProfessionalGroupModule } from './professional-group/professional-group
     CategoryModule,
     EventsModule,
     PollModule,
-    PackageModule,
     FeatureModule,
     MailerModule,
     LikeModule,
@@ -96,6 +95,7 @@ import { ProfessionalGroupModule } from './professional-group/professional-group
     OrganizationCategoryModule,
     ProfessionModule,
     ProfessionalGroupModule,
+    PackageModule,
     
   ],
   controllers: [AppController],

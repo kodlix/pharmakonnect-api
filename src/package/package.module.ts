@@ -1,15 +1,16 @@
-/* eslint-disable prettier/prettier */
-import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { AccountModule } from "src/account/account.module";
-import { PackageFeatureEntity } from "./entities/packagefeature.entity";
-import { PackageFeatureRepository } from "./package-feature.repository";
-import { PackageController } from "./package.controller";
-import { PackageService } from "./package.service";
+import { Module } from '@nestjs/common';
+import { PackageService } from './package.service';
+import {PackageController } from './package.controller';
+import { AccountModule } from 'src/account/account.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PackageEntity } from './entities/package.entity';
+
 
 @Module({
-   imports: [TypeOrmModule.forFeature([PackageFeatureEntity]),AccountModule],
-    controllers: [PackageController],
-    providers: [PackageService, PackageFeatureRepository],
-  })
-  export class PackageModule {}
+  imports: [TypeOrmModule.forFeature([PackageEntity]), 
+     AccountModule
+  ],
+  controllers: [PackageController],
+  providers: [PackageService]
+})
+export class PackageModule {}

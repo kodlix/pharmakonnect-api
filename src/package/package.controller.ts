@@ -1,47 +1,52 @@
-/* eslint-disable prettier/prettier */
-import { Controller, Req, UseGuards } from "@nestjs/common";
-import { Post, Body, Get, HttpStatus, HttpException, Param, Delete } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { CreatePackageFeaturesDto } from "./dto/createpackage-feature.dto";
-import { PackageRO } from "./package.interface";
-import { PackageService } from "./package.service";
-
+import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { PackageService } from './package.service';
+import { CreatePackageDto } from './dto/create-package.dto';
+import { UpdatePackageDto } from './dto/update-package.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { PackageRO } from './interfaces/package.interface';
+import { DeleteResult } from 'typeorm';
 
 @Controller('package')
 @ApiBearerAuth()
 @UseGuards(AuthGuard())
-@ApiTags('package')
+@ApiTags('Package')
 export class PackageController {
-    constructor(private readonly packageService: PackageService) { }
-    @Post()
-    @ApiOperation({ summary: 'Create Packages' })
-    @ApiResponse({ status: 403, description: 'Forbidden.' })
-    @ApiResponse({ status: 201, description: 'Package successfully created' })
-    create(@Body() createPackageFeatureDto: CreatePackageFeaturesDto, @Req() req: any ) {
-        return this.packageService.createEntity(createPackageFeatureDto,req.user);
-    }
+  constructor(private readonly packageService: PackageService) {}
 
-    @Get()
-    @ApiOperation({ summary: 'Get Packages' })
-    @ApiResponse({ status: 403, description: 'Forbidden.' })
-    @ApiResponse({ status: 201, description: 'Success' })
-    async findAll(): Promise<PackageRO[]> {
-        return await this.packageService.findAll();
-    }
+  @Post()
+  @ApiOperation({ summary: 'Save package' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 201, description: 'The record has been successfully created' })
+  async create(@Body() createPackageDto: CreatePackageDto, @Req() req: any ) {
+    return await this.packageService.createEntity(createPackageDto, req.user);
+  }
 
-    @Delete(':id')
-    @ApiResponse({ status: 201, description: 'Delete Successfull.' })
-    @ApiResponse({ status: 404, description: 'Not Found.' })
-    @ApiOperation({ summary: 'Delete Package' })
-    async deleteEntity(@Param('id') id: string): Promise<any> {
-        if (id === null) {
-            throw new HttpException(
-                { error: `Package does not exists` },
-                HttpStatus.INTERNAL_SERVER_ERROR,
-            );
-        }
-        return await this.packageService.deleteEntity(id);
-    }
+  @Get()
+  @ApiOperation({ summary: 'Get all packages' })
+  @ApiResponse({ status: 200, description: 'Return all packages' })
+  async findAll(): Promise<PackageRO[]> {
+    return await this.packageService.getAll();
+  }
 
+  @Get(':id')
+  @ApiOperation({ summary: 'Get package  by Id' })
+  @ApiResponse({ status: 200, description: 'Return package' })
+  async findOne(@Param('id') id: string): Promise<PackageRO> {
+    return await this.packageService.findById(id);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update package  by Id' })
+  @ApiResponse({ status: 200, description: 'Return package successfully updated' })
+  async update(@Param('id') id: string, @Body() updatePackageDto: UpdatePackageDto, @Req() req: any ): Promise<string> {
+    return await this.packageService.updateEntity(id, updatePackageDto, req.user);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete package  by Id' })
+  @ApiResponse({ status: 200, description: 'Package successfully deleted' })
+  async remove(@Param('id') id: string): Promise<DeleteResult> {
+    return await this.packageService.delete(id);
+  }
 }

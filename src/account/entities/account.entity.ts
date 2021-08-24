@@ -9,12 +9,12 @@ import { OutletEntity } from 'src/outlet/entity/outlet.entity';
 import { ArticleEntity } from "src/blog/article/entities/article.entity";
 import { PollEntity } from 'src/poll/entities/poll.entity';
 import { FeatureEntity } from 'src/features/entity/feature.entity';
-import { PackageFeatureEntity } from 'src/package/entities/packagefeature.entity';
 import { AdvertEntity } from 'src/advert/entity/advert.entity';
 import { CountryEntity } from 'src/country/entities/country.entity';
 import { StateEntity } from 'src/state/entities/state.entity';
 import { LgaEntity } from 'src/lga/entities/lga.entity';
 import { staffStatus } from '../account.constant';
+import { PackageEntity } from 'src/package/entities/package.entity';
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
@@ -184,7 +184,7 @@ export class AccountEntity extends AbstractBaseEntity {
   feature: FeatureEntity[];
 
   @OneToMany(() => FeatureEntity, (s) => s.account)
-  package: PackageFeatureEntity[];
+  package: PackageEntity[];
 
   @OneToMany(() => OutletEntity, (x) => x.account)
   outlet: OutletEntity[];
