@@ -1,6 +1,6 @@
-/* eslint-disable prettier/prettier */
 import { Exclude } from "class-transformer";
 import { AccountEntity } from "src/account/entities/account.entity";
+import { TargetAudience } from "src/enum/enum";
 import { EventUsersEntity } from "src/events/eventusers/entities/eventusers.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
 import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
@@ -77,6 +77,9 @@ export class EventEntity extends AbstractBaseEntity{
     @Column({ type: 'bool', default: false})
     rejected: boolean;
 
+    @Column({ type: 'bool', default: false})
+    cancelled: boolean;
+
     @ManyToOne(() => AccountEntity, s => s.meeting)
     account: AccountEntity;
 
@@ -95,8 +98,21 @@ export class EventEntity extends AbstractBaseEntity{
     rejectedOn: Date;
 
     @Exclude()
+    @Column({nullable: true})
+    cancelledOn: Date;
+
+    @Exclude()
     @Column({ type: 'bool', default: false})
     eventReminderSent: boolean;
+
+    @Column({type: "enum", enum: TargetAudience, default: TargetAudience.public })
+    targetAudience: TargetAudience;
+
+    @Column("simple-array", {nullable: true})
+    groups: string[];
+
+    @Column({ type: 'bool', default: false})
+    participantsCanViewCount: boolean;
 
 
 }

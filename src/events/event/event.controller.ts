@@ -11,6 +11,7 @@ import { editFileName, imageFileFilter } from 'src/_utility/fileupload.util';
 import { diskStorage } from 'multer';
 import { EventRegistrationDto } from './dto/event-registration.dto';
 import { uploadFile } from 'src/_utility/upload.util';
+import { ExtendPublishEventDto } from './dto/extend-publish-event.dto';
 
 
 @Controller('event')
@@ -66,6 +67,13 @@ export class EventController {
   @UseGuards(AuthGuard())
   async findMyEvents(@Query() filterDto: FilterDto, @Req() req: any): Promise<EventRO[]> {
     return await this.eventService.findMyEvents(filterDto, req.user);
+  }
+
+  @Get('publicevent')
+  @ApiOperation({ summary: 'Get all my events' })
+  @ApiResponse({ status: 200, description: 'Return all my events' })
+  async findPublicEvents(@Query() filterDto: FilterDto): Promise<EventRO[]> {
+    return await this.eventService.findPublicEvents(filterDto);
   }
 
   @Get(':id')
@@ -138,6 +146,22 @@ export class EventController {
   @UseGuards(AuthGuard())
   async remove(@Param('id') id: string) {
     return await this.eventService.remove(id);
+  }
+
+  @Put('cancel/:id')
+  @ApiOperation({ summary: 'Cancel an event' })
+  @ApiResponse({ status: 200, description: 'Return event successfully cancelled' })
+  @UseGuards(AuthGuard())
+  async cancelEvent(@Param('id') id: string, @Body() payload: { reason }, @Req() req: any): Promise<string> {
+    return await this.eventService.cancelEvent(id, payload, req.user);
+  }
+
+  @Put('extend_published_event/:id')
+  @ApiOperation({ summary: 'Extend published event' })
+  @ApiResponse({ status: 200, description: 'Return event successfully extended' })
+  @UseGuards(AuthGuard())
+  async extendPublishEvent(@Param('id') id: string, @Body() request: ExtendPublishEventDto, @Req() req: any): Promise<string> {
+    return await this.eventService.extendPublishEvent(id, request, req.user);
   }
 }
 

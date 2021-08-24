@@ -11,6 +11,7 @@ import { FilterDto } from 'src/_common/filter.dto';
 import { Connection, DeleteResult } from 'typeorm';
 import { CreateEventDto } from './dto/create-event.dto';
 import { EventRegistrationDto } from './dto/event-registration.dto';
+import { ExtendPublishEventDto } from './dto/extend-publish-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { EventRepository } from './event.repository';
 import { EventRO } from './interfaces/event.interface';
@@ -61,6 +62,10 @@ export class EventService {
 
   async findMyEvents(queryParam: FilterDto, user: AccountEntity): Promise<EventRO[]> {
     return await this.eventRepo.findMyEvents(queryParam, user);
+  }
+
+  async findPublicEvents(queryParam: FilterDto): Promise<EventRO[]> {
+    return await this.eventRepo.findPublicEvents(queryParam);
   }
 
   async findOne(id: string) : Promise<EventRO>{
@@ -193,7 +198,8 @@ export class EventService {
                         <p> Organizer Name: <strong> ${event.organizerName} </strong> </p> <br>
                         <p> Organizer Phone No: <strong> ${event.organizerPhoneNumber} </strong></p> <br>
                         <p> Access Code: <strong> ${event.requireUniqueAccessCode ? payload.accessCode : 'NIL'} </strong> </p> <br>
-                        <p> Url: <strong> ${event.url ? event.url : 'NIL'} </strong> </p>
+                        <p> Url: <strong> ${event.url ? event.url : 'NIL'} </strong> </p> <br>
+                        <p> Thank you for choosing <strong> Kapsuul </strong> </p>
                         `
             
             await this.mailService.sendHtmlMailAsync(payload.email, subject, html);
@@ -208,6 +214,90 @@ export class EventService {
 
   async remove(id: string) : Promise<DeleteResult>{
     return await this.eventRepo.deleteEvent(id);
+  }
+
+  async cancelEvent(id: string, {reason}, user: AccountEntity) : Promise<string> {
+    
+    try {
+      const eventToCancel = await this.eventRepo.findOne(id, {relations: ['eventUsers']});
+      
+      if(!eventToCancel) {
+        throw new HttpException('Event does not exist', HttpStatus.BAD_REQUEST);
+      }
+
+      if(eventToCancel.cancelled) {
+        throw new HttpException(`This event has been cancelled already`, HttpStatus.BAD_REQUEST);
+      }
+
+      if(!reason) {
+        throw new HttpException(`Cancellation reason should not be empty`, HttpStatus.BAD_REQUEST);
+      }
+
+      if (eventToCancel.accountId != user.id) {
+          throw new HttpException('Only creator of an event can cancel an event', HttpStatus.BAD_REQUEST);
+      }
+
+      if (new Date().setHours(0,0,0,0) > new Date(eventToCancel.startDate).setHours(0,0,0,0)) {
+        throw new HttpException('Cannot cancel an event that has already started', HttpStatus.BAD_REQUEST);
+      }
+    
+      eventToCancel.rejected = false;
+      eventToCancel.published = false;
+      eventToCancel.cancelled = true;
+      eventToCancel.cancelledOn = new Date();
+
+      //send email to all registered users that event has been cancelled;
+      const eventUsers = eventToCancel.eventUsers;
+
+      if(eventUsers.length > 0) {
+          for (const evUsers of eventUsers) {
+                          
+            const subject = `Event ${eventToCancel.name} has been cancelled`;
+            const html = `<p> Dear ${evUsers.name}, </p> <br>
+                    <p> This is to notify you that the event you registered for has been cancelled.</p> <br>
+                    <p> Below is the reason for the cancellation.</p> <br>
+                    <p> REASON: <strong> ${reason} </strong> </p> <br>
+                    <p> Thank you for choosing <strong> Kapsuul </strong> </p>
+                    `
+            await this.mailService.sendHtmlMailAsync(evUsers.email, subject, html);            
+          } 
+      }
+
+      return "Event cancelled successfully";
+  
+    } catch (error) {
+        throw new HttpException(`Error while cancelling event: Error: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR)      
+    }
+    
+  }
+
+
+  async extendPublishEvent(id: string, payload: ExtendPublishEventDto, user: AccountEntity) : Promise<string>  {
+      try {
+         const event = await this.eventRepo.findOne(id);
+
+         if(!event) {
+           throw new HttpException('Event not found', HttpStatus.BAD_REQUEST);
+         }
+
+         if(!event.published) {
+           throw new HttpException('Only published event can be extended', HttpStatus.BAD_REQUEST);
+         }
+
+         if (event.accountId != user.id) {
+            throw new HttpException('Only creator of an event can extend an event', HttpStatus.BAD_REQUEST);
+         }
+
+         event.endDate = payload.endDate;
+         event.endTime = payload.endTime;
+
+         await this.eventRepo.save(event);
+
+         return "Event successfully extended";
+
+      } catch (error) {
+        throw new HttpException('Error while trying to extend', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
   }
 
   stringToBoolean(val: any){
