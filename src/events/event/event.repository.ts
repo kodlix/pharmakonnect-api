@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
-import {Brackets, DeleteResult, EntityRepository, getCustomRepository, ILike, Repository} from "typeorm";
+import {Brackets, DeleteResult, EntityRepository, getCustomRepository, ILike, LessThan, Repository} from "typeorm";
 import { plainToClass, plainToClassFromExist } from 'class-transformer';
 import {validate} from 'class-validator';
 import { FilterDto } from "src/_common/filter.dto";
@@ -15,6 +15,7 @@ import { isNotValidDate } from "src/_utility/date-validator.util";
 import { isNotValidTime } from "src/_utility/time-validator.util";
 import { EventUsersRO } from "../eventusers/interfaces/eventusers.interface";
 import { EventUsersEntity } from "../eventusers/entities/eventusers.entity";
+import { TargetAudience } from "src/enum/enum";
 
 
 @EntityRepository(EventEntity)
@@ -68,6 +69,11 @@ export class EventRepository extends Repository<EventEntity> {
 
         const newEvent = plainToClass(EventEntity, payload);
 
+        if(payload.groups.length > 0) {
+            const groupIds = payload.groups.map(x => x.id);
+            newEvent.groups = groupIds;
+        }
+
         newEvent.accountId = user.id;
         newEvent.createdBy = user.createdBy;
         
@@ -102,6 +108,7 @@ export class EventRepository extends Repository<EventEntity> {
                         .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
                     }))
                     .andWhere("event.published = true")
+                    .andWhere("event.endDate < NOW()")
                     .orderBy("event.createdAt", "DESC")
                     .skip(15 * (page ? page - 1 : 0))
                     .take(15)
@@ -110,7 +117,14 @@ export class EventRepository extends Repository<EventEntity> {
             return events;
         }
 
-        return await this.find({where: {published: true}, relations: ['eventUsers'], order: { createdAt: 'DESC' }, take: 15, skip: 15 * (page - 1)});
+        return await this.createQueryBuilder("event")
+                .leftJoinAndSelect("event.eventUsers", "eventUsers")
+                .where("event.published = true")
+                .andWhere("event.endDate < NOW()")
+                .orderBy("event.createdAt", "DESC")
+                .skip(15 * (page ? page - 1 : 0))
+                .take(15)
+                .getMany();
     }
 
     async GetAllEvents({search, page}: FilterDto): Promise<EventRO[]> {
@@ -159,6 +173,29 @@ export class EventRepository extends Repository<EventEntity> {
         }
 
         return await this.find({where: {accountId: user.id}, relations: ['eventUsers'], order: { createdAt: 'DESC' }, take: 15, skip: 15 * (page - 1)});
+    }
+
+    async findPublicEvents({search, page}: FilterDto): Promise<EventRO[]> {
+        
+        
+        if(search) {
+
+           const events =  await this.createQueryBuilder("event")
+                    .leftJoinAndSelect("event.eventUsers", "eventUsers")
+                    .where("event.targetAudience = :targetAudience", { targetAudience: TargetAudience.public })
+                    .andWhere(new Brackets(qb => {
+                        qb.where("event.name ILike :name", { name: `%${search}%` })
+                        .orWhere("event.accessCode ILike :accessCode", { accessCode: `%${search}%` })
+                    }))
+                    .orderBy("event.createdAt", "DESC")
+                    .skip(15 * (page ? page - 1 : 0))
+                    .take(15)
+                    .getMany();
+
+            return events;
+        }
+
+        return await this.find({where: {targetAudience: TargetAudience.public}, relations: ['eventUsers'], order: { createdAt: 'DESC' }, take: 15, skip: 15 * (page - 1)});
     }
 
     async findEventById(id: string): Promise<EventRO> {
