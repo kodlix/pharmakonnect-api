@@ -50,8 +50,9 @@ export class AdvertController {
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'search', required: false })
-  async findAll(@Req() req: any, @Query('page') page?: number, @Query('search') search?: string): Promise<AdvertRO[]> {
-    return await this.advertservice.findAll(page, search);
+  @ApiQuery({ name: 'zone', required: false })
+  async findAll(@Req() req: any, @Query('page') page?: number, @Query('search') search?: string, @Query('zone') zone?:string): Promise<AdvertRO[]> {
+    return await this.advertservice.findAll(page, search,zone);
   }
 
   @Get(':id')
@@ -82,8 +83,8 @@ export class AdvertController {
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiQuery({ name: 'page', required: false })
   @ApiOperation({ summary: 'Get Advert by Approved' })
-  async findByApproved(@Query('page') page?: number): Promise<AdvertRO[]> {
-    return await this.advertservice.findByApproved(page);
+  async findByApproved(@Query('page') page?: number, @Query('zone') zone?: string ): Promise<AdvertRO[]> {
+    return await this.advertservice.findByApproved(page,zone);
   }
 
   @UseInterceptors(

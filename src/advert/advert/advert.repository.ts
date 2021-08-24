@@ -8,6 +8,7 @@ import { RejectAdvertDto, UpdateAdvertDto } from "./dto/update-advert";
 import {validate} from 'class-validator';
 import { isNotValidDate } from "src/_utility/date-validator.util";
 import { UpdateResult } from 'typeorm';
+import { advertZone } from "./advert.constant";
 
 
 @EntityRepository(AdvertEntity)
@@ -179,7 +180,9 @@ export class AdvertRepository extends Repository<AdvertEntity>{
     // }
     
 
-    async findall(page: number,search: string ): Promise<AdvertEntity[]> {
+    async findall(page: number,search: string , zone: string): Promise<AdvertEntity[]> {
+
+
         if(search) {
 
           const advert =  await this.createQueryBuilder("advert")
@@ -197,6 +200,19 @@ export class AdvertRepository extends Repository<AdvertEntity>{
       
            return advert;
       }
+
+      if(zone){
+        const advert = await this.find({
+          where: {zone: zone},
+          order: {approvedOn: "DESC"},
+          take: 25,
+          skip: page ? 25 * (page - 1) : 0
+              
+         });
+         return advert
+        }
+
+        
       
       return await this.find({ order: { createdAt: 'DESC' }, take: 25, skip: page ? 25 * (page - 1) : 0});
 
@@ -229,9 +245,20 @@ export class AdvertRepository extends Repository<AdvertEntity>{
     }
 
 
-    async findByAprroved(page = 1 ): Promise<AdvertEntity[]> {
+    async findByAprroved(page = 1,zone: string ): Promise<AdvertEntity[]> {
 
       const today = new Date();
+      if(zone){
+        const advert = await this.find({
+          where: {zone, approved: true , rejected : false , startDate: LessThanOrEqual (today), endDate: MoreThanOrEqual(today)},
+          order: {approvedOn: "DESC"},
+          take: 25,
+          skip: page ? 25 * (page - 1) : 0
+              
+         });
+         return advert
+        }
+
       const advert = await this.find({
         relations: ["advertCategory"],
         where: {approved: true , rejected : false , startDate: LessThanOrEqual (today), endDate: MoreThanOrEqual(today)},
