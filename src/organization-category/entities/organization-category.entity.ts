@@ -11,4 +11,8 @@ export class OrganizationCategoryEntity extends AbstractBaseEntity{
     @Column()
     description: string;
 
+    @Column({default: false})
+    requiresPremise: boolean;
+
+
 }

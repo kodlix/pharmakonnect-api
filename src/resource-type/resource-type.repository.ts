@@ -16,7 +16,7 @@ export class ResourceTypeRepository extends Repository<ResourceTypeEntity> {
 
         const isresourceTypeNameExist = await this.findOne({where: {name: payload.name}});
         if(isresourceTypeNameExist) {
-            throw new HttpException( `Resource type with ${payload.name} already exist`, HttpStatus.BAD_REQUEST);
+            throw new HttpException( `Resource type with name '${payload.name}' already exist`, HttpStatus.BAD_REQUEST);
         }
 
         const newResourceType = plainToClass(ResourceTypeEntity, payload);
@@ -50,7 +50,7 @@ export class ResourceTypeRepository extends Repository<ResourceTypeEntity> {
         if(resourceType) {
             return resourceType;
         }
-        throw new HttpException(`The resource type with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
+        throw new HttpException(`The resource type cannot be found`, HttpStatus.NOT_FOUND);
 
     }
     
@@ -61,7 +61,7 @@ export class ResourceTypeRepository extends Repository<ResourceTypeEntity> {
             return await this.delete({ id: resourceType.id });
         }
 
-        throw new HttpException(`The resource type with ID ${id} cannot be found`, HttpStatus.NOT_FOUND);
+        throw new HttpException(`The resource type cannot be found`, HttpStatus.NOT_FOUND);
 
     }
 
@@ -73,7 +73,7 @@ export class ResourceTypeRepository extends Repository<ResourceTypeEntity> {
                 
                 const nameExist = await this.findOne({where: {name: payload.name}});
                 if(nameExist){
-                    throw new HttpException( `Resource type with ${payload.name} is already in use`, HttpStatus.BAD_REQUEST);
+                    throw new HttpException( `Resource type with '${payload.name}' is already in use`, HttpStatus.BAD_REQUEST);
                 }
             }
          

@@ -1,6 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
-import { IsString, IsNotEmpty } from "class-validator";
+import { IsString, IsNotEmpty, IsBoolean } from "class-validator";
 
 export class CreateOrganizationCategoryDto {
     @Expose()
@@ -14,5 +14,10 @@ export class CreateOrganizationCategoryDto {
     @ApiProperty()
     @IsNotEmpty({message: 'Description cannot be empty'})
     description: string;
+
+    @Expose()
+    @IsBoolean()
+    @ApiPropertyOptional()
+    requiresPremise: boolean;
 
 }
