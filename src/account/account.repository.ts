@@ -2,56 +2,56 @@ import { EntityRepository, ILike, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { AccountEntity } from './entities/account.entity';
 import { RegisterDTO, LoginDTO, LockUserDTO, ChangePasswordDto, ResetPasswordDto } from './dto/credential.dto';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
 import { UserFromDbRO } from './interfaces/account.interface';
 import { OrganizationRO, UserDataRO } from './interfaces/user.interface';
 import { accountTypes, staffStatus } from './account.constant';
 import { constants } from 'buffer';
 import { OutletEntity } from 'src/outlet/entity/outlet.entity';
 import { FilterDto } from 'src/_common/filter.dto';
+import { exception } from 'console';
 
 @EntityRepository(AccountEntity)
 export class AccountRepository extends Repository<AccountEntity> {
-  public async register({
-    email,
-    password,
-    accountType,
-    isRegComplete,
-    firstName,
-    lastName, 
-    organizationName,
-    emailVerified,
-    organizationId,
-    subscribeToJobAlert
-  }: RegisterDTO): Promise<boolean> {
-    const isExists = await await this.findOne({ email });
+  public async register(dto: RegisterDTO): Promise<boolean> {
+    const isExists = await this.findOne({ email: dto.email });
     if (isExists) {
       throw new HttpException(
-        { error: `${email} already exists`, status: HttpStatus.BAD_REQUEST },
+        { error: `${dto.email} already exists`, status: HttpStatus.BAD_REQUEST },
         HttpStatus.BAD_REQUEST,
       );
     }
+
+    const pcnExists = await this.findOne({pcn: dto.pcn});
+    if (pcnExists) {
+      throw new BadRequestException(`The PCN Number '${dto.pcn}' is already in use.`)
+    }
+
+    if (dto.accountType === accountTypes.CORPORATE){
+      const premiseNuExists = await this.findOne({premiseNumber: dto.premiseNumber});
+      if (premiseNuExists) {
+        throw new BadRequestException(`The premise number '${dto.pcn}' is already in use.`)
+      }
+    }
     
     const user = new AccountEntity();
-    user.email = email;
-    user.accountType = accountType;
-    user.firstName = firstName;
-    user.lastName = lastName;
-    user.organizationName = organizationName;
-    user.organizationId = organizationId;
-    user.createdBy = email;
-    user.isRegComplete = isRegComplete;
-    user.emailVerified = emailVerified;
+    user.email = dto.email;
+    user.accountType = dto.accountType;
+    user.firstName = dto.firstName;
+    user.lastName = dto.lastName;
+    user.organizationName = dto.organizationName;
+    user.organizationId = dto.organizationId;
+    user.createdBy = dto.email;
+    user.isRegComplete = dto.isRegComplete;
+    user.emailVerified = dto.emailVerified;
     user.salt = await bcrypt.genSalt();
-    user.password = await this.hashPassword(password, user.salt);
-    user.subscribeToJobAlert = this.stringToBoolean(subscribeToJobAlert ? subscribeToJobAlert : false);
+    user.password = await this.hashPassword(dto.password, user.salt);
+    user.subscribeToJobAlert = this.stringToBoolean(dto.subscribeToJobAlert ? dto.subscribeToJobAlert : false);
     
     try {
       await user.save();
-      if (accountType = accountTypes.CORPORATE){
-
-        const outlet = new OutletEntity()
-        
+      if (dto.accountType === accountTypes.CORPORATE){
+        const outlet = new OutletEntity()        
         outlet.isHq = true;
         outlet.name = "Headquarters"
         outlet.accountId = user.id;
