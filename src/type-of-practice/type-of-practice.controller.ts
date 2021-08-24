@@ -30,21 +30,21 @@ export class TypeOfPracticeController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get type of practice' })
+  @ApiOperation({ summary: 'Get type of practice  by Id' })
   @ApiResponse({ status: 200, description: 'Return type of practice' })
   async findOne(@Param('id') id: string): Promise<TypeOfPracticeRO> {
     return await this.typeOfPracticeService.findById(id);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update type of practice' })
+  @ApiOperation({ summary: 'Update type of practice  by Id' })
   @ApiResponse({ status: 200, description: 'Return type of practice successfully updated' })
   async update(@Param('id') id: string, @Body() updateTypeOfPracticeDto: UpdateTypeOfPracticeDto, @Req() req: any ): Promise<string> {
     return await this.typeOfPracticeService.updateEntity(id, updateTypeOfPracticeDto, req.user);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete type of practice' })
+  @ApiOperation({ summary: 'Delete type of practice  by Id' })
   @ApiResponse({ status: 200, description: 'Type of practice successfully deleted' })
   async remove(@Param('id') id: string): Promise<DeleteResult> {
     return await this.typeOfPracticeService.delete(id);

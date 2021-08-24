@@ -30,21 +30,21 @@ export class ModuleController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get Module' })
+  @ApiOperation({ summary: 'Get Module  by Id' })
   @ApiResponse({ status: 200, description: 'Return Module' })
   async findOne(@Param('id') id: string): Promise<ModuleRO> {
     return await this.moduleService.findOne(id);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update Module' })
+  @ApiOperation({ summary: 'Update Module  by Id' })
   @ApiResponse({ status: 200, description: 'Return Module successfully updated' })
   async update(@Param('id') id: string, @Body() updateModuleDto: UpdateModuleDto, @Req() req: any ): Promise<string> {
     return await this.moduleService.update(id, updateModuleDto, req.user);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete Module' })
+  @ApiOperation({ summary: 'Delete Module  by Id' })
   @ApiResponse({ status: 200, description: 'Module successfully deleted' })
   async remove(@Param('id') id: string): Promise<DeleteResult> {
     return await this.moduleService.remove(id);

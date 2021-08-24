@@ -30,21 +30,21 @@ export class OrganizationTypeController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get organization type' })
+  @ApiOperation({ summary: 'Get organization type  by Id' })
   @ApiResponse({ status: 200, description: 'Return organization type' })
   async findOne(@Param('id') id: string): Promise<OrganizationTypeRO> {
     return await this.organizationTypeService.findById(id);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update organization type' })
+  @ApiOperation({ summary: 'Update organization type  by Id' })
   @ApiResponse({ status: 200, description: 'Return organization type successfully updated' })
   async update(@Param('id') id: string, @Body() updateOrganizationTypeDto: UpdateOrganizationTypeDto, @Req() req: any ): Promise<string> {
     return await this.organizationTypeService.updateEntity(id, updateOrganizationTypeDto, req.user);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete organization type' })
+  @ApiOperation({ summary: 'Delete organization type  by Id' })
   @ApiResponse({ status: 200, description: 'Organization type successfully deleted' })
   async remove(@Param('id') id: string): Promise<DeleteResult> {
     return await this.organizationTypeService.delete(id);

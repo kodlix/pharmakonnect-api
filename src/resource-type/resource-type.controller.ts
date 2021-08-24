@@ -30,21 +30,21 @@ export class ResourceTypeController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get resource type' })
+  @ApiOperation({ summary: 'Get resource type  by Id' })
   @ApiResponse({ status: 200, description: 'Return resource type' })
   async findOne(@Param('id') id: string): Promise<ResourceTypeRO> {
     return await this.resourceTypeService.findOne(id);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update resource type' })
+  @ApiOperation({ summary: 'Update resource type  by Id' })
   @ApiResponse({ status: 200, description: 'Return resource type successfully updated' })
   async update(@Param('id') id: string, @Body() updateResourceTypeDto: UpdateResourceTypeDto, @Req() req: any ): Promise<string> {
     return await this.resourceTypeService.update(id, updateResourceTypeDto, req.user);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete resource type' })
+  @ApiOperation({ summary: 'Delete resource type  by Id' })
   @ApiResponse({ status: 200, description: 'Resource type successfully deleted' })
   async remove(@Param('id') id: string): Promise<DeleteResult> {
     return await this.resourceTypeService.remove(id);
