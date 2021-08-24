@@ -36,6 +36,6 @@ export interface OrganizationRO {
     openingTime: string;
     closingTime: string;
     numberofEmployees: string;
-    yearofEstablishment: string;
+    yearofEstablishment: number;
 }
 

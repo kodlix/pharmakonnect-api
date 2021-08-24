@@ -40,7 +40,6 @@ export class AccountRepository extends Repository<AccountEntity> {
     user.organizationName = organizationName;
     user.organizationId = organizationId;
     user.createdBy = email;
-    user.accountPackage = 'Free';
     user.isRegComplete = isRegComplete;
     user.emailVerified = emailVerified;
     user.salt = await bcrypt.genSalt();
@@ -80,6 +79,7 @@ export class AccountRepository extends Repository<AccountEntity> {
         email,
         accountPackage: user.accountPackage,
         isRegComplete: user.isRegComplete,
+        premiseNumber: user.premiseNumber,
         accountType: user.accountType,
         accountId: user.id,
         verified: user.emailVerified,
@@ -312,6 +312,7 @@ export class AccountRepository extends Repository<AccountEntity> {
       staffStatus:user.staffStatus,
       typesOfPractice: user.typesOfPractice,
       isRegComplete: user.isRegComplete,
+      premiseNumber: user.premiseNumber,
       accountType: user.accountType,
       address: user.address,
       country: user.country,
@@ -353,7 +354,8 @@ export class AccountRepository extends Repository<AccountEntity> {
         email: user.email,
         logo: user.profileImage,
         website: user.website,
-        noOfEmployees: user.numberofEmployees
+        noOfEmployees: user.numberofEmployees,
+        premiseNumber: user.premiseNumber
       };
       userArr.push(userRO);
     });
