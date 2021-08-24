@@ -6,10 +6,8 @@ import { BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
 import { UserFromDbRO } from './interfaces/account.interface';
 import { OrganizationRO, UserDataRO } from './interfaces/user.interface';
 import { accountTypes, staffStatus } from './account.constant';
-import { constants } from 'buffer';
 import { OutletEntity } from 'src/outlet/entity/outlet.entity';
 import { FilterDto } from 'src/_common/filter.dto';
-import { exception } from 'console';
 
 @EntityRepository(AccountEntity)
 export class AccountRepository extends Repository<AccountEntity> {
@@ -28,9 +26,15 @@ export class AccountRepository extends Repository<AccountEntity> {
     }
 
     if (dto.accountType === accountTypes.CORPORATE){
+      const organizatioNameExists = await this.findOne({organizationName: dto.organizationName});
+
+      if (organizatioNameExists) {
+        throw new BadRequestException(`Organization with name '${dto.organizationName}' already exists.`);
+      }
+        
       const premiseNuExists = await this.findOne({premiseNumber: dto.premiseNumber});
       if (premiseNuExists) {
-        throw new BadRequestException(`The premise number '${dto.pcn}' is already in use.`)
+        throw new BadRequestException(`The premise number '${dto.pcn}' is already in use.`);
       }
     }
     
