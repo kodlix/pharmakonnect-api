@@ -9,12 +9,12 @@ import { DeleteResult } from 'typeorm';
 
 @Controller('type-of-practice')
 @ApiBearerAuth()
-@UseGuards(AuthGuard())
 @ApiTags('Type of Practice')
 export class TypeOfPracticeController {
   constructor(private readonly typeOfPracticeService: TypeOfPracticeService) {}
 
   @Post()
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Save type of practice' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 201, description: 'The record has been successfully created' })
@@ -37,6 +37,7 @@ export class TypeOfPracticeController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Update type of practice  by Id' })
   @ApiResponse({ status: 200, description: 'Return type of practice successfully updated' })
   async update(@Param('id') id: string, @Body() updateTypeOfPracticeDto: UpdateTypeOfPracticeDto, @Req() req: any ): Promise<string> {
@@ -44,6 +45,7 @@ export class TypeOfPracticeController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Delete type of practice  by Id' })
   @ApiResponse({ status: 200, description: 'Type of practice successfully deleted' })
   async remove(@Param('id') id: string): Promise<DeleteResult> {

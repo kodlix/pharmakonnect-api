@@ -9,12 +9,12 @@ import { DeleteResult } from 'typeorm';
 
 @Controller('professional-group')
 @ApiBearerAuth()
-@UseGuards(AuthGuard())
 @ApiTags('Professional Group')
 export class ProfessionalGroupController {
   constructor(private readonly professionalGroupService: ProfessionalGroupService) {}
 
   @Post()
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Save professional group' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 201, description: 'The record has been successfully created' })
@@ -37,6 +37,7 @@ export class ProfessionalGroupController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Update professional group  by Id' })
   @ApiResponse({ status: 200, description: 'Return professional group successfully updated' })
   async update(@Param('id') id: string, @Body() updateProfessionalGroupDto: UpdateProfessionalGroupDto, @Req() req: any ): Promise<string> {
@@ -44,6 +45,7 @@ export class ProfessionalGroupController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Delete professional group  by Id' })
   @ApiResponse({ status: 200, description: 'Professional group successfully deleted' })
   async remove(@Param('id') id: string): Promise<DeleteResult> {

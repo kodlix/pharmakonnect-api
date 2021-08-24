@@ -9,12 +9,12 @@ import { DeleteResult } from 'typeorm';
 
 @Controller('profession')
 @ApiBearerAuth()
-@UseGuards(AuthGuard())
 @ApiTags('Profession')
 export class ProfessionController {
   constructor(private readonly professionService: ProfessionService) {}
 
   @Post()
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Save profession' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 201, description: 'The record has been successfully created' })
@@ -37,6 +37,7 @@ export class ProfessionController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Update profession  by Id' })
   @ApiResponse({ status: 200, description: 'Return profession successfully updated' })
   async update(@Param('id') id: string, @Body() updateProfessionDto: UpdateProfessionDto, @Req() req: any ): Promise<string> {
@@ -44,6 +45,7 @@ export class ProfessionController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Delete profession  by Id' })
   @ApiResponse({ status: 200, description: 'Profession successfully deleted' })
   async remove(@Param('id') id: string): Promise<DeleteResult> {
