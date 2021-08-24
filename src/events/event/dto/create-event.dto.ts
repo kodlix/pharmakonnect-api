@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
-import {  IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
+import {  IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
+import { TargetAudience } from "src/enum/enum";
 
 
 export class CreateEventDto {
@@ -112,5 +113,20 @@ export class CreateEventDto {
     @ApiPropertyOptional()
     @IsOptional()
     coverImage: string;
+
+    @Expose()
+    @IsNotEmpty()
+    @ApiProperty({enum: TargetAudience, description: "Value can either be 'public', 'private' or 'group'"})
+    @IsEnum(TargetAudience)
+    targetAudience: TargetAudience;
+
+    @ApiPropertyOptional()
+    @ApiProperty()
+    groups? : any;
+
+    @ApiProperty({default: false})
+    @ApiPropertyOptional()
+    @IsOptional()
+    participantsCanViewCount: boolean;
 
 }

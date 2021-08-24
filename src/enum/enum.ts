@@ -4,3 +4,9 @@ export enum NotificationType {
     ADVERT = "advert",
     BLOG = "blog"
 }
+
+export enum TargetAudience {
+    private = "private",
+    public = "public",
+    group = "group"
+}

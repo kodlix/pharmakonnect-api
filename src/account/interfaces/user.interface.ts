@@ -3,6 +3,7 @@ export interface UserDataRO {
     email: string;
     organizationName: string;
     organizationType: string;
+    organizationCategory: string;
     accountPackage: string;
     firstName: string;
     lastName: string;
@@ -28,6 +29,7 @@ export interface JwtPayload {
 export interface OrganizationRO {
     organizationName: string;
     organizationType: string;
+    organizationCategory: string;
     companyRegistrationNumber: string;
     pcn: string;
     longitude: number;

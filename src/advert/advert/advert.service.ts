@@ -112,8 +112,8 @@ export class AdvertService{
     //     return await this.advertRepository.uploadAdvertImage(advertImage, advertId);
     // }
 
-    async findAll(page, search): Promise<AdvertRO[]> {
-        return await this.advertRepository.findall(page, search);
+    async findAll(page, search, zone): Promise<AdvertRO[]> {
+        return await this.advertRepository.findall(page, search, zone);
     }
 
     async findOne(id: string): Promise<AdvertRO> {
@@ -125,8 +125,8 @@ export class AdvertService{
     }
 
     
-    async findByApproved( page): Promise<AdvertRO[]> {
-        return await this.advertRepository.findByAprroved(page);
+    async findByApproved( page, zone): Promise<AdvertRO[]> {
+        return await this.advertRepository.findByAprroved(page, zone);
     }
 
     async remove(id: string) {

@@ -17,6 +17,10 @@ export class RegisterDTO {
     readonly organizationName?: string;
     @IsOptional() @ApiProperty()
     readonly organizationId?: string;
+    @IsOptional() @ApiProperty()
+    readonly pcn?: string;
+    @IsOptional() @ApiProperty()
+    readonly premiseNumber?: string;
     isRegComplete: boolean;
     emailVerified: boolean;
     subscribeToJobAlert?: boolean;
