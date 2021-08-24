@@ -123,8 +123,6 @@ export class AccountService {
   }
 
 
-
-
   public async findOne(id: string): Promise<UserDataRO> {
     return await this.accountRepository.getById(id);
   }

@@ -5,8 +5,13 @@ export enum accountTypes {
   ADMIN = "Admin"
 }
 
-export enum staffStatus{
-  
+export enum accountPackages {
+  BASIC = 'basic',
+  PREMIUM = 'premium',
+  GUEST = "guest"
+}
+
+export enum staffStatus{  
   PENDING = 'pending',
   VERIFIED = 'verified',
   REJECTED = 'rejected',

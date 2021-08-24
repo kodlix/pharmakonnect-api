@@ -1,7 +1,7 @@
 import { IsEmail, IsFQDN, Length } from 'class-validator';
 import { AbstractBaseEntity } from 'src/_common/base.entity';
-import { ManyToOne, OneToOne } from 'typeorm';
-import { AfterInsert, Column, Entity, OneToMany, BeforeInsert } from 'typeorm';
+import { ManyToOne } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JobVacancyEntity } from "src/jobvacancy/entities/jobvacancy.entity";
 import { ScheduleMeetingEntity } from "src/video-conferencing/schedule-meetings/entities/schedule-meeting.entity";
@@ -13,8 +13,8 @@ import { AdvertEntity } from 'src/advert/entity/advert.entity';
 import { CountryEntity } from 'src/country/entities/country.entity';
 import { StateEntity } from 'src/state/entities/state.entity';
 import { LgaEntity } from 'src/lga/entities/lga.entity';
-import { staffStatus } from '../account.constant';
 import { PackageEntity } from 'src/package/entities/package.entity';
+import { accountPackages, staffStatus } from '../account.constant';
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
@@ -31,7 +31,7 @@ export class AccountEntity extends AbstractBaseEntity {
   public accountType: string;
 
   @Length(128)
-  @Column({ length: 128 })
+  @Column({ length: 128, default: accountPackages.BASIC })
   public accountPackage: string;
 
   @Length(128)
@@ -46,6 +46,9 @@ export class AccountEntity extends AbstractBaseEntity {
 
   @Column({ type: 'bool', default: false })
   public pcnVerified: boolean;
+  
+  @Column({ type: 'bool', default: false })
+  public premiseNoVerified: boolean;
 
   @Column({ type: 'bool', default: false })
   public isReported: boolean;
@@ -146,13 +149,16 @@ export class AccountEntity extends AbstractBaseEntity {
   public numberofEmployees: number;
 
   @Column({ nullable: true })
+  public premiseNumber: string;
+
+  @Column({ nullable: true })
   public premisesImage: string;
 
   @Length(50)
   @Column({ length: 50, default: '' })
   public companyRegistrationNumber?: string;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({nullable: true})
   public yearofEstablishment: number;
 
   @Column('time', { default: (): string => 'LOCALTIMESTAMP',nullable:true })
