@@ -69,9 +69,11 @@ export class EventRepository extends Repository<EventEntity> {
 
         const newEvent = plainToClass(EventEntity, payload);
 
-        if(payload.groups.length > 0) {
-            const groupIds = payload.groups.map(x => x.id);
-            newEvent.groups = groupIds;
+        if(payload.groups ) {
+            if(payload.groups.length > 0) {
+                const groupIds = payload.groups.map(x => x.id);
+                newEvent.groups = groupIds;
+            }
         }
 
         newEvent.accountId = user.id;
