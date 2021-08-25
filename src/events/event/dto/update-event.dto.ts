@@ -114,8 +114,9 @@ export class UpdateEventDto {
     coverImage: string;
 
     @Expose()
-    @IsNotEmpty()
-    @ApiProperty({enum: TargetAudience, description: "Value can either be 'public', 'private' or 'group'"})
+    @ApiPropertyOptional()
+    @IsOptional()
+    @ApiProperty({enum: TargetAudience,  description: "Value can either be 'public', 'private' or 'group'"})
     @IsEnum(TargetAudience)
     targetAudience: TargetAudience;
 

@@ -1,6 +1,7 @@
 export enum accountTypes {
-  INDIVIDUAL = 'individual',
+  INDIVIDUAL = 'professional',
   CORPORATE = 'corporate',
+  GUEST = 'guest',
   DEVELOPER = "Developer",
   ADMIN = "Admin"
 }
