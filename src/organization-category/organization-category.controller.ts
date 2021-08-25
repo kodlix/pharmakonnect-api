@@ -9,12 +9,12 @@ import { DeleteResult } from 'typeorm';
 
 @Controller('organization-category')
 @ApiBearerAuth()
-@UseGuards(AuthGuard())
 @ApiTags('Organization Category')
 export class OrganizationCategoryController {
   constructor(private readonly organizationCategoryService: OrganizationCategoryService) {}
 
   @Post()
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Save organization category' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 201, description: 'The record has been successfully created' })
@@ -37,6 +37,7 @@ export class OrganizationCategoryController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Update organization category  by Id' })
   @ApiResponse({ status: 200, description: 'Return organization category successfully updated' })
   async update(@Param('id') id: string, @Body() updateOrganizationCategoryDto: UpdateOrganizationCategoryDto, @Req() req: any ): Promise<string> {
@@ -44,6 +45,7 @@ export class OrganizationCategoryController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Delete organization category  by Id' })
   @ApiResponse({ status: 200, description: 'Organization category successfully deleted' })
   async remove(@Param('id') id: string): Promise<DeleteResult> {
