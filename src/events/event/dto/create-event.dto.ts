@@ -115,8 +115,9 @@ export class CreateEventDto {
     coverImage: string;
 
     @Expose()
-    @IsNotEmpty()
-    @ApiProperty({enum: TargetAudience, description: "Value can either be 'public', 'private' or 'group'"})
+    @ApiPropertyOptional()
+    @IsOptional()
+    @ApiProperty({enum: TargetAudience, default: TargetAudience.public, description: "Value can either be 'public', 'private' or 'group'"})
     @IsEnum(TargetAudience)
     targetAudience: TargetAudience;
 
