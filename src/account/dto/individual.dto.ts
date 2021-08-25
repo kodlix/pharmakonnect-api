@@ -29,6 +29,10 @@ export class IndividualDTO extends BaseAccountDTO {
     organizationCategory:string;
     @ApiProperty()
     readonly organizationId: string;
+    @ApiProperty()
+    readonly profession: string;
+    @ApiProperty()
+    readonly professionalGroup: string;
     // @IsString()
     // @IsNotEmpty()
     @ApiProperty()

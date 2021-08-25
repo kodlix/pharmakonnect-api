@@ -319,6 +319,8 @@ export class AccountRepository extends Repository<AccountEntity> {
       isRegComplete: user.isRegComplete,
       premiseNumber: user.premiseNumber,
       accountType: user.accountType,
+      profession: user.profession,
+      professionalGroup: user.professionalGroup,
       address: user.address,
       country: user.country,
       city: user.city,

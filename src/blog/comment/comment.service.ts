@@ -37,12 +37,13 @@ export class CommentService {
     image: string
   ): Promise<CommentEntity> {
     const article = await this.articleService.findOne(articleId);
+    const author = await this.accountService.getOneUserByEmail(userEmail);
     const comment = new CommentEntity();
     comment.article = article;
     comment.message = commentDto.message;
     comment.createdBy = commentDto.createdBy;
     comment.authorImage = image;
-    comment.author = (await this.accountService.getOneUserByEmail(userEmail)).email;
+    comment.author = author?.firstName + ' ' + author?.lastName;
     const createdComment = await this.commentRepo.save(comment);
     return this.findOne(createdComment.id);
   }

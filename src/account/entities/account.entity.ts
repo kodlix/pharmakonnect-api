@@ -85,6 +85,14 @@ export class AccountEntity extends AbstractBaseEntity {
   @Column({ nullable: true, length: 50 })
   public typesOfPractice: string;
 
+  @Length(50)
+  @Column({ nullable: true, length: 50 })
+  public profession: string;
+
+  @Length(50)
+  @Column({ nullable: true, length: 50 })
+  public professionalGroup: string;
+
   @Length(128)
   @Column({ nullable: true, length: 128 })
   public sectorId: string;
@@ -227,5 +235,4 @@ export class AccountEntity extends AbstractBaseEntity {
   lowerEmail() {
       this.email = this.email?.toLowerCase();
   }
-
 }
