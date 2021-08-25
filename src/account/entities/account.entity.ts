@@ -1,6 +1,6 @@
 import { IsEmail, IsFQDN, Length } from 'class-validator';
 import { AbstractBaseEntity } from 'src/_common/base.entity';
-import { ManyToOne } from 'typeorm';
+import { BeforeInsert, ManyToOne } from 'typeorm';
 import { Column, Entity, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JobVacancyEntity } from "src/jobvacancy/entities/jobvacancy.entity";
@@ -221,6 +221,11 @@ export class AccountEntity extends AbstractBaseEntity {
   public async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);
     return hash === this.password;
+  }
+
+  @BeforeInsert()
+  lowerEmail() {
+      this.email = this.email?.toLocaleLowerCase();
   }
 
 }
