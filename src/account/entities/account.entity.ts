@@ -225,7 +225,7 @@ export class AccountEntity extends AbstractBaseEntity {
 
   @BeforeInsert()
   lowerEmail() {
-      this.email = this.email?.toLocaleLowerCase();
+      this.email = this.email?.toLowerCase();
   }
 
 }
