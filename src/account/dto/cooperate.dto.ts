@@ -9,8 +9,6 @@ export class CorperateDTO extends BaseAccountDTO {
     @IsNotEmpty()
     @ApiProperty()
     readonly organizationName: string;
-    @IsString()
-    @IsNotEmpty()
     @ApiProperty()
     readonly organizationType: string;
     @IsInt()
@@ -23,7 +21,6 @@ export class CorperateDTO extends BaseAccountDTO {
     @IsString()
     @ApiProperty()
     readonly companyRegistrationNumber: string;
-    @IsString()
     @ApiProperty()
     readonly organizationCategory: string;
     @IsInt()

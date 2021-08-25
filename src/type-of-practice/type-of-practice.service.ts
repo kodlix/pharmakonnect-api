@@ -45,7 +45,7 @@ export class TypeOfPracticeService {
 
     async getAll(): Promise<TypeOfPracticeRO[]> {
         
-        return await this.zoneRepository.find();
+        return await this.zoneRepository.find({order: {name: 'ASC'}});
     }
 
     async findById(id: string): Promise<TypeOfPracticeRO> {
