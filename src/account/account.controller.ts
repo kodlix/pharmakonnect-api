@@ -43,6 +43,15 @@ export class AccountController {
     return await this.accountService.findAll(filterDto);
   }
 
+  @Get("/availableUsersByContact")
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @ApiOperation({ summary: 'Get all users by contact for group' })
+  @ApiResponse({ status: 200, description: 'Return all user' })
+  async availableUsersByContactForGroup(@Query() dto:FilterDto, @Req() req:any):Promise<UserDataRO[]> {
+    return await this.accountService.availableUsersByContactForGroup(dto.search, dto.groupId, dto.page, dto.take, req?.user);
+  }
+
   @Get("/contacts")
   @ApiBearerAuth()
   @UseGuards(AuthGuard())

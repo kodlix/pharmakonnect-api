@@ -1,5 +1,5 @@
 import { CorperateDTO } from './dto/cooperate.dto';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IndividualDTO } from './dto/individual.dto';
 import { RegisterDTO, LoginDTO, LockUserDTO, ResetPasswordDto, ChangePasswordDto } from './dto/credential.dto';
 import { CorperateRO, IndividualRO, UserRO } from './interfaces/account.interface';
@@ -13,6 +13,7 @@ import { SendGridService } from 'src/mailer/sendgrid.service';
 import { accountTypes } from './account.constant';
 import { ContactEntity } from 'src/contact/entities/contact.entity';
 import { NodeMailerService } from 'src/mailer/node-mailer.service';
+import { GroupService } from 'src/group/group.service';
 
 
 @Injectable()
@@ -20,6 +21,8 @@ export class AccountService {
   constructor(
     private readonly accountRepository: AccountRepository,
     private jwtService: JwtService,
+    @Inject(forwardRef(() => GroupService))
+    private groupService: GroupService,
     private readonly mailService: NodeMailerService,
   ) { }
 
@@ -83,6 +86,72 @@ export class AccountService {
       .getMany();
 
     let contactIds = [user.id, ...contacts.map(c => c.accountId)];
+
+    if (search) {
+      const searchQuery = `(account.firstName ILIKE :search OR 
+        account.lastName ILIKE :search OR account.email ILIKE :search OR
+        account.phoneNumber ILIKE :search)`;
+
+      const accts = await getRepository(AccountEntity)
+        .createQueryBuilder('account')
+        .where(`account.isRegComplete = true AND account.accountType Not In (:...types) 
+        AND account.id Not In (:...contacts)`, {
+          contacts: contactIds,
+          types:
+            [accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]        })
+        .andWhere(searchQuery, {search: `%${search}%`
+      })
+        .skip(take * (page - 1))
+        .take(take)
+        .orderBy('account.createdAt', 'DESC')
+        .getMany();
+
+      return this.accountRepository.buildUserArrRO(accts);
+    }
+
+
+    // const accounts = await getRepository(AccountEntity)
+    //   .createQueryBuilder('account')
+    //   .where('account.isRegComplete = :status', { status: true })
+    //   .andWhere('account.accountType Not In (:...types)', {
+    //     types:
+    //       [accountTypes.CORPORATE, accountTypes.DEVELOPER, accountTypes.ADMIN]
+    //   })
+    //   .andWhere('account.id Not In (:...contacts)', { contacts: contactIds })
+    //   .skip(take * (page - 1))
+    //   .take(take)
+    //   .orderBy('account.createdAt', 'DESC')
+    //   .getMany();
+    return this.accountRepository.buildUserArrRO([]);
+  }
+
+  public async availableUsersByContactForGroup(search, groupId = null,  page = 1, take = 20, user: any): Promise<UserDataRO[]> {
+    page = +page;
+    take = take && +take || 20;
+
+    let groupContacts = [];
+    let contactIds = [];
+
+    if (groupId) {
+      const members = await this.groupService.getGroupbyId(groupId);
+       groupContacts = members.members?.map(x => x.id);
+    }
+  
+
+    const contacts = await getRepository(ContactEntity)
+      .createQueryBuilder('contact')
+      .where('contact.creatorId = :id', { id: user.id })
+      .select('contact.accountId')
+      .getMany();
+
+    
+      if (groupContacts.length > 0) {
+        contactIds = [user.id, ...contacts.map(c => c.accountId), ...groupContacts];
+      }
+      else{
+        contactIds = [user.id, ...contacts.map(c => c.accountId)];
+      }
+
 
     if (search) {
       const searchQuery = `(account.firstName ILIKE :search OR 
