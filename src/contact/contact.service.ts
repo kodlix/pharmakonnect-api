@@ -230,63 +230,72 @@ export class ContactService {
   }
 
   async filter(dto: ContactAdvanceFilter, user: AccountEntity) {
-    const entityManager = getManager();
-    let whereConditions: any[] = [];
+    const entityManager = await this.acctSvc
+    let condition = {isRegComplete: true, accountType: 'professional'};
     if (dto.email) {
-      whereConditions.push({ email: ILike(`%${dto.email}%`) });
+      const like = ILike(`%${dto.email}%`);
+      condition['email'] = ILike(`%${dto.email}%`);
     }
 
     if (dto.phoneNumber) {
-      whereConditions.push({ phoneNumber: ILike(`%${dto.phoneNumber})%`) });
+      condition['phoneNumber'] = ILike(`%${dto.phoneNumber})%`);
     }
 
     if (dto.state) {
-      whereConditions.push({ state: dto.state });
+      condition['state'] = ILike(`%${dto.state}%`);
     }
 
     if (dto.lga) {
-      whereConditions.push({ lga: dto.lga });
+      condition['lga'] = ILike(`%${dto.lga}%`);
     }
 
     if (dto.city) {
-      whereConditions.push({ city: ILike(`%${dto.city})%`) });
+      condition['city'] = ILike(`%${dto.city}%`);
     }
 
     if (dto.organizationName) {
-      whereConditions.push({ organizationName: ILike(`%${dto.organizationName})%`) });
+      condition['organizationName'] = ILike(`%${dto.organizationName}%`);
     }
 
     if (dto.address) {
-      whereConditions.push({ address: ILike(`%${dto.address})%`) });
+      condition['address'] = ILike(`%${dto.address}%`);
     }
 
     if (dto.gender) {
-      whereConditions.push({ gender: dto.gender });
+      condition['gender'] = ILike(`%${dto.gender}%`);
     }
 
     if (dto.typesOfPractice) {
-      whereConditions.push({ typesOfPractice: dto.typesOfPractice.toLowerCase() });
+      condition['typesOfPractice'] = ILike(`%${dto.typesOfPractice}%`);
+    }
+    
+    if (dto.yearOfGraduation) {
+      condition['yearOfGraduation'] = ILike(`%${dto.yearOfGraduation}%`);
     }
 
-    if (whereConditions.length > 0) {
-      const conditions = [...whereConditions]
-      let groups = await entityManager.find(GroupMemeberView, {
+    if (dto.schoolOfGraduation) {
+      condition['schoolOfGraduation'] = ILike(`%${dto.schoolOfGraduation}%`);
+    }
+
+    if (condition) {
+      const conditions = {...condition};
+      let users = await getRepository(AccountEntity).find({
         where: conditions,
         order: { firstName: 'ASC' }
       });
 
-      groups = this.removeDuplicates(groups, "email");
-      if (groups.length > 0) {
-        const contacts = await getRepository(ContactEntity).createQueryBuilder('c')
-          .where(`c.creatorId = :userId`, { userId: user.id })
-          .getMany();
+      users = this.removeDuplicates(users, "email");
+      // if (users.length > 0) {
+      //   const contacts = await getRepository(ContactEntity).createQueryBuilder('c')
+      //     .where(`c.creatorId = :userId`, { userId: user.id })
+      //     .getMany();
 
-        const contactIds = contacts.map(x => x.accountId);
-        if (contactIds.length > 0) {
-          groups = groups.filter(x => !contactIds.includes(x.id));
-        }
-      }
-      return groups;
+      //   const contactIds = contacts.map(x => x.accountId);
+      //   if (contactIds.length > 0) {
+      //     users = users.filter(x => !contactIds.includes(x.id));
+      //   }
+      // }
+      return users;
     }
 
     return [];

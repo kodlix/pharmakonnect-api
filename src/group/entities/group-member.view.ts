@@ -7,13 +7,14 @@ import { ViewEntity, ViewColumn } from "typeorm";
      "account"."lastName" as "lastName", "account"."profileImage" as "profileImage",  
      "account"."organizationName" as "organizationName", "account"."address" as "address",
      "account"."state" as "state", "account"."lga" as "lga", "account"."typesOfPractice" as "typesOfPractice",
+     "account"."professionalGroup" as "professionalGroup", 
      "account"."pcn" as "pcn", "account"."phoneNumber" as "phoneNumber", "account"."gender" as "gender",
-     "groupMember"."contactId" as "contactId", "groupMember"."groupId" as "groupId",
+     "groupMember"."contactId" as "contactId", "groupMember"."groupId" as "groupId",     
      "group"."name" as "groupName", "group"."description" as "groupDescription", "group"."logo" as "logo", "group"."ownerName" as "ownerName",
      "account"."city" as "city", "groupMember"."ownerId" as "ownerId" FROM "Account" "account"
     LEFT JOIN "GroupMember" "groupMember" ON "account"."id" = "groupMember"."contactId"
     LEFT JOIN "Group" "group" ON "group"."id" = "groupMember"."groupId"
-    WHERE ("account"."accountType" = 'individual' OR "account"."accountType" = 'corporate' )  AND "groupMember"."ownerId" IS NOT NULL
+    WHERE ("account"."accountType" = 'individual' OR "account"."accountType" = 'corporate' AND "account"."isRegComplete" = true )
      `
 })
 
@@ -81,5 +82,8 @@ export class GroupMemeberView
 
     @ViewColumn()
     gender: string;
+
+    @ViewColumn()
+    professionalGroup: string;
     
 }
