@@ -43,9 +43,7 @@ export class CommentService {
     comment.message = commentDto.message;
     comment.createdBy = commentDto.createdBy;
     comment.authorImage = image;
-<<<<<<< Updated upstream
     comment.author = author?.firstName + ' ' + author?.lastName;
-=======
     const user = await this.accountService.getOneUserByEmail(userEmail)
     if (user.accountType = "corporate"){
       await this.articleService.findOne(articleId);
@@ -55,7 +53,6 @@ export class CommentService {
       comment.author = `${(await this.accountService.getOneUserByEmail(userEmail)).firstName} ${(await this.accountService.getOneUserByEmail(userEmail)).lastName}`;
     }
     
->>>>>>> Stashed changes
     const createdComment = await this.commentRepo.save(comment);
     return this.findOne(createdComment.id);
   }
