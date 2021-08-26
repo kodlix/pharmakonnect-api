@@ -9,6 +9,10 @@ export class FilterDto {
 
     @ApiProperty()
     @ApiPropertyOptional()
+    groupId: string;
+
+    @ApiProperty()
+    @ApiPropertyOptional()
     page: number;
 
     @ApiProperty()

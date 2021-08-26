@@ -21,7 +21,8 @@ import { CreateContactDto } from 'src/contact/dto/create-contact.dto';
 @Injectable()
 export class GroupService extends Repository<GroupEntity> {
   constructor(
-    @Inject(forwardRef(() => ContactService)) private readonly contactServcie: ContactService) {
+    @Inject(forwardRef(() => ContactService)) private readonly contactServcie: ContactService) 
+    {
     super();    
   }
 
@@ -83,7 +84,7 @@ export class GroupService extends Repository<GroupEntity> {
     }
 
     // add group members to owner's contacts
-    await this.addMembersToOwnerContact(members, user);
+    //await this.addMembersToOwnerContact(members, user);
     return true;
   }
 
@@ -128,9 +129,9 @@ export class GroupService extends Repository<GroupEntity> {
     }
 
     
-    if (dto.addMembersToContact) {
-      await this.addMembersToOwnerContact(dto.members, user);
-    }
+    // if (dto.addMembersToContact) {
+    //   await this.addMembersToOwnerContact(dto.members, user);
+    // }
 
     const groupMembers: any[] = [];
     for (const member of dto.members) {
