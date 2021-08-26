@@ -31,7 +31,6 @@ export class CorperateDTO extends BaseAccountDTO {
     readonly openingTime: Date;
     @ApiProperty()
     readonly closingTime: Date;
-    @IsString()
     @ApiProperty()
     readonly website: string;
 }

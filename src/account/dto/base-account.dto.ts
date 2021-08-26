@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsNotEmpty, IsNumber, IsString } from "class-validator"
 
 export abstract class BaseAccountDTO {
@@ -31,8 +31,7 @@ export abstract class BaseAccountDTO {
     @IsNotEmpty()
     @ApiProperty()
     readonly address: string;
-    @IsString()
-    @ApiProperty()
+    @ApiPropertyOptional()
     readonly pcn: string;
     @IsNumber()
     @ApiProperty()

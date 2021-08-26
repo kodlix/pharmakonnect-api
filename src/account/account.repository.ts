@@ -77,7 +77,7 @@ export class AccountRepository extends Repository<AccountEntity> {
     email,
     password,
   }: LoginDTO): Promise<UserFromDbRO> {
-    const user = await await this.findOne({ where: { email: email?.toLowerCase() } });
+    const user = await await this.findOne({ where: { email: email } });
     if (user && (await user.validatePassword(password))) {
       let data = {
         email,
