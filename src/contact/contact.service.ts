@@ -17,7 +17,7 @@ export class ContactService {
     @InjectRepository(ContactEntity)
     private readonly repository: Repository<ContactEntity>,
     @Inject(forwardRef(() => GroupService)) private readonly groupSvc: GroupService,
-    private acctSvc: AccountService
+    @Inject(forwardRef(() => AccountService))private acctSvc: AccountService
   ) { }
 
   async createContact(dto: CreateContactDto[], user: any): Promise<any[]> {

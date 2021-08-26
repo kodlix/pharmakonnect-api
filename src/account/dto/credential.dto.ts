@@ -20,7 +20,13 @@ export class RegisterDTO {
     @IsOptional() @ApiProperty()
     readonly pcn?: string;
     @IsOptional() @ApiProperty()
+    readonly typesOfPractice?: string;
+    @IsOptional() @ApiProperty()
+    readonly organizationCategory?: string;
+    @IsOptional() @ApiProperty()
     readonly premiseNumber?: string;
+    @IsOptional() @ApiProperty()
+    readonly profession?: string;
     isRegComplete: boolean;
     emailVerified: boolean;
     subscribeToJobAlert?: boolean;

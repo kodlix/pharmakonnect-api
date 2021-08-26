@@ -7,7 +7,10 @@ import { AccountModule } from 'src/account/account.module';
 import { GroupModule } from 'src/group/group.module';
 
 @Module({
-  imports:[AccountModule, TypeOrmModule.forFeature([ContactEntity]),  forwardRef(() => GroupModule)],
+  imports:[
+    forwardRef(() => GroupModule), 
+    forwardRef(() =>AccountModule), 
+    TypeOrmModule.forFeature([ContactEntity])],
   controllers: [ContactController],
   providers: [ContactService],
   exports: [ContactService]

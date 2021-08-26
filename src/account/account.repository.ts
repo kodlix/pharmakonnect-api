@@ -44,10 +44,15 @@ export class AccountRepository extends Repository<AccountEntity> {
     user.firstName = dto.firstName;
     user.lastName = dto.lastName;
     user.organizationName = dto.organizationName;
+    user.pcn = dto.pcn;
+    user.organizationCategory = dto.organizationCategory;
+    user.premiseNumber = dto.premiseNumber;
     user.organizationId = dto.organizationId;
     user.createdBy = dto.email;
     user.isRegComplete = dto.isRegComplete;
     user.emailVerified = dto.emailVerified;
+    user.typesOfPractice = dto.typesOfPractice;
+    user.profession = dto.profession;
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(dto.password, user.salt);
     user.subscribeToJobAlert = this.stringToBoolean(dto.subscribeToJobAlert ? dto.subscribeToJobAlert : false);
@@ -77,7 +82,7 @@ export class AccountRepository extends Repository<AccountEntity> {
     email,
     password,
   }: LoginDTO): Promise<UserFromDbRO> {
-    const user = await await this.findOne({ where: { email: email } });
+    const user = await await this.findOne({ where: { email: email.toLowerCase() } });
     if (user && (await user.validatePassword(password))) {
       let data = {
         email,
