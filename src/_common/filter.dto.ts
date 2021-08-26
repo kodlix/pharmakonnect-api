@@ -46,7 +46,6 @@ export class ContactAdvanceFilter {
     @ApiPropertyOptional()
     email: string;
 
-
     @ApiProperty()
     @ApiPropertyOptional()
     firstName: string;
@@ -90,4 +89,12 @@ export class ContactAdvanceFilter {
     @ApiProperty()
     @ApiPropertyOptional()
     gender: string;
+
+    @ApiProperty()
+    @ApiPropertyOptional()
+    yearOfGraduation: string;
+
+    @ApiProperty()
+    @ApiPropertyOptional()
+    schoolOfGraduation: string;
 }
