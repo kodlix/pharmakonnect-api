@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
 import { IsString, IsNotEmpty } from "class-validator";
 
@@ -8,6 +8,10 @@ export class CreateSchoolDto {
     @ApiProperty()
     @IsNotEmpty({message: 'Name cannot be empty'})
     name: string;
+
+    @Expose()
+    @ApiPropertyOptional()
+    otherValue: string;
 
     @Expose()
     @IsString()
