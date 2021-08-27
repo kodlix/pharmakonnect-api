@@ -231,7 +231,7 @@ export class ContactService {
 
   async filter(dto: ContactAdvanceFilter, user: AccountEntity) {
     const entityManager = await this.acctSvc
-    let condition = {isRegComplete: true, accountType: 'professional'};
+    let condition = {};
     if (dto.email) {
       const like = ILike(`%${dto.email}%`);
       condition['email'] = ILike(`%${dto.email}%`);
@@ -282,6 +282,8 @@ export class ContactService {
     } 
 
     if (condition) {
+      condition['isRegComplete'] = true;
+      condition['accountType'] =  'professional';
       const conditions = {...condition};
       let users = await getRepository(AccountEntity).find({
         where: conditions,
