@@ -313,6 +313,7 @@ export class AccountRepository extends Repository<AccountEntity> {
       phoneNumber: user.phoneNumber,
       yearOfGraduation:user.yearOfGraduation,
       school: user.school,
+      schoolOtherValue: user.schoolOtherValue,
       profileImage: user.profileImage,
       accountPackage: user.accountPackage,
       organizationName: user.organizationName,
