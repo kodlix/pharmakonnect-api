@@ -89,7 +89,12 @@ export class CommentService {
       await this.userLikeService.resetDisLike(accountId, commentId, "comment");
      }
      await this.userLikeService.likeComment(accountId, commentId);
-    }     
+    }
+    else if(hasLiked){
+      comment.likes -= 1;
+      await this.userLikeService.resetLike(accountId, commentId, "comment")
+
+    }      
      
     const result = await this.commentRepo.save(comment);    
     return result; 
@@ -111,6 +116,10 @@ export class CommentService {
       await this.userLikeService.resetLike(accountId, commentId, "comment");
      }
      await this.userLikeService.dislikeComment(accountId, commentId);
+    }else if(hasDisliked){
+      comment.dislikes -= 1;
+      await this.userLikeService.resetDisLike(accountId, commentId, "comment")
+
     }      
      
     const result = await this.commentRepo.save(comment);    

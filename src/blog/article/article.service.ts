@@ -276,6 +276,11 @@ export class ArticleService {
       await this.userLikeService.resetDisLike(accountId, articleId, "article");
      }
      await this.userLikeService.likeArticle(accountId, articleId);
+    }
+    else if(hasLiked){
+      article.likes -= 1;
+      await this.userLikeService.resetLike(accountId, articleId, "article")
+
     }     
      
     const result = await this.articleRepo.save(article);    
@@ -298,7 +303,11 @@ export class ArticleService {
       await this.userLikeService.resetLike(accountId, articleId, "article");
      }
      await this.userLikeService.dislikeArticle(accountId, articleId);
-    }      
+    }else if(hasDisliked){
+      article.dislikes -= 1;
+      await this.userLikeService.resetDisLike(accountId, articleId, "article")
+
+    }         
      
     const result = await this.articleRepo.save(article);    
     return result;  

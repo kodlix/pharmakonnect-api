@@ -50,19 +50,19 @@ export class UserLikeService {
       return await this.likeRepo.save(newLike);
     }
 
-    public async likeComment(accountId : string, articleId : string): Promise<UserLikeEntity> {   
+    public async likeComment(accountId : string,commentId : string): Promise<UserLikeEntity> {   
       let newLike = new UserLikeEntity();
       newLike.accountId = accountId;
-      newLike.articleId = articleId;
+      newLike.commentId = commentId;
       newLike.isLike = true;
 
       return await this.likeRepo.save(newLike);
     }
 
-    public async dislikeComment(accountId : string, articleId : string): Promise<UserLikeEntity> {   
+    public async dislikeComment(accountId : string,commentId : string): Promise<UserLikeEntity> {   
       let newLike = new UserLikeEntity();
       newLike.accountId = accountId;
-      newLike.articleId = articleId;
+      newLike.commentId = commentId;
       newLike.isDislike = true;
 
       return await this.likeRepo.save(newLike);
