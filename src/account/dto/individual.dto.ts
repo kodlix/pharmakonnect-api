@@ -41,4 +41,6 @@ export class IndividualDTO extends BaseAccountDTO {
     // @IsNotEmpty()
     @ApiProperty()
     readonly school: string;
+    @ApiProperty()
+    schoolOtherValue: string;
 }

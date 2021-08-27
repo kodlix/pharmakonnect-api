@@ -146,6 +146,9 @@ export class AccountEntity extends AbstractBaseEntity {
   @Column({ nullable: true })
   school: string;
 
+  @Column({ nullable: true })
+  schoolOtherValue: string;
+
   @Length(256)
   @Column({ length: 256, nullable: true })
   public organizationName: string;

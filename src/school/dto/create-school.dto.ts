@@ -10,10 +10,6 @@ export class CreateSchoolDto {
     name: string;
 
     @Expose()
-    @ApiPropertyOptional()
-    otherValue: string;
-
-    @Expose()
     @IsString()
     @ApiProperty()
     @IsNotEmpty({message: 'Address cannot be empty'})

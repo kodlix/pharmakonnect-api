@@ -7,10 +7,7 @@ export class SchoolEntity extends AbstractBaseEntity{
 
     @Column()
     name: string;
-
-    @Column({nullable: true})
-    otherValue: string;
-
+    
     @Column()
     address: string;
 
