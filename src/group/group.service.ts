@@ -242,7 +242,7 @@ export class GroupService extends Repository<GroupEntity> {
 
     const entityManager = getManager();
     const groups = await entityManager.find(GroupMemeberView, {
-      where: { groupId: id }
+      where: { groupId: id }, order: { firstName: 'ASC'}      
     });
     return {
       name: group.name,

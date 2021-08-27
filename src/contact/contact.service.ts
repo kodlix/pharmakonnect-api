@@ -281,7 +281,7 @@ export class ContactService {
       condition['professionalGroup'] = ILike(`%${dto.professionalGroup}%`);
     } 
 
-    if (condition) {
+    if (Object.entries(condition).length !== 0) {
       condition['isRegComplete'] = true;
       condition['accountType'] =  'professional';
       const conditions = {...condition};
