@@ -244,11 +244,10 @@ export class ArticleController {
     }
   }
 
-  @Put('/view/:articleId')
+  @Get('/view/:articleId')
   @ApiResponse({ status: 201, description: 'article  viewd successfully.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'View Article' })
-  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   viewArticle(@Param('articleId') articleId: string ) {
     try {
