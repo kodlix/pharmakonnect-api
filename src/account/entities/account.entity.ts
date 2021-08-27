@@ -91,6 +91,10 @@ export class AccountEntity extends AbstractBaseEntity {
 
   @Length(50)
   @Column({ nullable: true, length: 50 })
+  public professionOthervalue: string;
+
+  @Length(50)
+  @Column({ nullable: true, length: 50 })
   public professionalGroup: string;
 
   @Length(128)

@@ -53,6 +53,7 @@ export class AccountRepository extends Repository<AccountEntity> {
     user.emailVerified = dto.emailVerified;
     user.typesOfPractice = dto.typesOfPractice;
     user.profession = dto.profession;
+    user.professionOthervalue = dto.professionOthervalue;
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(dto.password, user.salt);
     user.subscribeToJobAlert = this.stringToBoolean(dto.subscribeToJobAlert ? dto.subscribeToJobAlert : false);
@@ -326,6 +327,7 @@ export class AccountRepository extends Repository<AccountEntity> {
       premiseNumber: user.premiseNumber,
       accountType: user.accountType,
       profession: user.profession,
+      professionOtherValue :user.professionOthervalue,
       professionalGroup: user.professionalGroup,
       address: user.address,
       country: user.country,

@@ -78,7 +78,6 @@ export class JobVacancyController {
   @ApiResponse({ status: 201, description: 'Success.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'Get jobvacancy by Id' })
-  @UseGuards(AuthGuard())
   async findOne(@Param('id') id: string): Promise<JobVacancyRO> {
     return await this.jobvacancyService.findOne(id);
   }

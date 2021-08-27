@@ -30,6 +30,8 @@ export class RegisterDTO {
     isRegComplete: boolean;
     emailVerified: boolean;
     subscribeToJobAlert?: boolean;
+    @IsOptional() @ApiProperty()
+    readonly professionOthervalue?: string;
 }
 
 export class LoginDTO {
