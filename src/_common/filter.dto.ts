@@ -96,5 +96,10 @@ export class ContactAdvanceFilter {
 
     @ApiProperty()
     @ApiPropertyOptional()
-    schoolOfGraduation: string;
+    school: string;
+
+    
+    @ApiProperty()
+    @ApiPropertyOptional()
+    professionalGroup: string;
 }

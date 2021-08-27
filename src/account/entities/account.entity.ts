@@ -141,6 +141,9 @@ export class AccountEntity extends AbstractBaseEntity {
   yearOfGraduation: string;
 
   @Column({ nullable: true })
+  schoolOfGraduation: string;
+
+  @Column({ nullable: true })
   school: string;
 
   @Length(256)

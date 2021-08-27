@@ -273,9 +273,13 @@ export class ContactService {
       condition['yearOfGraduation'] = ILike(`%${dto.yearOfGraduation}%`);
     }
 
-    if (dto.schoolOfGraduation) {
-      condition['schoolOfGraduation'] = ILike(`%${dto.schoolOfGraduation}%`);
-    }
+    if (dto.school) {
+      condition['school'] = ILike(`%${dto.school}%`);
+    } 
+
+    if (dto.professionalGroup) {
+      condition['professionalGroup'] = ILike(`%${dto.professionalGroup}%`);
+    } 
 
     if (condition) {
       const conditions = {...condition};
