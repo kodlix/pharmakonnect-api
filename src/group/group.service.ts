@@ -32,7 +32,7 @@ export class GroupService extends Repository<GroupEntity> {
       .getOne();
 
     if (exists) {
-      throw new BadRequestException(`Group ${name} already exists.`);
+      throw new BadRequestException(`Group ${dto.name} already exists.`);
     }
 
     const result = await getRepository(GroupEntity).createQueryBuilder('g')
