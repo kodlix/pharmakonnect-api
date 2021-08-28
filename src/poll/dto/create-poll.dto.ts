@@ -56,6 +56,11 @@ export class CreatePollDto {
   @IsNotEmpty({ message: 'Start date is required' })
   endDate: Date;
 
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  owner: string;
+
   @ApiProperty({type: [CreatePollQuestionDto]})
   @IsNotEmpty()
   questions: CreatePollQuestionDto[];

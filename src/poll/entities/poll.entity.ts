@@ -62,6 +62,7 @@ export class PollEntity extends AbstractBaseEntity {
     @Column({ nullable: true })
     message: string;
 
+    @Column({ nullable: true })
     owner: string;
 
     @ManyToOne(() => AccountEntity, acc => acc.polls)
