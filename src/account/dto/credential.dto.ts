@@ -31,7 +31,7 @@ export class RegisterDTO {
     emailVerified: boolean;
     subscribeToJobAlert?: boolean;
     @IsOptional() @ApiProperty()
-    readonly professionOthervalue?: string;
+    readonly professionOtherValue?: string;
 }
 
 export class LoginDTO {

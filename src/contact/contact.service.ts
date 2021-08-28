@@ -3,10 +3,9 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
 import { AccountEntity } from 'src/account/entities/account.entity';
-import { GroupMemeberView } from 'src/group/entities/group-member.view';
 import { GroupService } from 'src/group/group.service';
 import { ContactAdvanceFilter } from 'src/_common/filter.dto';
-import { getRepository, Repository, Brackets, getManager, ILike } from 'typeorm';
+import { getRepository, Repository, Brackets, ILike } from 'typeorm';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { ContactEntity } from './entities/contact.entity';
 
@@ -291,16 +290,6 @@ export class ContactService {
       });
 
       users = this.removeDuplicates(users, "email");
-      // if (users.length > 0) {
-      //   const contacts = await getRepository(ContactEntity).createQueryBuilder('c')
-      //     .where(`c.creatorId = :userId`, { userId: user.id })
-      //     .getMany();
-
-      //   const contactIds = contacts.map(x => x.accountId);
-      //   if (contactIds.length > 0) {
-      //     users = users.filter(x => !contactIds.includes(x.id));
-      //   }
-      // }
       return users;
     }
 
