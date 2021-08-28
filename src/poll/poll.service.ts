@@ -9,7 +9,6 @@ import { PollRepository } from './repositories/poll.repository';
 
 @Injectable()
 export class PollService {
- 
 
   /**
    * poll servcie 

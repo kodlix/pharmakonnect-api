@@ -24,6 +24,11 @@ export class PollRepository extends Repository<PollEntity> {
       where: { title: dto.title, accountId: user.id }
     });
 
+    const owner = await this.accountRepository.findOne(user.id);
+    if (!owner) {
+      throw new HttpException(`Invalid user.`, HttpStatus.BAD_REQUEST);
+    }
+
     const today = new Date();
 
     if (existingPoll && existingPoll.endDate >= today) {
@@ -60,7 +65,7 @@ export class PollRepository extends Repository<PollEntity> {
     poll.accountId = user.id;
     poll.createdBy = user.email;
     poll.createdAt = new Date()
-    poll.owner = user.firstName + ' ' + user.lastName;
+    poll.owner = owner.firstName + ' ' + owner.lastName;
     if (poll.questions?.length > 0) {
       for (const [index, question] of poll.questions.entries()) {
         question.id = uuidv4();
@@ -289,7 +294,7 @@ export class PollRepository extends Repository<PollEntity> {
       return searchResult;
     }
 
-    const Poll = await this.find({
+    const polls = await this.find({
       where: { published: true, active: true },
       order: { createdAt: 'DESC', published: 'DESC' },
       take: 25,
@@ -297,7 +302,7 @@ export class PollRepository extends Repository<PollEntity> {
       skip: 25 * (page - 1),
     });
 
-    return Poll;
+    return polls;
   }
 
 
