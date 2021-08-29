@@ -111,6 +111,7 @@ export class EventRepository extends Repository<EventEntity> {
                     }))
                     .andWhere("event.published = true")
                     // .andWhere("event.endDate < NOW()")
+                    
                     .orderBy("event.createdAt", "DESC")
                     .skip(15 * (page ? page - 1 : 0))
                     .take(15)
