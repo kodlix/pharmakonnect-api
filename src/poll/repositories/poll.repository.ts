@@ -9,6 +9,7 @@ import { PollEntity } from '../entities/poll.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { AccountRepository } from 'src/account/account.repository';
 import { PollSummaryDto } from '../dto/poll-summary.dto';
+import { domainToASCII } from 'url';
 
 
 @EntityRepository(PollEntity)
@@ -218,7 +219,11 @@ export class PollRepository extends Repository<PollEntity> {
       throw new HttpException(`Poll does not exist`, HttpStatus.NOT_FOUND);
     }
 
-    return await this.delete({ id: existingPoll.id });
+    if (existingPoll.published == true) {
+      throw new HttpException(`Poll Event has been published and therefore cannot be deleted`, HttpStatus.NOT_FOUND);
+    }
+    
+    return await this.softDelete({ id: existingPoll.id });
   }
 
   async findById(id: string): Promise<PollEntity> {
