@@ -2,7 +2,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { plainToClass, plainToClassFromExist } from 'class-transformer';
 import { NotEquals, validate } from 'class-validator';
 import { AccountEntity } from 'src/account/entities/account.entity';
-import { Repository, EntityRepository, DeleteResult, ILike, MoreThan, getRepository } from 'typeorm';
+import { Repository, EntityRepository, DeleteResult, ILike, MoreThan, getRepository, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { CreatePollDto } from '../dto/create-poll.dto';
 import { UpdatePollDto } from '../dto/update-poll.dto';
 import { PollEntity } from '../entities/poll.entity';
@@ -14,7 +14,9 @@ import { PollSummaryDto } from '../dto/poll-summary.dto';
 @EntityRepository(PollEntity)
 export class PollRepository extends Repository<PollEntity> {
 
-  constructor(private readonly accountRepository: AccountRepository) {
+  constructor(
+    private readonly accountRepository: AccountRepository
+  ) {
     super();
   }
 
@@ -24,7 +26,7 @@ export class PollRepository extends Repository<PollEntity> {
       where: { title: dto.title, accountId: user.id }
     });
 
-    const owner = await this.accountRepository.findOne(user.id);
+    const owner = await getRepository(AccountEntity).findOne({ where: { id: user.id } });
     if (!owner) {
       throw new HttpException(`Invalid user.`, HttpStatus.BAD_REQUEST);
     }
@@ -157,8 +159,7 @@ export class PollRepository extends Repository<PollEntity> {
     existingPoll.published = true;
     existingPoll.publishedAt = new Date();
     existingPoll.publishedBy = user.email;
-    existingPoll.active = false;
-
+    existingPoll.active = true;
 
     return await existingPoll.save();
   }
@@ -295,7 +296,7 @@ export class PollRepository extends Repository<PollEntity> {
     }
 
     const polls = await this.find({
-      where: { published: true, active: true },
+      where: { published: true, active: true, startDate: LessThanOrEqual(new Date()), endDate: MoreThanOrEqual(new Date()) },
       order: { createdAt: 'DESC', published: 'DESC' },
       take: 25,
 
