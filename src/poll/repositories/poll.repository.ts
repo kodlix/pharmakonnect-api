@@ -218,6 +218,7 @@ export class PollRepository extends Repository<PollEntity> {
       throw new HttpException(`Poll does not exist`, HttpStatus.NOT_FOUND);
     }
 
+    
     return await this.delete({ id: existingPoll.id });
   }
 

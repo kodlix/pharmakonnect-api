@@ -9,7 +9,6 @@ import { AccountRepository } from './account.repository';
 import { FilterDto } from 'src/_common/filter.dto';
 import { getRepository, Not } from 'typeorm';
 import { AccountEntity } from './entities/account.entity';
-import { SendGridService } from 'src/mailer/sendgrid.service';
 import { accountTypes } from './account.constant';
 import { ContactEntity } from 'src/contact/entities/contact.entity';
 import { NodeMailerService } from 'src/mailer/node-mailer.service';
@@ -18,6 +17,7 @@ import { GroupService } from 'src/group/group.service';
 
 @Injectable()
 export class AccountService {
+  
   constructor(
     private readonly accountRepository: AccountRepository,
     private jwtService: JwtService,
@@ -31,7 +31,7 @@ export class AccountService {
     if (!user) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.BAD_REQUEST);
     }
-    const { email, accountPackage, isRegComplete, accountType, accountId, profileImage, name } = user
+    const { email, accountPackage, isRegComplete, accountType, accountId, profileImage, name, pcnVerified } = user
     if (!email) {
       throw new HttpException({ error: `Invalid email or password` }, HttpStatus.BAD_REQUEST);
     }
@@ -43,7 +43,7 @@ export class AccountService {
     const accessToken = await this.jwtService.sign(payload);
     let dataToReturn = {
       email, token: accessToken, expires_in: 86400, accountPackage,
-      isRegComplete, accountType, accountId, profileImage, name
+      isRegComplete, accountType, accountId, profileImage, name, pcnVerified
     };
     return dataToReturn;
   }
@@ -67,11 +67,18 @@ export class AccountService {
   public async findAll({ search }: FilterDto): Promise<UserDataRO[]> {
     const query = this.accountRepository.createQueryBuilder('account');
     if (search) {
-      query.andWhere('(account.firstName LIKE :search OR account.lastName LIKE :search OR account.organizationName LIKE :search)',
+      query.andWhere(`(account.firstName LIKE :search 
+        OR account.lastName LIKE :search 
+        OR account.organizationName LIKE :search)`,
         { search: `%${search}%` });
     }
     const users = await query.getMany();
     return this.accountRepository.buildUserArrRO(users);
+  }
+
+
+  public async findAllCompletedAccounts(dto: FilterDto): Promise<UserDataRO[]>{
+    return this.accountRepository.findAllCompletedAccounts(dto);
   }
 
 
@@ -216,6 +223,10 @@ export class AccountService {
 
   public async verifyStaff(id: string) {
     return await this.accountRepository.verifyStaff(id)
+  }
+
+  public async verifyPcn(id: string) {
+    return await this.accountRepository.verifyPCN(id)
   }
 
   public async rejectStaff(id: string, message: string) {

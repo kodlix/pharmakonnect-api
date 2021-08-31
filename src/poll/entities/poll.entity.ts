@@ -74,7 +74,7 @@ export class PollEntity extends AbstractBaseEntity {
     @OneToMany(() => PollOptionEntity, (x) => x.poll, { cascade: ['insert', 'update'] })
     options: PollOptionEntity[];
 
-    @OneToMany(() => PollVoteEntity, (x) => x.poll)
+    @OneToMany(() => PollVoteEntity, (x) => x.poll, )
     votes: PollVoteEntity[];
 
 }

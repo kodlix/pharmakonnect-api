@@ -1,4 +1,4 @@
-import { EntityRepository, ILike, Repository } from 'typeorm';
+import { Brackets, EntityRepository, ILike, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { AccountEntity } from './entities/account.entity';
 import { RegisterDTO, LoginDTO, LockUserDTO, ChangePasswordDto, ResetPasswordDto } from './dto/credential.dto';
@@ -20,24 +20,24 @@ export class AccountRepository extends Repository<AccountEntity> {
       );
     }
 
-    const pcnExists = await this.findOne({pcn: dto.pcn});
+    const pcnExists = await this.findOne({ pcn: dto.pcn });
     if (pcnExists) {
       throw new BadRequestException(`The PCN Number '${dto.pcn}' is already in use.`)
     }
 
-    if (dto.accountType === accountTypes.CORPORATE){
-      const organizatioNameExists = await this.findOne({organizationName: dto.organizationName});
+    if (dto.accountType === accountTypes.CORPORATE) {
+      const organizatioNameExists = await this.findOne({ organizationName: dto.organizationName });
 
       if (organizatioNameExists) {
         throw new BadRequestException(`Organization with name '${dto.organizationName}' already exists.`);
       }
-        
-      const premiseNuExists = await this.findOne({premiseNumber: dto.premiseNumber});
+
+      const premiseNuExists = await this.findOne({ premiseNumber: dto.premiseNumber });
       if (premiseNuExists) {
-        throw new BadRequestException(`The premise number '${dto.pcn}' is already in use.`);
+        throw new BadRequestException(`The premise number '${dto.premiseNumber}' is already in use.`);
       }
     }
-    
+
     const user = new AccountEntity();
     user.email = dto.email;
     user.accountType = dto.accountType;
@@ -57,11 +57,11 @@ export class AccountRepository extends Repository<AccountEntity> {
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(dto.password, user.salt);
     user.subscribeToJobAlert = this.stringToBoolean(dto.subscribeToJobAlert ? dto.subscribeToJobAlert : false);
-    
+
     try {
       await user.save();
-      if (dto.accountType === accountTypes.CORPORATE){
-        const outlet = new OutletEntity()        
+      if (dto.accountType === accountTypes.CORPORATE) {
+        const outlet = new OutletEntity()
         outlet.isHq = true;
         outlet.name = "Headquarters"
         outlet.accountId = user.id;
@@ -76,7 +76,7 @@ export class AccountRepository extends Repository<AccountEntity> {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-    
+
   }
 
   public async validateUserPassword({
@@ -93,7 +93,8 @@ export class AccountRepository extends Repository<AccountEntity> {
         accountType: user.accountType,
         accountId: user.id,
         verified: user.emailVerified,
-        name:  user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : `${user.organizationName}`,
+        pcnVerified: user.pcnVerified,
+        name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : `${user.organizationName}`,
         profileImage: user.accountType === accountTypes.INDIVIDUAL ? user.profileImage : user.premisesImage ? user.premisesImage : user.profileImage
       };
       return data;
@@ -115,7 +116,7 @@ export class AccountRepository extends Repository<AccountEntity> {
           status: HttpStatus.NOT_FOUND,
         },
         HttpStatus.NOT_FOUND,
-      );` `
+      ); ` `
     }
     return this.buildUserRO(result);
   }
@@ -134,61 +135,102 @@ export class AccountRepository extends Repository<AccountEntity> {
     return this.buildUserRO(result);
   }
 
-  public async findUnverifedStaff(id:string, dto: FilterDto ):Promise<UserDataRO[]>{
+  public async findUnverifedStaff(id: string, dto: FilterDto): Promise<UserDataRO[]> {
     dto.page = dto.page && +dto.page || 1;
     dto.take = dto.take && +dto.take || 50;
     let result = await this.find({
-      where: {organizationId:id, staffStatus:staffStatus.PENDING,},
+      where: { organizationId: id, staffStatus: staffStatus.PENDING, },
       take: dto.take,
       skip: dto.page * (dto.page - 1)
     })
 
-    if(dto.search){
+    if (dto.search) {
       result = await this.find({
         where: [
-          { organizationId:id, staffStatus:staffStatus.PENDING, firstName: ILike(`%${dto.search}%`)},
-          { organizationId:id, staffStatus:staffStatus.PENDING, lastName: ILike(`%${dto.search}%`)},
-          { organizationId:id, staffStatus:staffStatus.PENDING, address: ILike(`%${dto.search}%`)},
-          { organizationId:id, staffStatus:staffStatus.PENDING, phoneNumber: ILike(`%${dto.search}%`)},
-          { organizationId:id, staffStatus:staffStatus.PENDING, email: ILike(`%${dto.search}%`)},
-          { organizationId:id, staffStatus:staffStatus.PENDING, organizationName: ILike(`%${dto.search}%`)},
-          { organizationId:id, staffStatus:staffStatus.PENDING, city: ILike(`%${dto.search}%`)},
-          { organizationId:id, staffStatus:staffStatus.PENDING, pcn: ILike(`%${dto.search}%`)}
+          { organizationId: id, staffStatus: staffStatus.PENDING, firstName: ILike(`%${dto.search}%`) },
+          { organizationId: id, staffStatus: staffStatus.PENDING, lastName: ILike(`%${dto.search}%`) },
+          { organizationId: id, staffStatus: staffStatus.PENDING, address: ILike(`%${dto.search}%`) },
+          { organizationId: id, staffStatus: staffStatus.PENDING, phoneNumber: ILike(`%${dto.search}%`) },
+          { organizationId: id, staffStatus: staffStatus.PENDING, email: ILike(`%${dto.search}%`) },
+          { organizationId: id, staffStatus: staffStatus.PENDING, organizationName: ILike(`%${dto.search}%`) },
+          { organizationId: id, staffStatus: staffStatus.PENDING, city: ILike(`%${dto.search}%`) },
+          { organizationId: id, staffStatus: staffStatus.PENDING, pcn: ILike(`%${dto.search}%`) }
         ],
         take: dto.take,
         skip: 25 * (dto.page - 1)
       })
     }
-  
+
     return this.buildUserArrRO(result);
   }
 
-  public async findVerifedStaff(id:string, dto: FilterDto):Promise<UserDataRO[]>{
+  public async findVerifedStaff(id: string, dto: FilterDto): Promise<UserDataRO[]> {
     dto.page = dto.page && +dto.page || 1;
     dto.take = dto.take && +dto.take || 50;
     let result = await this.find({
-      where: {organizationId:id, staffStatus:staffStatus.VERIFIED,},
+      where: { organizationId: id, staffStatus: staffStatus.VERIFIED, },
       take: dto.take,
       skip: dto.page * (dto.page - 1)
     })
 
-    if(dto.search){
+    if (dto.search) {
       result = await this.find({
         where: [
-          { organizationId:id, staffStatus:staffStatus.VERIFIED, firstName: ILike(`%${dto.search}%`)},
-          { organizationId:id, staffStatus:staffStatus.VERIFIED, lastName: ILike(`%${dto.search}%`)},
-          { organizationId:id, staffStatus:staffStatus.VERIFIED, address: ILike(`%${dto.search}%`)},
-          { organizationId:id, staffStatus:staffStatus.VERIFIED, phoneNumber: ILike(`%${dto.search}%`)},
-          { organizationId:id, staffStatus:staffStatus.VERIFIED, email: ILike(`%${dto.search}%`)},
-          { organizationId:id, staffStatus:staffStatus.VERIFIED, organizationName: ILike(`%${dto.search}%`)},
-          { organizationId:id, staffStatus:staffStatus.VERIFIED, city: ILike(`%${dto.search}%`)},
-          { organizationId:id, staffStatus:staffStatus.VERIFIED, pcn: ILike(`%${dto.search}%`)}
+          { organizationId: id, staffStatus: staffStatus.VERIFIED, firstName: ILike(`%${dto.search}%`) },
+          { organizationId: id, staffStatus: staffStatus.VERIFIED, lastName: ILike(`%${dto.search}%`) },
+          { organizationId: id, staffStatus: staffStatus.VERIFIED, address: ILike(`%${dto.search}%`) },
+          { organizationId: id, staffStatus: staffStatus.VERIFIED, phoneNumber: ILike(`%${dto.search}%`) },
+          { organizationId: id, staffStatus: staffStatus.VERIFIED, email: ILike(`%${dto.search}%`) },
+          { organizationId: id, staffStatus: staffStatus.VERIFIED, organizationName: ILike(`%${dto.search}%`) },
+          { organizationId: id, staffStatus: staffStatus.VERIFIED, city: ILike(`%${dto.search}%`) },
+          { organizationId: id, staffStatus: staffStatus.VERIFIED, pcn: ILike(`%${dto.search}%`) }
         ],
         take: dto.take,
         skip: dto.take * (dto.page - 1)
       })
     }
-  
+
+    return this.buildUserArrRO(result);
+  }
+
+  async findAllCompletedAccounts(dto: FilterDto): Promise<UserDataRO[]> {
+    dto.page = dto.page && +dto.page || 1;
+    dto.take = dto.take && +dto.take || 50;
+    let result = null;
+
+    if (dto.search) {
+      //TODO: optimise query 
+      result = await this.createQueryBuilder("acc")
+        .andWhere("acc.isRegComplete = true")
+        .andWhere("acc.isRegComplete = ('corporate' || 'professional')")
+        .where(new Brackets(qb => {
+          qb.where("acc.firstName ILike :search", { search: `%${dto.search}%` })
+            .orWhere("acc.lastName ILike :search", { search: `%${dto.search}%` })
+            .orWhere("acc.phoneNumber ILike :search", { search: `%${dto.search}%` })
+            .orWhere("acc.email ILike :search", { search: `%${dto.search}%` })
+            .orWhere("acc.organizationName ILike :search", { search: `%${dto.search}%` })
+            .orWhere("acc.pcn ILike :search", { search: `%${dto.search}%` })
+        }))
+        .take(50)
+        .skip(50 * (dto.page ? dto.page - 1 : 0))
+        .orderBy( 'acc.pcnVerified', 'ASC')
+        .addOrderBy('acc.accountType', 'ASC')
+        .addOrderBy('acc.firstName', 'ASC')
+        .addOrderBy('acc.organizationName','ASC')
+        .getMany();
+    }
+    else {
+      result = await this.find({
+        where: [
+          { isRegComplete: true, accountType: accountTypes.CORPORATE },
+          { isRegComplete: true, accountType: accountTypes.INDIVIDUAL }
+        ],
+        take: dto.take,
+        skip: 50 * (dto.page - 1),
+        order: { pcnVerified: 'ASC', accountType:'ASC', firstName: 'ASC', organizationName:'ASC' }
+      })
+    }
+
     return this.buildUserArrRO(result);
   }
 
@@ -197,6 +239,13 @@ export class AccountRepository extends Repository<AccountEntity> {
     result.staffStatus = staffStatus.VERIFIED
     result.message = "";
     return await this.save(result)
+  }
+
+  public async verifyPCN(id: string): Promise<boolean> {
+    const result = await this.findOne(id)
+    result.pcnVerified = true
+    await this.save(result);
+    return true;
   }
 
   public async rejectStaff(id: string, message: string): Promise<UserDataRO> {
@@ -260,10 +309,10 @@ export class AccountRepository extends Repository<AccountEntity> {
         `User does not exist`,
         HttpStatus.NOT_FOUND,
       );
-    }   
+    }
 
-    user.profileImage = filename;    
-    console.log(user);        
+    user.profileImage = filename;
+    console.log(user);
     return await user.save();
   }
 
@@ -303,6 +352,7 @@ export class AccountRepository extends Repository<AccountEntity> {
     const userRO = {
       id: user.id,
       pcn: user.pcn,
+      pcnVerified: user.pcnVerified,
       email: user.email,
       dateOfBirth: user.dateOfBirth,
       gender: user.gender,
@@ -312,7 +362,7 @@ export class AccountRepository extends Repository<AccountEntity> {
       firstName: user.firstName,
       longitude: user.longitude,
       phoneNumber: user.phoneNumber,
-      yearOfGraduation:user.yearOfGraduation,
+      yearOfGraduation: user.yearOfGraduation,
       school: user.school,
       schoolOtherValue: user.schoolOtherValue,
       profileImage: user.profileImage,
@@ -321,13 +371,13 @@ export class AccountRepository extends Repository<AccountEntity> {
       organizationType: user.organizationType,
       organizationCategory: user.organizationCategory,
       organizationId: user.organizationId,
-      staffStatus:user.staffStatus,
+      staffStatus: user.staffStatus,
       typesOfPractice: user.typesOfPractice,
       isRegComplete: user.isRegComplete,
       premiseNumber: user.premiseNumber,
       accountType: user.accountType,
       profession: user.profession,
-      professionOtherValue :user.professionOtherValue,
+      professionOtherValue: user.professionOtherValue,
       professionalGroup: user.professionalGroup,
       address: user.address,
       country: user.country,
@@ -339,7 +389,7 @@ export class AccountRepository extends Repository<AccountEntity> {
       closingTime: user.closingTime,
       companyRegistrationNumber: user.companyRegistrationNumber,
       yearofEstablishment: user.yearofEstablishment,
-      numberofEmployees: user.numberofEmployees
+      numberofEmployees: user.numberofEmployees,
     };
     return userRO;
   }
@@ -378,13 +428,13 @@ export class AccountRepository extends Repository<AccountEntity> {
     return userArr;
   }
 
-  stringToBoolean(val: any){
-    if(val === false) return false;
-    if(val === true) return true;
-    switch(val.toLowerCase().trim()){
-        case 'true': return true;
-        case 'false':return false;
-        default: return Boolean(val);
-      }
+  stringToBoolean(val: any) {
+    if (val === false) return false;
+    if (val === true) return true;
+    switch (val.toLowerCase().trim()) {
+      case 'true': return true;
+      case 'false': return false;
+      default: return Boolean(val);
     }
+  }
 }
