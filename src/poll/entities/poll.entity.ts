@@ -1,6 +1,6 @@
 import { AccountEntity } from "src/account/entities/account.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
-import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
+import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
 import { PollOptionEntity } from "./poll-option.entity";
 import { PollQuestionEntity } from "./poll-question.entity";
 import { PollVoteEntity } from "./poll-vote.entity";
@@ -64,17 +64,17 @@ export class PollEntity extends AbstractBaseEntity {
 
     @Column({ nullable: true })
     owner: string;
-
+    
     @ManyToOne(() => AccountEntity, acc => acc.polls)
     account: AccountEntity;
 
-    @OneToMany(() => PollQuestionEntity, (x) => x.poll, { cascade: ['insert', 'update'] })
+    @OneToMany(() => PollQuestionEntity, (x) => x.poll, { cascade: ['insert', 'update', 'remove'] })
     questions: PollQuestionEntity[];
 
-    @OneToMany(() => PollOptionEntity, (x) => x.poll, { cascade: ['insert', 'update'] })
+    @OneToMany(() => PollOptionEntity, (x) => x.poll, { cascade: ['insert', 'update', 'remove'] })
     options: PollOptionEntity[];
 
-    @OneToMany(() => PollVoteEntity, (x) => x.poll, )
+    @OneToMany(() => PollVoteEntity, (x) => x.poll, { cascade: ['insert', 'update', 'remove'] })
     votes: PollVoteEntity[];
 
 }

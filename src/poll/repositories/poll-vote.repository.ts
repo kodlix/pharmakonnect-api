@@ -11,7 +11,7 @@ import { PollRepository } from './poll.repository';
 
 @EntityRepository(PollVoteEntity)
 export class PollVoteRepository extends Repository<PollVoteEntity> {
-  constructor(private readonly pollRepository: PollRepository) {
+  constructor(private readonly  : PollRepository) {
     super();
   }
   async vote(dto: CreatePollVoteDto, user: AccountEntity): Promise<PollVoteEntity[]> {

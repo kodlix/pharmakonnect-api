@@ -2,20 +2,19 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { plainToClass, plainToClassFromExist } from 'class-transformer';
 import { NotEquals, validate } from 'class-validator';
 import { AccountEntity } from 'src/account/entities/account.entity';
-import { Repository, EntityRepository, DeleteResult, ILike, MoreThan, getRepository, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import { Repository, EntityRepository, DeleteResult, ILike, getRepository, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { CreatePollDto } from '../dto/create-poll.dto';
 import { UpdatePollDto } from '../dto/update-poll.dto';
 import { PollEntity } from '../entities/poll.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { AccountRepository } from 'src/account/account.repository';
 import { PollSummaryDto } from '../dto/poll-summary.dto';
+import { accountTypes } from 'src/account/account.constant';
 
 
 @EntityRepository(PollEntity)
 export class PollRepository extends Repository<PollEntity> {
 
   constructor(
-    private readonly accountRepository: AccountRepository
   ) {
     super();
   }
@@ -32,6 +31,9 @@ export class PollRepository extends Repository<PollEntity> {
     }
 
     const today = new Date();
+    let startDate = new Date(dto.startDate);
+    let endDate = new Date(dto.endDate);
+    endDate.setHours(20);
 
     if (existingPoll && existingPoll.endDate >= today) {
       throw new HttpException(
@@ -40,14 +42,14 @@ export class PollRepository extends Repository<PollEntity> {
       );
     }
 
-    if (dto.endDate < today) {
+    if (endDate < today) {
       throw new HttpException(
         `Poll end-date cannot be less than today`,
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    if (dto.endDate < dto.startDate) {
+    if (endDate < startDate) {
       throw new HttpException(
         `Poll end-date cannot be greater than start-date`,
         HttpStatus.BAD_REQUEST,
@@ -67,7 +69,7 @@ export class PollRepository extends Repository<PollEntity> {
     poll.accountId = user.id;
     poll.createdBy = user.email;
     poll.createdAt = new Date()
-    poll.owner = owner.firstName + ' ' + owner.lastName;
+    poll.owner = owner.accountType == accountTypes.INDIVIDUAL? (owner.firstName + ' ' + owner.lastName) : owner.organizationName;
     if (poll.questions?.length > 0) {
       for (const [index, question] of poll.questions.entries()) {
         question.id = uuidv4();
@@ -97,6 +99,7 @@ export class PollRepository extends Repository<PollEntity> {
     }
 
     try {
+      poll.endDate = endDate;
       return await this.save(poll);
     } catch (error) {
       console.log(error);
@@ -208,7 +211,7 @@ export class PollRepository extends Repository<PollEntity> {
   }
 
 
-  async deleteEntity(id: string): Promise<DeleteResult> {
+  async deleteEntity(id: string): Promise<DeleteResult | any> {
     if (!id) {
       throw new HttpException(`Invalid poll`, HttpStatus.BAD_REQUEST);
     }
@@ -218,8 +221,14 @@ export class PollRepository extends Repository<PollEntity> {
       throw new HttpException(`Poll does not exist`, HttpStatus.NOT_FOUND);
     }
 
+    if (existingPoll.published == true) {
+      throw new HttpException(`Poll Event has been published and therefore cannot be deleted`, HttpStatus.NOT_FOUND);
+    }
     
-    return await this.delete({ id: existingPoll.id });
+    // await this.pollVoteRepo.delete({pollId: existingPoll.id});
+    // await this.pollOptionRepo.delete({pollId: existingPoll.id});
+    // await  this.pollQuestionRepo.delete({pollId: existingPoll.id});
+    return await this.remove(existingPoll);
   }
 
   async findById(id: string): Promise<PollEntity> {
@@ -350,16 +359,7 @@ export class PollRepository extends Repository<PollEntity> {
     if (!existingPoll) {
       throw new HttpException(`Poll does not exist`, HttpStatus.NOT_FOUND);
     }
-
-    const pollOwner = await getRepository(AccountEntity).createQueryBuilder('acc')
-      .where(`acc.id =:accountId`, { accountId: existingPoll.accountId })
-      .getOne();
-
-    if (!pollOwner) {
-      throw new HttpException(`Poll has no valid owner.`, HttpStatus.NOT_FOUND);
-    }
-    existingPoll.owner = pollOwner?.firstName + " " + pollOwner?.lastName;
-
+  
     const pollSummaryDto = plainToClass(PollSummaryDto, existingPoll);
     const votes = pollSummaryDto.votes;
 

@@ -47,12 +47,10 @@ export class CreatePollDto {
   hint: string;
 
   @ApiProperty()
-  @IsString()
   @IsNotEmpty({ message: 'Start date is required' })
   startDate: Date;
 
   @ApiProperty()
-  @IsString()
   @IsNotEmpty({ message: 'Start date is required' })
   endDate: Date;
 
