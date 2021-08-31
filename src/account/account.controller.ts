@@ -120,6 +120,16 @@ export class AccountController {
     return await this.accountService.findOrg();
   }
 
+  @Get('/all/complete')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @ApiOperation({ summary: 'Get Users that have completed their regisitration' })
+  @ApiResponse({ status: 200, description: 'Get Users that have completed their regisitration' })
+  async findCompletedAccounts(@Query() filterDto: FilterDto): Promise<UserDataRO[]> {
+      return await this.accountService.findAllCompletedAccounts(filterDto);
+    }
+  
+
   // upload single file
   @Put('/uploads')
   @ApiBearerAuth()
@@ -243,6 +253,14 @@ export class AccountController {
   @ApiOperation({ summary: 'Approve Staff' })
   async approve(@Param('id') id: string,):Promise<UserDataRO>{
     return await this.accountService.verifyStaff(id); 
+  }
+
+  @Put('verify/pcn/:id')
+  @ApiResponse({ status: 201, description: 'Approved.' })
+  @ApiResponse({ status: 404, description: 'Not Found.' })
+  @ApiOperation({ summary: 'Verify PCN Number' })
+  async verifyPcn(@Param('id') id: string,):Promise<boolean>{
+    return await this.accountService.verifyPcn(id); 
   }
 
   @Put('reject/:id')
