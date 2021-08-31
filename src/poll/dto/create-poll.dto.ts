@@ -51,7 +51,7 @@ export class CreatePollDto {
   startDate: Date;
 
   @ApiProperty()
-  @IsNotEmpty({ message: 'Start date is required' })
+  @IsNotEmpty({ message: 'End date is required' })
   endDate: Date;
 
   @ApiProperty()
@@ -62,5 +62,13 @@ export class CreatePollDto {
   @ApiProperty({type: [CreatePollQuestionDto]})
   @IsNotEmpty()
   questions: CreatePollQuestionDto[];
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'Start time is required' })
+  startTime: any;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'End time is required' })
+  endTime: any;
 
 }

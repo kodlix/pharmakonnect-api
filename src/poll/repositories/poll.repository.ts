@@ -9,13 +9,14 @@ import { PollEntity } from '../entities/poll.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { PollSummaryDto } from '../dto/poll-summary.dto';
 import { accountTypes } from 'src/account/account.constant';
+import { isNotValidDate } from 'src/_utility/date-validator.util';
+import { isNotValidTime } from 'src/_utility/time-validator.util';
 
 
 @EntityRepository(PollEntity)
 export class PollRepository extends Repository<PollEntity> {
 
-  constructor(
-  ) {
+  constructor() {
     super();
   }
 
@@ -31,9 +32,22 @@ export class PollRepository extends Repository<PollEntity> {
     }
 
     const today = new Date();
-    let startDate = new Date(dto.startDate);
-    let endDate = new Date(dto.endDate);
-    endDate.setHours(20);
+
+    if (new Date(dto.endDate).setHours(0, 0, 0, 0) < new Date(dto.startDate).setHours(0, 0, 0, 0)) {
+      throw new HttpException(`Start date of poll cannot be greater than End date`, HttpStatus.BAD_REQUEST,);
+    }
+
+    if (isNotValidDate(dto.startDate)) {
+      throw new HttpException(`Poll Start Date cannot be less than current date`, HttpStatus.BAD_REQUEST);
+    }
+
+    if (isNotValidTime(dto.startTime, dto.startDate)) {
+      throw new HttpException(`Poll Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
+    }
+
+    if (dto.startTime > dto.endTime ) {
+      throw new HttpException(`Poll Start Time cannot be greater than End time.`, HttpStatus.BAD_REQUEST);
+    }
 
     if (existingPoll && existingPoll.endDate >= today) {
       throw new HttpException(
@@ -42,14 +56,14 @@ export class PollRepository extends Repository<PollEntity> {
       );
     }
 
-    if (endDate < today) {
+    if (dto.endDate < today) {
       throw new HttpException(
         `Poll end-date cannot be less than today`,
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    if (endDate < startDate) {
+    if (dto.endDate < dto.startDate) {
       throw new HttpException(
         `Poll end-date cannot be greater than start-date`,
         HttpStatus.BAD_REQUEST,
@@ -69,7 +83,7 @@ export class PollRepository extends Repository<PollEntity> {
     poll.accountId = user.id;
     poll.createdBy = user.email;
     poll.createdAt = new Date()
-    poll.owner = owner.accountType == accountTypes.INDIVIDUAL? (owner.firstName + ' ' + owner.lastName) : owner.organizationName;
+    poll.owner = owner.accountType == accountTypes.INDIVIDUAL ? (owner.firstName + ' ' + owner.lastName) : owner.organizationName;
     if (poll.questions?.length > 0) {
       for (const [index, question] of poll.questions.entries()) {
         question.id = uuidv4();
@@ -99,7 +113,7 @@ export class PollRepository extends Repository<PollEntity> {
     }
 
     try {
-      poll.endDate = endDate;
+      poll.endDate = dto.endDate;
       return await this.save(poll);
     } catch (error) {
       console.log(error);
@@ -224,7 +238,7 @@ export class PollRepository extends Repository<PollEntity> {
     if (existingPoll.published == true) {
       throw new HttpException(`Poll Event has been published and therefore cannot be deleted`, HttpStatus.NOT_FOUND);
     }
-    
+
     // await this.pollVoteRepo.delete({pollId: existingPoll.id});
     // await this.pollOptionRepo.delete({pollId: existingPoll.id});
     // await  this.pollQuestionRepo.delete({pollId: existingPoll.id});
@@ -359,7 +373,7 @@ export class PollRepository extends Repository<PollEntity> {
     if (!existingPoll) {
       throw new HttpException(`Poll does not exist`, HttpStatus.NOT_FOUND);
     }
-  
+
     const pollSummaryDto = plainToClass(PollSummaryDto, existingPoll);
     const votes = pollSummaryDto.votes;
 
