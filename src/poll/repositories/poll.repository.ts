@@ -83,7 +83,7 @@ export class PollRepository extends Repository<PollEntity> {
     poll.accountId = user.id;
     poll.createdBy = user.email;
     poll.createdAt = new Date()
-    poll.owner = owner.accountType == accountTypes.INDIVIDUAL ? (owner.firstName + ' ' + owner.lastName) : owner.organizationName;
+    poll.owner = owner.accountType == accountTypes.PROFESSIONAL ? (owner.firstName + ' ' + owner.lastName) : owner.organizationName;
     if (poll.questions?.length > 0) {
       for (const [index, question] of poll.questions.entries()) {
         question.id = uuidv4();

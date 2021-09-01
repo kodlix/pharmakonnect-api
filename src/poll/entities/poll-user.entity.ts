@@ -12,7 +12,7 @@ export class PollUserEntity extends AbstractBaseEntity {
   @Column({ length: 50 })
   email: string;
 
-  @Column({ length: 128, nullable: true })
+  @Column({ length: 128})
   accountId: string;
 
   @Column({ length: 128 })
@@ -20,6 +20,9 @@ export class PollUserEntity extends AbstractBaseEntity {
 
   @Column({ default: new Date() })
   registeredAt: Date;
+
+  @Column({ default: false })
+  voted: boolean;
 
   @Column({ type: 'bool', default: true })
   active: boolean;

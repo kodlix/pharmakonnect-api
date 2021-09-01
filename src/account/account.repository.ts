@@ -95,7 +95,7 @@ export class AccountRepository extends Repository<AccountEntity> {
         verified: user.emailVerified,
         pcnVerified: user.pcnVerified,
         name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : `${user.organizationName}`,
-        profileImage: user.accountType === accountTypes.INDIVIDUAL ? user.profileImage : user.premisesImage ? user.premisesImage : user.profileImage
+        profileImage: user.accountType === accountTypes.PROFESSIONAL ? user.profileImage : user.premisesImage ? user.premisesImage : user.profileImage
       };
       return data;
     } else {
@@ -223,7 +223,7 @@ export class AccountRepository extends Repository<AccountEntity> {
       result = await this.find({
         where: [
           { isRegComplete: true, accountType: accountTypes.CORPORATE },
-          { isRegComplete: true, accountType: accountTypes.INDIVIDUAL }
+          { isRegComplete: true, accountType: accountTypes.PROFESSIONAL }
         ],
         take: dto.take,
         skip: 50 * (dto.page - 1),
