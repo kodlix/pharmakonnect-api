@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsEnum,
@@ -34,6 +34,14 @@ export class CreatePollDto {
   @IsOptional()
   @IsBoolean()
   requiresLogin: boolean;
+
+  @ApiPropertyOptional()
+  @IsString()
+  accessLevel: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  group: string;
 
   @ApiProperty()
   @IsString()
