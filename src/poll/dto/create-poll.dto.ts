@@ -40,7 +40,6 @@ export class CreatePollDto {
   accessLevel: string;
 
   @ApiPropertyOptional()
-  @IsString()
   group: string;
 
   @ApiProperty()
