@@ -54,7 +54,7 @@ import { PackageModule } from './package/package.module';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),   // <-- path to the static files
     }),
-    TypeOrmModule.forRoot(),
+    TypeOrmModule.forRoot({ }),
     AccountModule,
     SectorModule,
     CountryModule,
@@ -96,9 +96,9 @@ import { PackageModule } from './package/package.module';
     ProfessionModule,
     ProfessionalGroupModule,
     PackageModule,
-    
+
   ],
   controllers: [AppController],
   providers: [AppService, ChatGateway, NotificationGateway],
 })
-export class AppModule {}
+export class AppModule { }
