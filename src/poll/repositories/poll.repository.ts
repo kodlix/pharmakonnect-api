@@ -45,7 +45,7 @@ export class PollRepository extends Repository<PollEntity> {
       throw new HttpException(`Poll Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
     }
 
-    if (dto.startTime > dto.endTime ) {
+    if (new Date(dto.endDate).setHours(0, 0, 0, 0) === new Date(dto.startDate).setHours(0, 0, 0, 0) && dto.startTime > dto.endTime ) {
       throw new HttpException(`Poll Start Time cannot be greater than End time.`, HttpStatus.BAD_REQUEST);
     }
 
