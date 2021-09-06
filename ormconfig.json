@@ -3,8 +3,8 @@
   "host": "localhost",
   "port": 5432,
   "username": "postgres",
-  "password": "!Pass4sure",
+  "password": "!pass4sure",
   "database": "pharmakonnectdb",
   "entities": ["dist/**/*.entity.js", "dist/**/*.view.js"],
-  "synchronize": false
+  "synchronize": true
 }

@@ -200,6 +200,15 @@ export class AccountEntity extends AbstractBaseEntity {
   @Column({ nullable: true })
   public emailToken: string;
 
+  @Column({nullable: true})
+  public countryName: string;
+  
+  @Column({nullable: true})
+  public stateName: string;
+
+  @Column({nullable: true})
+  public lgaName: string;
+
   @OneToMany(() => JobVacancyEntity, (s) => s.account)
   jobVacancy: JobVacancyEntity[];
 
