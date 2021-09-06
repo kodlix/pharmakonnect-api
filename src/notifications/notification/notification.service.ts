@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { AccountEntity } from 'src/account/entities/account.entity';
 import { Brackets, DeleteResult } from 'typeorm';
 import { NotificationRO } from './interface/notification.interface';
 import { NotificationRepository } from './notification.repository';
@@ -71,6 +72,21 @@ export class NotificationService {
     }
 
     return await this.notificationRepo.delete({id});
+  }
+
+  async clear(user: AccountEntity) {
+
+    try {
+      const nots = await this.notificationRepo.find({where: {accountId: user.id}, relations: ['notificationType']});
+
+      if(nots.length === 0) {
+        throw new HttpException('Some Entities not found, no changes applied!', HttpStatus.NOT_FOUND);
+      }
+  
+      return await this.notificationRepo.remove(nots); 
+    } catch (error) {
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
 

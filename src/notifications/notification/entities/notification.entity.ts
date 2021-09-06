@@ -38,7 +38,7 @@ export class NotificationEntity extends AbstractBaseEntity{
     @Column({ type: 'bool', default: false})
     seen: boolean;
 
-    @ManyToOne(() => NotificationTypeEntity, notificationType => notificationType.notification)
+    @ManyToOne(() => NotificationTypeEntity, notificationType => notificationType.notification, {onDelete: 'CASCADE'})
     @JoinColumn()
     notificationType: NotificationTypeEntity;
 

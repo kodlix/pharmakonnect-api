@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Put, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Put, Req, UseGuards } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { NotificationRO } from './interface/notification.interface';
@@ -57,6 +57,13 @@ export class NotificationController {
   @ApiResponse({ status: 200, description: 'Notification successfully deleted' })
   async remove(@Param('id') id: string): Promise<DeleteResult> {
     return await this.notificationService.remove(id);
+  }
+
+  @Delete('me/clearall')
+  @ApiOperation({ summary: 'Clear all user notifications ' })
+  @ApiResponse({ status: 200, description: 'Notification successfully cleared' })
+  async clearAll(@Req() req: any) {
+    return await this.notificationService.clear(req.user);
   }
 
 }
