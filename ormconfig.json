@@ -1,10 +1,10 @@
 {
   "type": "postgres",
-  "host": "pharmakonnectdb-do-user-8783484-0.b.db.ondigitalocean.com",
-  "port": 25060,
-  "username": "doadmin",
-  "password": "j5u8nqg3zscdufkh",
+  "host": "pharmaconnectdb.cnc0jskuhfs1.us-east-1.rds.amazonaws.com",
+  "port": 5432,
+  "username": "postgres",
+  "password": "!Pass4sure",
   "database": "pharmakonnectdb",
-  "entities": ["dist/**/*.entity.js", "dist/**/*.view.js"],
-  "synchronize": true
+  "entities": ["dist/*/.entity.js", "dist/*/.view.js"],
+  "synchronize": false
 }
