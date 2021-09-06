@@ -48,6 +48,7 @@ import { OrganizationCategoryModule } from './organization-category/organization
 import { ProfessionModule } from './profession/profession.module';
 import { ProfessionalGroupModule } from './professional-group/professional-group.module';
 import { PackageModule } from './package/package.module';
+import { MembershipInterestGroupModule } from './membership-interest-group/membership-interest-group.module';
 
 @Module({
   imports: [
@@ -96,6 +97,7 @@ import { PackageModule } from './package/package.module';
     ProfessionModule,
     ProfessionalGroupModule,
     PackageModule,
+    MembershipInterestGroupModule,
 
   ],
   controllers: [AppController],
