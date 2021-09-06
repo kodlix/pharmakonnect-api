@@ -1,21 +1,32 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
+import { accountTypes } from 'src/account/account.constant';
+import { AccountRepository } from 'src/account/account.repository';
 import { AccountEntity } from 'src/account/entities/account.entity';
+import { GroupRepository } from 'src/group/group-repository';
+import { accessLevels } from 'src/_common/constants/access-level';
 import { Repository, EntityRepository, DeleteResult, ILike, getRepository } from 'typeorm';
 import { CreatePollVoteDto } from '../dto/create-poll-vote.dto';
+import { PollUserEntity } from '../entities/poll-user.entity';
 import { PollVoteEntity } from '../entities/poll-vote.entity';
 import { PollEntity } from '../entities/poll.entity';
+import { PollUserRepository } from './poll-user.repository';
 import { PollRepository } from './poll.repository';
 
 
 @EntityRepository(PollVoteEntity)
 export class PollVoteRepository extends Repository<PollVoteEntity> {
-  constructor(private readonly pollRepository: PollRepository) {
+  constructor(
+    private readonly pollResitory: PollRepository,
+    private readonly pollUserRepository: PollUserRepository,
+    private readonly groupRepository: GroupRepository,
+    private readonly accountRepository: AccountRepository
+  ) {
     super();
   }
   async vote(dto: CreatePollVoteDto, user: AccountEntity): Promise<PollVoteEntity[]> {
-    
+
 
     if (dto && !dto.pollId) {
       throw new HttpException(
@@ -32,6 +43,7 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
       );
     }
 
+
     const existingPoll = await getRepository(PollEntity).createQueryBuilder('poll')
       .where(`poll.id =:pollId`, { pollId: dto.pollId })
       .getOne();
@@ -43,11 +55,55 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
       );
     }
 
+
     if (existingPoll.endDate < (new Date())) {
       throw new HttpException(
         `Sorry, poll is no longer open for participation.`,
         HttpStatus.BAD_REQUEST,
       );
+    }
+
+    if (existingPoll.accessLevel === accessLevels.GROUP) {
+      const userExistsInGroup = await this.groupRepository.memberExistsInGroup(existingPoll.group, dto.accountId);
+      if (!userExistsInGroup) {
+        throw new HttpException(
+          `You are not permitted to participate in this ${existingPoll.type.toLowerCase()}.`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
+    if (existingPoll.accessLevel === accessLevels.PROFESSIONAL) {
+      //check if the user is a professional
+      // system genersaed device specific ids start with _
+      if (dto.accountId.startsWith('_')) {
+        throw new HttpException(
+          `This ${existingPoll.type.toLowerCase()} is available to professionals only.`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const user = await this.accountRepository.getById(dto.accountId);
+      if (!user) {
+        throw new HttpException(
+          `You are not permitted to participate in this ${existingPoll.type.toLowerCase()}. Account does not exist.`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (user.accountType !== accountTypes.PROFESSIONAL) {
+        throw new HttpException(
+          `This ${existingPoll.type.toLowerCase()} is available to professionals only.`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      const userExistsInGroup = await this.groupRepository.memberExistsInGroup(existingPoll.group, dto.accountId);
+      if (!userExistsInGroup) {
+        throw new HttpException(
+          `You are not permitted to participate in this ${existingPoll.type.toLowerCase()}.`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
 
     if (existingPoll.requiresLogin && !dto.accountId) {
@@ -69,13 +125,13 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
 
       if (existingVote) {
         throw new HttpException(
-          `You have already participated in this poll. Multiple submition not allowed`,
+          `You have already voted in this ${existingPoll.type}. Multiple submition not allowed`,
           HttpStatus.BAD_REQUEST,
         );
       }
     }
 
-   
+
     const errors = await validate(dto);
     if (errors.length > 0) {
       throw new HttpException(errors, HttpStatus.BAD_REQUEST);
@@ -86,21 +142,26 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
       let newVote: any = {};
 
       newVote.pollId = dto.pollId;
-      newVote.pollType = dto.pollType;      
-      newVote.createdBy = (dto.email || dto.phoneNumber) || dto && dto.email || 'administrator@netopconsult.com';
+      newVote.pollType = dto.pollType;
+      newVote.createdBy = dto.accountId || 'admin@netopng.com';
       newVote.email = dto && dto.email || null;
       newVote.optionId = option.optionId;
       newVote.questionId = option.questionId;
       newVote.content = option.content;
       newVote.content = option.content;
-      newVote.accountId = dto && dto.accountId || null;
+      newVote.accountId = dto && dto.accountId;
       newVote.questionType = option.questionType;
 
       newVotes.push(newVote);
     }
 
     try {
-      return await this.save(newVotes);
+      const votes =  await this.save(newVotes);
+      return votes
+
+      //@TODO: Consider saving the voter in polluser table
+      //save the voted user
+      //const pollUser = new PollUserEntity();
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }

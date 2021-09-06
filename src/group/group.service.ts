@@ -21,9 +21,8 @@ import { CreateContactDto } from 'src/contact/dto/create-contact.dto';
 @Injectable()
 export class GroupService extends Repository<GroupEntity> {
   constructor(
-    @Inject(forwardRef(() => ContactService)) private readonly contactServcie: ContactService) 
-    {
-    super();    
+    @Inject(forwardRef(() => ContactService)) private readonly contactServcie: ContactService) {
+    super();
   }
 
   async createGroup(dto: CreateGroupDto, user: AccountEntity): Promise<InsertResult> {
@@ -59,7 +58,7 @@ export class GroupService extends Repository<GroupEntity> {
     // @TODO: make this process a transaction
 
     const members = dto?.members;
-    if(members.length === 0){
+    if (members.length === 0) {
       throw new BadRequestException("No members to create");
     }
 
@@ -128,7 +127,7 @@ export class GroupService extends Repository<GroupEntity> {
       }
     }
 
-    
+
     // if (dto.addMembersToContact) {
     //   await this.addMembersToOwnerContact(dto.members, user);
     // }
@@ -242,7 +241,7 @@ export class GroupService extends Repository<GroupEntity> {
 
     const entityManager = getManager();
     const groups = await entityManager.find(GroupMemeberView, {
-      where: { groupId: id }, order: { firstName: 'ASC'}      
+      where: { groupId: id }, order: { firstName: 'ASC' }
     });
     return {
       name: group.name,
@@ -254,6 +253,18 @@ export class GroupService extends Repository<GroupEntity> {
       ownerId: group.ownerId,
       ownerName: group.ownerName
     };
+  }
+
+
+  async memberExistsInGroup(groupId: string, accountId: string): Promise<boolean> {
+    const group = await this.getGroupbyId(groupId);
+    let members: GroupMemeberView[];
+    if (group) {
+      members = group.members;
+      let member = members?.find(x => x.id === accountId);
+      return !!member;
+    }
+    return false;
   }
 
   async getGroupByOwner(user: any) {
@@ -301,21 +312,21 @@ export class GroupService extends Repository<GroupEntity> {
       .where("contactId =:id AND ownerId =:ownerId AND groupId =:groupId",
         { id, groupId, ownerId: user.id }).execute();
 
-    if(from === 'chat') {
+    if (from === 'chat') {
 
       await getConnection().createQueryBuilder()
-      .delete()
-      .from(GroupMemberEntity)
-      .where("contactId =:id AND groupId =:groupId",
-      { id, groupId}).execute();
+        .delete()
+        .from(GroupMemberEntity)
+        .where("contactId =:id AND groupId =:groupId",
+          { id, groupId }).execute();
 
       await getConnection().createQueryBuilder()
-      .delete()
-      .from(ParticipantEntity)
-      .where("accountId =:id AND groupChatID =:groupId",
-      { id, groupId}).execute();
+        .delete()
+        .from(ParticipantEntity)
+        .where("accountId =:id AND groupChatID =:groupId",
+          { id, groupId }).execute();
     }
- 
+
     return true;
   }
 }

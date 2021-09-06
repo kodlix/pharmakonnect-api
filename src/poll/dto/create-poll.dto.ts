@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsEnum,
@@ -35,6 +35,13 @@ export class CreatePollDto {
   @IsBoolean()
   requiresLogin: boolean;
 
+  @ApiPropertyOptional()
+  @IsString()
+  accessLevel: string;
+
+  @ApiPropertyOptional()
+  group: string;
+
   @ApiProperty()
   @IsString()
   @IsNotEmpty({ message: 'Poll type is required' })
@@ -47,13 +54,11 @@ export class CreatePollDto {
   hint: string;
 
   @ApiProperty()
-  @IsString()
   @IsNotEmpty({ message: 'Start date is required' })
   startDate: Date;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty({ message: 'Start date is required' })
+  @IsNotEmpty({ message: 'End date is required' })
   endDate: Date;
 
   @ApiProperty()
@@ -64,5 +69,13 @@ export class CreatePollDto {
   @ApiProperty({type: [CreatePollQuestionDto]})
   @IsNotEmpty()
   questions: CreatePollQuestionDto[];
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'Start time is required' })
+  startTime: any;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'End time is required' })
+  endTime: any;
 
 }

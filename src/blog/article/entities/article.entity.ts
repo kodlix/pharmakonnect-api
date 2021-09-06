@@ -50,6 +50,12 @@ import {
 
     @Column({ type: 'bool', default: false })
     disabled?: boolean = false;
+
+    @Column({length: 50, nullable: true})
+    accessLevel?: string;
+
+    @Column({length: 50, nullable: true})
+    group?: string;
     
     @Column({ default: 0 })
     claps?: number;

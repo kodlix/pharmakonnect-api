@@ -80,6 +80,12 @@ export class JobVacancyEntity extends AbstractBaseEntity {
   @Column({ nullable: true })
   rejectionMessage: string;
 
+  @Column({length: 50, nullable: true})
+  accessLevel: string;
+
+  @Column({length: 50, nullable: true})
+  group: string;
+
   @ManyToOne(() => AccountEntity, (s) => s.jobVacancy)
   account: AccountEntity;
 

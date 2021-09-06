@@ -1,6 +1,7 @@
 import { AccountEntity } from "src/account/entities/account.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
-import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
+import { accessLevels } from "src/_common/constants/access-level";
+import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
 import { PollOptionEntity } from "./poll-option.entity";
 import { PollQuestionEntity } from "./poll-question.entity";
 import { PollVoteEntity } from "./poll-vote.entity";
@@ -26,6 +27,12 @@ export class PollEntity extends AbstractBaseEntity {
     @Column({ length: 50, nullable: true })
     accessCode: string;
 
+    @Column({length: 50, nullable: true})
+    accessLevel: string;
+
+    @Column({length: 50, nullable: true})
+    group: string;
+
     @Column({ type: 'bool', default: false })
     requiresLogin: boolean;
 
@@ -47,11 +54,18 @@ export class PollEntity extends AbstractBaseEntity {
     @Column({ type: 'varchar', nullable: true })
     publishedBy: string;   
 
-    @Column()
+    @Column({default: new Date()})
     startDate: Date;
 
-    @Column()
+    @Column({default: new Date()})
     endDate: Date;
+    
+    @Column({ type: 'time', name: 'startTime', default: (): string => 'LOCALTIMESTAMP'})
+    startTime: Date;
+
+    @Column({ type: 'time', name: 'endTime', default: (): string => 'LOCALTIMESTAMP'})
+    endTime: Date;
+
 
     @Column({ nullable: false })
     accountId: string;
@@ -64,17 +78,17 @@ export class PollEntity extends AbstractBaseEntity {
 
     @Column({ nullable: true })
     owner: string;
-
+    
     @ManyToOne(() => AccountEntity, acc => acc.polls)
     account: AccountEntity;
 
-    @OneToMany(() => PollQuestionEntity, (x) => x.poll, { cascade: ['insert', 'update'] })
+    @OneToMany(() => PollQuestionEntity, (x) => x.poll, { cascade: ['insert', 'update', 'remove'] })
     questions: PollQuestionEntity[];
 
-    @OneToMany(() => PollOptionEntity, (x) => x.poll, { cascade: ['insert', 'update'] })
+    @OneToMany(() => PollOptionEntity, (x) => x.poll, { cascade: ['insert', 'update', 'remove'] })
     options: PollOptionEntity[];
 
-    @OneToMany(() => PollVoteEntity, (x) => x.poll)
+    @OneToMany(() => PollVoteEntity, (x) => x.poll, { cascade: ['insert', 'update', 'remove'] })
     votes: PollVoteEntity[];
 
 }

@@ -50,6 +50,12 @@ export class EventEntity extends AbstractBaseEntity{
     @Column({type: "varchar", nullable: true, length: 128})
     url: string;
 
+    @Column({length: 50, nullable: true})
+    accessLevel: string;
+
+    @Column({length: 50, nullable: true})
+    group: string;
+
     @Column({type: "varchar", nullable: true, length: 256})
     rejectionMessage: string;
 

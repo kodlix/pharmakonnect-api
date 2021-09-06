@@ -15,5 +15,12 @@ export const Account_Seed: RegisterSeedRO[] = [
         accountType: accountTypes.ADMIN,
         isRegComplete: true,
         emailVerified: true
+    },
+    {
+        email: "kapsuuladmin@netopconsult.com",
+        password: "KaP@$$1718!",
+        accountType: accountTypes.ADMIN,
+        isRegComplete: true,
+        emailVerified: true
     }
 ]
