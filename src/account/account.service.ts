@@ -96,8 +96,8 @@ export class AccountService {
 
     if (search) {
       const searchQuery = `(account.firstName ILIKE :search OR 
-        account.lastName ILIKE :search OR account.email ILIKE :search OR
-        account.phoneNumber ILIKE :search)`;
+        account.lastName ILIKE :search OR
+        account.phoneNumber ILIKE :search OR account.organizationName ILIKE :search)`;
 
       const accts = await getRepository(AccountEntity)
         .createQueryBuilder('account')
