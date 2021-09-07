@@ -11,6 +11,7 @@ import { PollSummaryDto } from '../dto/poll-summary.dto';
 import { accountTypes } from 'src/account/account.constant';
 import { isNotValidDate } from 'src/_utility/date-validator.util';
 import { isNotValidTime } from 'src/_utility/time-validator.util';
+import { PollVoteEntity } from '../entities/poll-vote.entity';
 
 
 @EntityRepository(PollEntity)
@@ -45,7 +46,7 @@ export class PollRepository extends Repository<PollEntity> {
       throw new HttpException(`Poll Start Time cannot be in the past.`, HttpStatus.BAD_REQUEST);
     }
 
-    if (new Date(dto.endDate).setHours(0, 0, 0, 0) === new Date(dto.startDate).setHours(0, 0, 0, 0) && dto.startTime > dto.endTime ) {
+    if (new Date(dto.endDate).setHours(0, 0, 0, 0) === new Date(dto.startDate).setHours(0, 0, 0, 0) && dto.startTime > dto.endTime) {
       throw new HttpException(`Poll Start Time cannot be greater than End time.`, HttpStatus.BAD_REQUEST);
     }
 
@@ -83,7 +84,7 @@ export class PollRepository extends Repository<PollEntity> {
     poll.accountId = user.id;
     poll.createdBy = user.email;
     poll.createdAt = new Date()
-    poll.owner = owner.accountType == accountTypes.PROFESSIONAL ? (owner.firstName + ' ' + owner.lastName) : owner.organizationName;
+    poll.owner = owner.firstName ? (owner.firstName + ' ' + owner.lastName) : owner.organizationName;
     if (poll.questions?.length > 0) {
       for (const [index, question] of poll.questions.entries()) {
         question.id = uuidv4();
@@ -320,7 +321,8 @@ export class PollRepository extends Repository<PollEntity> {
     }
 
     const polls = await this.find({
-      where: { published: true, active: true, startDate: LessThanOrEqual(new Date()), endDate: MoreThanOrEqual(new Date()) },
+      // where: { published: true, active: true, startDate: LessThanOrEqual(new Date()), endDate: MoreThanOrEqual(new Date()) },
+      where: { published: true, active: true }, //@TODO: hotfix FOR now add end date also
       order: { createdAt: 'DESC', published: 'DESC' },
       take: 25,
 
@@ -385,7 +387,13 @@ export class PollRepository extends Repository<PollEntity> {
       }
     })
 
-    pollSummaryDto.totalVotes = votes?.length;
+    // pollSummaryDto.totalVotes = votes?.length;
+    const totalVotes = await getRepository(PollVoteEntity).createQueryBuilder('v')
+      .where(`v.pollId =:pollId`, { pollId: existingPoll.id})
+      .groupBy(`v.accountId`)
+      .getCount();
+
+    pollSummaryDto.totalVotes = totalVotes;
 
     return pollSummaryDto;
   }
