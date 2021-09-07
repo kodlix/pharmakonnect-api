@@ -4,7 +4,7 @@ import { accountTypes } from "../account.constant";
 
 export class RegisterDTO {
     @IsNotEmpty() @IsEmail() @ApiProperty() readonly email: string;
-    @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, { message: 'password too weak' })
+    //@Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, { message: 'password too weak' })
     @IsNotEmpty() @MinLength(8) @ApiProperty() readonly password: string;
     @IsEnum(accountTypes, { message: "Account type can either be 'Individual' or 'Corporate'" })
     @IsNotEmpty() @ApiProperty()
