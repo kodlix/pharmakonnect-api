@@ -1,25 +1,20 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { accountTypes } from 'src/account/account.constant';
 import { AccountRepository } from 'src/account/account.repository';
 import { AccountEntity } from 'src/account/entities/account.entity';
 import { GroupRepository } from 'src/group/group-repository';
 import { accessLevels } from 'src/_common/constants/access-level';
+import { addTimeToDate } from 'src/_utility/formatter.util';
 import { Repository, EntityRepository, DeleteResult, ILike, getRepository } from 'typeorm';
 import { CreatePollVoteDto } from '../dto/create-poll-vote.dto';
-import { PollUserEntity } from '../entities/poll-user.entity';
 import { PollVoteEntity } from '../entities/poll-vote.entity';
 import { PollEntity } from '../entities/poll.entity';
-import { PollUserRepository } from './poll-user.repository';
-import { PollRepository } from './poll.repository';
 
 
 @EntityRepository(PollVoteEntity)
 export class PollVoteRepository extends Repository<PollVoteEntity> {
   constructor(
-    private readonly pollResitory: PollRepository,
-    private readonly pollUserRepository: PollUserRepository,
     private readonly groupRepository: GroupRepository,
     private readonly accountRepository: AccountRepository
   ) {
@@ -56,9 +51,9 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
     }
 
 
-    if (existingPoll.endDate < (new Date())) {
+    if (addTimeToDate(existingPoll.endDate, existingPoll.endTime) < (new Date())) {
       throw new HttpException(
-        `Sorry, poll is no longer open for participation.`,
+        `Sorry, poll has expired and no longer open for participation.`,
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -75,7 +70,7 @@ export class PollVoteRepository extends Repository<PollVoteEntity> {
 
     if (existingPoll.accessLevel === accessLevels.PROFESSIONAL) {
       //check if the user is a professional
-      // system genersaed device specific ids start with _
+      // system generated device specific ids start with _ (stored as cookie on the client side)
       if (dto.accountId.startsWith('_')) {
         throw new HttpException(
           `This ${existingPoll.type.toLowerCase()} is available to professionals only.`,
