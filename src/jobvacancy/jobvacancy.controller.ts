@@ -54,7 +54,7 @@ export class JobVacancyController {
   //   return await this.jobvacancyService.findAll(page);
   // }
 
-  @Get()
+  @Get('publicjobs')
     @ApiOperation({ summary: 'Get all JobVacancy' })
     @ApiResponse({ status: 201, description: 'Success.' })
     @ApiResponse({ status: 404, description: 'Not Found.' })

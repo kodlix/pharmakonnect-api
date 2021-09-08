@@ -79,7 +79,7 @@ export class EventController {
   @Get(':id')
   @ApiOperation({ summary: 'Get event' })
   @ApiResponse({ status: 200, description: 'Return event' })
-  @UseGuards(AuthGuard())
+  // @UseGuards(AuthGuard())
   async findOne(@Param('id') id: string): Promise<EventRO> {
     return await this.eventService.findOne(id);
   }
