@@ -22,6 +22,9 @@ export interface UserDataRO {
     address: string;
     yearOfGraduation: string;
     school: string;
+    stateName?: string;
+    countryName?: string;
+    lgaName?: string;
 }
 export interface JwtPayload {
     email: string;

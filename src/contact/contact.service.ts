@@ -3,7 +3,10 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
 import { AccountEntity } from 'src/account/entities/account.entity';
+import { CountryService } from 'src/country/country.service';
 import { GroupService } from 'src/group/group.service';
+import { LgaService } from 'src/lga/lga.service';
+import { StateService } from 'src/state/state.service';
 import { ContactAdvanceFilter } from 'src/_common/filter.dto';
 import { getRepository, Repository, Brackets, ILike } from 'typeorm';
 import { CreateContactDto } from './dto/create-contact.dto';
@@ -16,7 +19,11 @@ export class ContactService {
     @InjectRepository(ContactEntity)
     private readonly repository: Repository<ContactEntity>,
     @Inject(forwardRef(() => GroupService)) private readonly groupSvc: GroupService,
-    @Inject(forwardRef(() => AccountService))private acctSvc: AccountService
+    @Inject(forwardRef(() => AccountService))private acctSvc: AccountService,
+    @Inject(forwardRef(() => StateService))private stateSvc: StateService,
+    @Inject(forwardRef(() => CountryService))private countrySvc: CountryService,
+    @Inject(forwardRef(() => LgaService))private lgaSvc: LgaService
+
   ) { }
 
   async createContact(dto: CreateContactDto[], user: any): Promise<any[]> {
@@ -116,8 +123,21 @@ export class ContactService {
           if (shapedData.length > 0) {
             result.push(...shapedData);
           }
+
+          for (const s of result) {
+            s.stateName = s.state ? await (await this.stateSvc.findOne(parseInt(s.state))).name : "";
+            s.lgaName = s.lga ? await (await this.lgaSvc.findOne(s.lga)).name : "";
+            s.countryName = s.country ? await (await this.countrySvc.findOne(s.country)).name : "";
+          }
+
           return result;
         }
+      }
+
+      for (const s of result) {
+        s.stateName = s.state ? await (await this.stateSvc.findOne(parseInt(s.state))).name : "";
+        s.lgaName = s.lga ? await (await this.lgaSvc.findOne(s.lga)).name : "";
+        s.countryName = s.country ? await (await this.countrySvc.findOne(s.country)).name : "";
       }
 
       return result;

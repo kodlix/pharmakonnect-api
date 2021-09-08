@@ -9,6 +9,9 @@ import { AccountRepository } from './account.repository';
 import { default as config } from './config';
 import { MailerModule } from 'src/mailer/mailer.module';
 import { GroupModule } from 'src/group/group.module';
+import { StateModule } from 'src/state/state.module';
+import { CountryModule } from 'src/country/country.module';
+import { LgaModule } from 'src/lga/lga.module';
 
 @Module({
   imports: [
@@ -21,7 +24,10 @@ import { GroupModule } from 'src/group/group.module';
       },
     }),
     TypeOrmModule.forFeature([AccountRepository]),
-    forwardRef(() => GroupModule)
+    forwardRef(() => GroupModule),
+    forwardRef(() => StateModule),
+    forwardRef(() => CountryModule),
+    forwardRef(() => LgaModule)
   ],
   controllers: [AccountController],
   providers: [AccountService, JwtStrategy],

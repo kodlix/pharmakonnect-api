@@ -18,7 +18,8 @@ export abstract class BaseAccountDTO {
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    readonly state: string;
+    state: string;
+    stateName: string;
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
@@ -45,16 +46,7 @@ export abstract class BaseAccountDTO {
     isRegComplete: boolean;    
     @ApiProperty()
     readonly typesOfPractice: string;
-    // @IsString()
-    // @IsNotEmpty()
-    // @ApiProperty()
-    // readonly countryName: string;
-    // @IsString()
-    // @IsNotEmpty()
-    // @ApiProperty()
-    // readonly stateName: string;
-    // @IsString()
-    // @IsNotEmpty()
-    // @ApiProperty()
-    // readonly lgaName: string;
+    
+    countryName: string;
+    lgaName: string;
 }

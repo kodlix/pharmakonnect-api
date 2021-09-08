@@ -13,6 +13,9 @@ import { accountTypes } from './account.constant';
 import { ContactEntity } from 'src/contact/entities/contact.entity';
 import { NodeMailerService } from 'src/mailer/node-mailer.service';
 import { GroupService } from 'src/group/group.service';
+import { StateService } from 'src/state/state.service';
+import { LgaService } from 'src/lga/lga.service';
+import { CountryService } from 'src/country/country.service';
 
 
 @Injectable()
@@ -24,6 +27,12 @@ export class AccountService {
     @Inject(forwardRef(() => GroupService))
     private groupService: GroupService,
     private readonly mailService: NodeMailerService,
+    @Inject(forwardRef(() => StateService))
+    private stateSvc: StateService,
+    @Inject(forwardRef(() => LgaService))
+    private lgaSvc: LgaService,
+    @Inject(forwardRef(() => CountryService))
+    private countrySvc: CountryService
   ) { }
 
   public async login(loginDto: LoginDTO): Promise<UserRO> {
@@ -113,7 +122,15 @@ export class AccountService {
         .orderBy('account.createdAt', 'DESC')
         .getMany();
 
-      return this.accountRepository.buildUserArrRO(accts);
+      const r = this.accountRepository.buildUserArrRO(accts);
+      for (const s of r) {
+        s.stateName = s.state ? await (await this.stateSvc.findOne(parseInt(s.state))).name : "";
+        s.lgaName = s.lga ? await (await this.lgaSvc.findOne(s.lga)).name : "";
+        s.countryName = s.country ? await (await this.countrySvc.findOne(s.country)).name : "";
+      }
+
+      return r;
+      
     }
 
 
@@ -204,7 +221,14 @@ export class AccountService {
   }
 
   public async findByEmail(email: string): Promise<UserDataRO> {
-    return await this.accountRepository.findByEmail(email);
+    
+    const r =  await this.accountRepository.findByEmail(email);
+  
+    r.stateName = r.state ? await (await this.stateSvc.findOne(parseInt(r.state))).name : "";
+    r.lgaName = r.lga ? await (await this.lgaSvc.findOne(r.lga)).name : "";
+    r.countryName = r.country ? await (await this.countrySvc.findOne(r.country)).name : "";
+
+    return r;
   }
 
   public async updateIndividual(email: string, toUpdate: IndividualDTO): Promise<IndividualRO> {
