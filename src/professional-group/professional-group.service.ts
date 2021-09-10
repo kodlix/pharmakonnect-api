@@ -98,4 +98,10 @@ export class ProfessionalGroupService {
         throw new HttpException(`The professional group cannot be found`, HttpStatus.NOT_FOUND);
     }
 
+    getOneProfessionalGroup(id: string): Promise<ProfessionalGroupEntity> {
+        return this.zoneRepository.findOneOrFail(id, {
+          relations: ['users'],
+        });
+    }
+
 }

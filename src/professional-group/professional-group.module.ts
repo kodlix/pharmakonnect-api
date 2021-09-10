@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ProfessionalGroupService } from './professional-group.service';
 import { ProfessionalGroupController } from './professional-group.controller';
 import { AccountModule } from 'src/account/account.module';
@@ -8,9 +8,11 @@ import { ProfessionalGroupEntity } from './entities/professional-group.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ProfessionalGroupEntity]), 
-     AccountModule
+     forwardRef(() => AccountModule)
   ],
   controllers: [ProfessionalGroupController],
-  providers: [ProfessionalGroupService]
+  providers: [ProfessionalGroupService],
+  exports: [ProfessionalGroupService]
+
 })
 export class ProfessionalGroupModule {}

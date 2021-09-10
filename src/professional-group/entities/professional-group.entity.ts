@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
+import { AccountEntity } from "src/account/entities/account.entity";
 import { AbstractBaseEntity } from "src/_common/base.entity";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, ManyToMany, ManyToOne } from "typeorm";
 
 @Entity('ProfessionalGroup')
 export class ProfessionalGroupEntity extends AbstractBaseEntity{
@@ -10,5 +11,8 @@ export class ProfessionalGroupEntity extends AbstractBaseEntity{
 
     @Column()
     description: string;
+
+    @ManyToMany(type => AccountEntity, ac => ac.professionalGroup)
+    users?: AccountEntity[];
 
 }
