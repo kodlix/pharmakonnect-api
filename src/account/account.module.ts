@@ -12,6 +12,7 @@ import { GroupModule } from 'src/group/group.module';
 import { StateModule } from 'src/state/state.module';
 import { CountryModule } from 'src/country/country.module';
 import { LgaModule } from 'src/lga/lga.module';
+import { ProfessionalGroupModule } from 'src/professional-group/professional-group.module';
 
 @Module({
   imports: [
@@ -27,7 +28,9 @@ import { LgaModule } from 'src/lga/lga.module';
     forwardRef(() => GroupModule),
     forwardRef(() => StateModule),
     forwardRef(() => CountryModule),
-    forwardRef(() => LgaModule)
+    forwardRef(() => LgaModule),
+    forwardRef(() => ProfessionalGroupModule)
+
   ],
   controllers: [AccountController],
   providers: [AccountService, JwtStrategy],

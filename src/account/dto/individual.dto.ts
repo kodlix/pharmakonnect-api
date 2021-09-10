@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsNotEmpty, IsString } from "class-validator"
+import { IsDate, IsDefined, IsNotEmpty, IsString } from "class-validator"
 import { BaseAccountDTO } from "./base-account.dto"
 
 export class IndividualDTO extends BaseAccountDTO {
@@ -31,8 +31,8 @@ export class IndividualDTO extends BaseAccountDTO {
     readonly organizationId: string;
     @ApiProperty()
     readonly profession: string;
-    @ApiProperty()
-    readonly professionalGroup: string;
+    // @ApiProperty()
+    // readonly professionalGroup: string;
     // @IsString()
     // @IsNotEmpty()
     @ApiProperty()
@@ -43,4 +43,7 @@ export class IndividualDTO extends BaseAccountDTO {
     readonly school: string;
     @ApiProperty()
     schoolOtherValue: string;
+
+    @IsDefined() @ApiProperty()
+    professionalGroupIds: any;
 }

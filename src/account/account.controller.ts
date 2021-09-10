@@ -88,6 +88,8 @@ export class AccountController {
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 201, description: 'The record has been successfully updated' })
   async individual(@Param('email') email: string, @Body() toUpdate: IndividualDTO): Promise<IndividualRO> {
+      const profGroupIds = toUpdate.professionalGroupIds.split(',');
+      toUpdate.professionalGroupIds = profGroupIds;
     return this.accountService.updateIndividual(email, toUpdate);
   }
 

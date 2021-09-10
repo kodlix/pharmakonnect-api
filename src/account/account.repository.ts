@@ -8,6 +8,8 @@ import { OrganizationRO, UserDataRO } from './interfaces/user.interface';
 import { accountTypes, staffStatus } from './account.constant';
 import { OutletEntity } from 'src/outlet/entity/outlet.entity';
 import { FilterDto } from 'src/_common/filter.dto';
+import { IndividualDTO } from './dto/individual.dto';
+import { ProfessionalGroupEntity } from 'src/professional-group/entities/professional-group.entity';
 
 @EntityRepository(AccountEntity)
 export class AccountRepository extends Repository<AccountEntity> {
@@ -108,7 +110,7 @@ export class AccountRepository extends Repository<AccountEntity> {
   }
 
   public async getById(id: string): Promise<UserDataRO> {
-    const result = await this.findOne(id);
+    const result = await this.findOne(id, {relations: ['professionalGroups']});
     if (!result) {
       throw new HttpException(
         {
@@ -122,7 +124,7 @@ export class AccountRepository extends Repository<AccountEntity> {
   }
 
   public async findByEmail(email: string): Promise<UserDataRO | undefined> {
-    const result = await this.findOne({ where: { email: email } });
+    const result = await this.findOne({ where: { email: email }, relations: ['professionalGroups'] });
     if (!result) {
       throw new HttpException(
         {
@@ -261,21 +263,15 @@ export class AccountRepository extends Repository<AccountEntity> {
   public async updateUser<T>(
     email: string,
     toUpdate: T,
+    user: AccountEntity
   ): Promise<UserDataRO | undefined> {
-    const user = await this.findOne({ where: { email: email } });
-    if (!user) {
-      throw new HttpException(
-        {
-          error: `User with email: ${email} does not exists`,
-          status: HttpStatus.NOT_FOUND,
-        },
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    const result = await this.merge(user, toUpdate);
+    
+    const result = await this.merge(user, toUpdate);        
     await this.save(user);
     return this.buildUserRO(result);
   }
+
+ 
 
   public async lockAndUnlockUser({
     email,
@@ -390,6 +386,7 @@ export class AccountRepository extends Repository<AccountEntity> {
       companyRegistrationNumber: user.companyRegistrationNumber,
       yearofEstablishment: user.yearofEstablishment,
       numberofEmployees: user.numberofEmployees,
+      professionalGroups: user.professionalGroups
     };
     return userRO;
   }

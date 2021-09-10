@@ -16,6 +16,8 @@ import { GroupService } from 'src/group/group.service';
 import { StateService } from 'src/state/state.service';
 import { LgaService } from 'src/lga/lga.service';
 import { CountryService } from 'src/country/country.service';
+import { ProfessionalGroupEntity } from 'src/professional-group/entities/professional-group.entity';
+import { ProfessionalGroupService } from 'src/professional-group/professional-group.service';
 
 
 @Injectable()
@@ -32,7 +34,10 @@ export class AccountService {
     @Inject(forwardRef(() => LgaService))
     private lgaSvc: LgaService,
     @Inject(forwardRef(() => CountryService))
-    private countrySvc: CountryService
+    private countrySvc: CountryService,
+    @Inject(forwardRef(() => ProfessionalGroupService))
+    private readonly profGroupSvc: ProfessionalGroupService,
+
   ) { }
 
   public async login(loginDto: LoginDTO): Promise<UserRO> {
@@ -233,7 +238,21 @@ export class AccountService {
 
   public async updateIndividual(email: string, toUpdate: IndividualDTO): Promise<IndividualRO> {
     toUpdate.isRegComplete = true;
-    return await this.accountRepository.updateUser(email, toUpdate);
+    const user = await this.accountRepository.findOne({ where: { email: email } });
+
+    if (!user) {
+      throw new HttpException(
+        {
+          error: `User with email: ${email} does not exists`,
+          status: HttpStatus.NOT_FOUND,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    
+    user.professionalGroups = await this.professsionalGroupIdsToEntities(toUpdate.professionalGroupIds);
+    
+    return await this.accountRepository.updateUser(email, toUpdate, user);
   }
 
   public async findUnverifedStaff(id: string, dto: FilterDto) {
@@ -266,7 +285,28 @@ export class AccountService {
         error: `${orgName} already exists`, status: HttpStatus.NOT_FOUND
       }, HttpStatus.NOT_FOUND);
     }
-    return await this.accountRepository.updateUser(email, toUpdate);
+
+    const user = await this.accountRepository.findOne({ where: { email: email } });
+
+    if (!user) {
+      throw new HttpException(
+        {
+          error: `User with email: ${email} does not exists`,
+          status: HttpStatus.NOT_FOUND,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return await this.accountRepository.updateUser(email, toUpdate, user);
+  }
+
+  public async professsionalGroupIdsToEntities(profGroupIds: string[]): Promise<ProfessionalGroupEntity[]> {
+    const entities: ProfessionalGroupEntity[] = [];
+    for (const profGroupId of profGroupIds) {
+      const entity = await this.profGroupSvc.getOneProfessionalGroup(profGroupId);
+      entities.push(entity);
+    }
+    return entities;
   }
 
   public async lockAndUnlockUser(lockUserDto: LockUserDTO): Promise<UserDataRO> {

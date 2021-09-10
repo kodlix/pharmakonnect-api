@@ -1,6 +1,6 @@
 import { IsEmail, IsFQDN, Length } from 'class-validator';
 import { AbstractBaseEntity } from 'src/_common/base.entity';
-import { BeforeInsert, ManyToOne } from 'typeorm';
+import { BeforeInsert, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { Column, Entity, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JobVacancyEntity } from "src/jobvacancy/entities/jobvacancy.entity";
@@ -15,6 +15,7 @@ import { StateEntity } from 'src/state/entities/state.entity';
 import { LgaEntity } from 'src/lga/entities/lga.entity';
 import { PackageEntity } from 'src/package/entities/package.entity';
 import { accountPackages, staffStatus } from '../account.constant';
+import { ProfessionalGroupEntity } from 'src/professional-group/entities/professional-group.entity';
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
@@ -96,6 +97,11 @@ export class AccountEntity extends AbstractBaseEntity {
   @Length(50)
   @Column({ nullable: true, length: 50 })
   public professionalGroup: string;
+
+  
+  @ManyToMany(() => ProfessionalGroupEntity, pg => pg.users)
+  @JoinTable({ name: 'user_professional_group'})
+  professionalGroups?: ProfessionalGroupEntity[];
 
   @Length(128)
   @Column({ nullable: true, length: 128 })
