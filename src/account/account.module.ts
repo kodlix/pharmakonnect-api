@@ -13,6 +13,7 @@ import { StateModule } from 'src/state/state.module';
 import { CountryModule } from 'src/country/country.module';
 import { LgaModule } from 'src/lga/lga.module';
 import { ProfessionalGroupModule } from 'src/professional-group/professional-group.module';
+import { MembershipInterestGroupModule } from 'src/membership-interest-group/membership-interest-group.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { ProfessionalGroupModule } from 'src/professional-group/professional-gro
     forwardRef(() => StateModule),
     forwardRef(() => CountryModule),
     forwardRef(() => LgaModule),
-    forwardRef(() => ProfessionalGroupModule)
+    forwardRef(() => ProfessionalGroupModule),
+    forwardRef(() => MembershipInterestGroupModule)
 
   ],
   controllers: [AccountController],

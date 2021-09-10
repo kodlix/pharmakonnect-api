@@ -39,7 +39,7 @@ export class AccountService {
     private countrySvc: CountryService,
     @Inject(forwardRef(() => ProfessionalGroupService))
     private readonly profGroupSvc: ProfessionalGroupService,
-    @Inject(forwardRef(() => ProfessionalGroupService))
+    @Inject(forwardRef(() => MembershipInterestGroupService))
     private readonly memInterestGroupSvc: MembershipInterestGroupService,
 
   ) { }
