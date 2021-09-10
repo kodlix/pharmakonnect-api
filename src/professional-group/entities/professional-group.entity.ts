@@ -12,7 +12,7 @@ export class ProfessionalGroupEntity extends AbstractBaseEntity{
     @Column()
     description: string;
 
-    @ManyToMany(type => AccountEntity, ac => ac.professionalGroup)
+    @ManyToMany(type => AccountEntity, ac => ac.professionalGroups)
     users?: AccountEntity[];
 
 }

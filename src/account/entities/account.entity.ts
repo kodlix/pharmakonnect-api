@@ -16,6 +16,7 @@ import { LgaEntity } from 'src/lga/entities/lga.entity';
 import { PackageEntity } from 'src/package/entities/package.entity';
 import { accountPackages, staffStatus } from '../account.constant';
 import { ProfessionalGroupEntity } from 'src/professional-group/entities/professional-group.entity';
+import { MembershipInterestGroupEntity } from 'src/membership-interest-group/entities/membership-interest-group.entity';
 
 @Entity('Account')
 export class AccountEntity extends AbstractBaseEntity {
@@ -102,6 +103,10 @@ export class AccountEntity extends AbstractBaseEntity {
   @ManyToMany(() => ProfessionalGroupEntity, pg => pg.users)
   @JoinTable({ name: 'user_professional_group'})
   professionalGroups?: ProfessionalGroupEntity[];
+
+  @ManyToMany(() => MembershipInterestGroupEntity, pg => pg.users)
+  @JoinTable({ name: 'user_membership_interest_group'})
+  membershipInterestGroups?: MembershipInterestGroupEntity[];
 
   @Length(128)
   @Column({ nullable: true, length: 128 })

@@ -18,6 +18,8 @@ import { LgaService } from 'src/lga/lga.service';
 import { CountryService } from 'src/country/country.service';
 import { ProfessionalGroupEntity } from 'src/professional-group/entities/professional-group.entity';
 import { ProfessionalGroupService } from 'src/professional-group/professional-group.service';
+import { MembershipInterestGroupService } from 'src/membership-interest-group/membership-interest-group.service';
+import { MembershipInterestGroupEntity } from 'src/membership-interest-group/entities/membership-interest-group.entity';
 
 
 @Injectable()
@@ -37,6 +39,8 @@ export class AccountService {
     private countrySvc: CountryService,
     @Inject(forwardRef(() => ProfessionalGroupService))
     private readonly profGroupSvc: ProfessionalGroupService,
+    @Inject(forwardRef(() => ProfessionalGroupService))
+    private readonly memInterestGroupSvc: MembershipInterestGroupService,
 
   ) { }
 
@@ -251,6 +255,7 @@ export class AccountService {
     }
     
     user.professionalGroups = await this.professsionalGroupIdsToEntities(toUpdate.professionalGroupIds);
+    user.membershipInterestGroups = await this.membershipInterestGroupIdsToEntities(toUpdate.membershipInterestGroupIds);
     
     return await this.accountRepository.updateUser(email, toUpdate, user);
   }
@@ -304,6 +309,15 @@ export class AccountService {
     const entities: ProfessionalGroupEntity[] = [];
     for (const profGroupId of profGroupIds) {
       const entity = await this.profGroupSvc.getOneProfessionalGroup(profGroupId);
+      entities.push(entity);
+    }
+    return entities;
+  }
+
+  public async membershipInterestGroupIdsToEntities(memIntGroupIds: string[]): Promise<MembershipInterestGroupEntity[]> {
+    const entities: MembershipInterestGroupEntity[] = [];
+    for (const gid of memIntGroupIds) {
+      const entity = await this.memInterestGroupSvc.getOneMembershipInterestGroup(gid);
       entities.push(entity);
     }
     return entities;

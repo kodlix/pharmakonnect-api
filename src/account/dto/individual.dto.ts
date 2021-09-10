@@ -46,4 +46,7 @@ export class IndividualDTO extends BaseAccountDTO {
 
     @IsDefined() @ApiProperty()
     professionalGroupIds: any;
+
+    @IsDefined() @ApiProperty()
+    membershipInterestGroupIds: any;
 }

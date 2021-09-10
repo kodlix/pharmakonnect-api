@@ -43,15 +43,18 @@ export class CommentService {
     comment.message = commentDto.message;
     comment.createdBy = commentDto.createdBy;
     comment.authorImage = image;
-    comment.author = author?.firstName + ' ' + author?.lastName;
-    const user = await this.accountService.getOneUserByEmail(userEmail)
-    if (user.accountType = "corporate"){
-      await this.articleService.findOne(articleId);
-      comment.author = (await (await this.accountService.getOneUserByEmail(userEmail)).organizationName)
-    }
-    else{
-      comment.author = `${(await this.accountService.getOneUserByEmail(userEmail)).firstName} ${(await this.accountService.getOneUserByEmail(userEmail)).lastName}`;
-    }
+    comment.author = author.accountType === 'corporate' ? author.organizationName : `${author?.firstName} ${author?.lastName}`;
+    comment.authorId = author.id;
+
+   //John this is a disaster of a code
+    // const user = await this.accountService.getOneUserByEmail(userEmail)
+    // if (user.accountType = "corporate"){
+    //   await this.articleService.findOne(articleId);
+    //   comment.author = (await (await this.accountService.getOneUserByEmail(userEmail)).organizationName)
+    // }
+    // else{
+    //   comment.author = `${(await this.accountService.getOneUserByEmail(userEmail)).firstName} ${(await this.accountService.getOneUserByEmail(userEmail)).lastName}`;
+    // }
     
     const createdComment = await this.commentRepo.save(comment);
     return this.findOne(createdComment.id);

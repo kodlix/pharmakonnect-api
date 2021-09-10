@@ -98,4 +98,10 @@ export class MembershipInterestGroupService {
         throw new HttpException(`The membership of interest group cannot be found`, HttpStatus.NOT_FOUND);
     }
 
+    getOneMembershipInterestGroup(id: string): Promise<MembershipInterestGroupEntity> {
+        return this.zoneRepository.findOneOrFail(id, {
+          relations: ['users'],
+        });
+    }
+
 }

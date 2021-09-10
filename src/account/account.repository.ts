@@ -124,7 +124,7 @@ export class AccountRepository extends Repository<AccountEntity> {
   }
 
   public async findByEmail(email: string): Promise<UserDataRO | undefined> {
-    const result = await this.findOne({ where: { email: email }, relations: ['professionalGroups'] });
+    const result = await this.findOne({ where: { email: email }, relations: ['professionalGroups', 'membershipInterestGroups'] });
     if (!result) {
       throw new HttpException(
         {
@@ -386,7 +386,9 @@ export class AccountRepository extends Repository<AccountEntity> {
       companyRegistrationNumber: user.companyRegistrationNumber,
       yearofEstablishment: user.yearofEstablishment,
       numberofEmployees: user.numberofEmployees,
-      professionalGroups: user.professionalGroups
+      professionalGroups: user.professionalGroups,
+      membershipInterestGroups: user.membershipInterestGroups
+
     };
     return userRO;
   }

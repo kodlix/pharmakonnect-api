@@ -29,6 +29,9 @@ export class CommentEntity {
 
   @Column({ default: 'n/a' })
   author?: string;
+
+  @Column({ default: 'n/a' })
+  authorId?: string;
   
   @Column({ default: 0 })
   likes?: number;

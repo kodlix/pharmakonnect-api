@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MembershipInterestGroupService } from './membership-interest-group.service';
 import { MembershipInterestGroupController } from './membership-interest-group.controller';
 import { AccountModule } from 'src/account/account.module';
@@ -8,9 +8,10 @@ import { MembershipInterestGroupEntity } from './entities/membership-interest-gr
 
 @Module({
   imports: [TypeOrmModule.forFeature([MembershipInterestGroupEntity]), 
-     AccountModule
+  forwardRef(() => AccountModule)
   ],
   controllers: [MembershipInterestGroupController],
-  providers: [MembershipInterestGroupService]
+  providers: [MembershipInterestGroupService],
+  exports: [MembershipInterestGroupService]
 })
 export class MembershipInterestGroupModule {}
