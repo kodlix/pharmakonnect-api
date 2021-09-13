@@ -244,14 +244,14 @@ export class ArticleController {
     }
   }
 
-  @Get('/view/:articleId')
+  @Put('/view/:articleId')
   @ApiResponse({ status: 201, description: 'article  viewd successfully.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'View Article' })
   @UseGuards(AuthGuard())
-  viewArticle(@Param('articleId') articleId: string ) {
+  viewArticle(@Param('articleId') articleId: string, @Req() req: any ) {
     try {
-      return this.articleService.viewArticle(articleId);
+      return this.articleService.viewArticle(articleId, req.user);
     } catch (err) {
       throw new HttpException(err, HttpStatus.NOT_FOUND);
     }

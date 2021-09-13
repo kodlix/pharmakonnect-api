@@ -63,6 +63,10 @@ import {
     @Column({ default: 0 })
     views?: number;
 
+
+    @Column("simple-array", {nullable: true})
+    viewers?: string[];
+
     @Column({ default: 0 })
     likes?: number;
 

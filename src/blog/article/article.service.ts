@@ -313,14 +313,30 @@ export class ArticleService {
     return result;  
   }
 
-  public async viewArticle(articleId): Promise<ArticleEntity> {
-    const article = await this.articleRepo.findOne(articleId);
+  public async viewArticle(articleId, user: AccountEntity): Promise<ArticleEntity> {
+    
+    let viewersId = [];
+    const article = await this.articleRepo.findOne(articleId, {relations: ['comments', 'categories', 'author']});
     if (!article) {
       return;
     }
+
+    if(article.viewers && article.viewers.length > 0) {
+        if(article.viewers.includes(user.id)) {
+          return article;
+        } else {
+          viewersId = [...article.viewers, user.id];
+          article.viewers = viewersId;
+        }
+    } else {
+      viewersId.push(user.id);
+      article.viewers = viewersId;
+    }
     
     article.views += 1;
-    const result = await this.articleRepo.save(article);    
+    const saved = await this.articleRepo.save(article);  
+    const result = await this.articleRepo.findOne(saved.id, {relations: ['comments', 'categories', 'author']});
+
     return result;  
   }
 
