@@ -31,6 +31,10 @@ export class ContactAdvanceFilter {
 
     @ApiProperty()
     @ApiPropertyOptional()
+    groupId: string
+
+    @ApiProperty()
+    @ApiPropertyOptional()
     ownerId: string
 
     @ApiProperty()

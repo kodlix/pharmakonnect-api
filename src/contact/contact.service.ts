@@ -11,6 +11,8 @@ import { ContactAdvanceFilter } from 'src/_common/filter.dto';
 import { getRepository, Repository, Brackets, ILike } from 'typeorm';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { ContactEntity } from './entities/contact.entity';
+import { GroupMemberEntity } from './../group/entities/group-member.entity';
+import { group } from 'console';
 
 @Injectable()
 export class ContactService {
@@ -302,7 +304,7 @@ export class ContactService {
 
     if (Object.entries(condition).length !== 0) {
       condition['isRegComplete'] = true;
-      condition['accountType'] =  'professional';
+      //condition['accountType'] =  'professional';
       const conditions = {...condition};
       let users = await getRepository(AccountEntity).find({
         where: conditions,
@@ -310,6 +312,15 @@ export class ContactService {
       });
 
       users = this.removeDuplicates(users, "email");
+      //pick all members based on the group id
+      //filter users where
+      // const gId 
+      const groupMembers = await getRepository(GroupMemberEntity).find({where: {groupId: dto.groupId}});
+      // user = this.removeDuplicates(groupMembers)
+      users = [].concat(
+        users.filter(obj1 => groupMembers.every(obj2 => obj1.id !== obj2.contactId)),
+        groupMembers.filter(obj2 => users.every(obj1 => obj2.contactId !== obj1.id))
+      );
       return users;
     }
 
