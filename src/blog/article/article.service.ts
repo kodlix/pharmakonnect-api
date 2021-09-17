@@ -350,7 +350,7 @@ export class ArticleService {
           .where(new Brackets(qb => {
                 qb.where("article.title ILike :title", { title: `%${search}%` })
                 .orWhere("article.body ILike :body", { body: `%${search}%` })
-                .orWhere("article.author ILike :body", { body: `%${search}%` })
+                //.orWhere("article.author ILike :body", { body: `%${search}%` })
                 .orWhere("article.rejectMessage ILike :rejectMessage", { rejectMessage: `%${search}%` })
                }))
             .orderBy("article.editedAt", "DESC")
