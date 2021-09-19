@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsDate, IsDefined, IsNotEmpty, IsString } from "class-validator"
 import { BaseAccountDTO } from "./base-account.dto"
 
@@ -44,9 +44,11 @@ export class IndividualDTO extends BaseAccountDTO {
     @ApiProperty()
     schoolOtherValue: string;
 
-    @IsDefined() @ApiProperty()
+    @ApiProperty()
+    @ApiPropertyOptional()
     professionalGroupIds: any;
-
-    @IsDefined() @ApiProperty()
+ 
+    @ApiProperty()
+    @ApiPropertyOptional()
     membershipInterestGroupIds: any;
 }

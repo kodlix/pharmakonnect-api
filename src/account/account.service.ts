@@ -254,8 +254,10 @@ export class AccountService {
       );
     }
     
-    user.professionalGroups = await this.professsionalGroupIdsToEntities(toUpdate.professionalGroupIds);
-    user.membershipInterestGroups = await this.membershipInterestGroupIdsToEntities(toUpdate.membershipInterestGroupIds);
+    if(user.accountType !== 'guest') {
+      user.professionalGroups = await this.professsionalGroupIdsToEntities(toUpdate.professionalGroupIds);
+      user.membershipInterestGroups = await this.membershipInterestGroupIdsToEntities(toUpdate.membershipInterestGroupIds);
+    }
     
     return await this.accountRepository.updateUser(email, toUpdate, user);
   }

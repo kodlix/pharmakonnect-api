@@ -88,9 +88,10 @@ export class ContactService {
       .getMany();
 
     const userIds = conversations.map(x => x.accountId);
+    let result: AccountEntity[] = [];
 
     if (userIds.length > 0) {
-      const result = await getRepository(AccountEntity)
+       result = await getRepository(AccountEntity)
         .createQueryBuilder('a')
         .where('a.id IN (:...userIds)', { userIds })
         .orderBy('a.firstName', 'ASC')
@@ -144,6 +145,43 @@ export class ContactService {
 
       return result;
     }
+    if (from === 'chat') {
+      const myGroups = await this.groupSvc.getGroupByOwner(user);
+      const groupWithMembers = myGroups.filter(x => x.members.length > 0);
+      const shapedData = [];
+      if (groupWithMembers.length > 0) {
+
+        for (const g of groupWithMembers) {
+
+          let data = {
+            id: g.groupId,
+            profileImage: g.logo,
+            firstName: g.groupName,
+            isGroupChat: true,
+            groupDescription: g.groupDescription,
+            ownerId: g.ownerId,
+            ownerName: g.ownerName
+          }
+
+          shapedData.push(data);
+          data = {} as any;
+
+        }
+
+        if (shapedData.length > 0) {
+          result.push(...shapedData);
+        }
+
+        for (const s of result) {
+          s.stateName = s.state ? await (await this.stateSvc.findOne(parseInt(s.state))).name : "";
+          s.lgaName = s.lga ? await (await this.lgaSvc.findOne(s.lga)).name : "";
+          s.countryName = s.country ? await (await this.countrySvc.findOne(s.country)).name : "";
+        }
+
+        return result;
+      }
+    }
+
   }
 
   async getContactbyId(id: string) {
