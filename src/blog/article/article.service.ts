@@ -313,7 +313,7 @@ export class ArticleService {
     return result;  
   }
 
-  public async viewArticle(articleId, user: AccountEntity): Promise<ArticleEntity> {
+  public async viewArticle(articleId, userId: any): Promise<ArticleEntity> {
     
     let viewersId = [];
     const article = await this.articleRepo.findOne(articleId, {relations: ['comments', 'categories', 'author']});
@@ -321,22 +321,20 @@ export class ArticleService {
       return;
     }
 
-    if(!user) {
-      return article;
+    if(userId !== 'undefined') {
+      if(article.viewers && article.viewers.length > 0) {
+          if(article.viewers.includes(userId)) {
+            return article;
+          } else {
+            viewersId = [...article.viewers, userId];
+            article.viewers = viewersId;
+          }
+      } else {
+        viewersId.push(userId);
+        article.viewers = viewersId;
+      }
     }
-
-    if(article.viewers && article.viewers.length > 0) {
-        if(article.viewers.includes(user.id)) {
-          return article;
-        } else {
-          viewersId = [...article.viewers, user.id];
-          article.viewers = viewersId;
-        }
-    } else {
-      viewersId.push(user.id);
-      article.viewers = viewersId;
-    }
-    
+  
     article.views += 1;
     const saved = await this.articleRepo.save(article);  
     const result = await this.articleRepo.findOne(saved.id, {relations: ['comments', 'categories', 'author']});
