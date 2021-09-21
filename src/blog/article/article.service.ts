@@ -321,6 +321,10 @@ export class ArticleService {
       return;
     }
 
+    if(!user) {
+      return article;
+    }
+
     if(article.viewers && article.viewers.length > 0) {
         if(article.viewers.includes(user.id)) {
           return article;

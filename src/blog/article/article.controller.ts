@@ -248,7 +248,7 @@ export class ArticleController {
   @ApiResponse({ status: 201, description: 'article  viewd successfully.' })
   @ApiResponse({ status: 404, description: 'Not Found.' })
   @ApiOperation({ summary: 'View Article' })
-  @UseGuards(AuthGuard())
+  // @UseGuards(AuthGuard())
   viewArticle(@Param('articleId') articleId: string, @Req() req: any ) {
     try {
       return this.articleService.viewArticle(articleId, req.user);
