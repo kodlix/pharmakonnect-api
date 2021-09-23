@@ -262,6 +262,7 @@ export class EventService {
             await this.mailService.sendHtmlMailAsync(evUsers.email, subject, html);            
           } 
       }
+      await this.eventRepo.save(eventToCancel);
 
       return "Event cancelled successfully";
   
